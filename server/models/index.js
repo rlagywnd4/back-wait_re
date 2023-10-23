@@ -19,6 +19,56 @@ const Review = require('./Review')(sequelize, Sequelize);
 const ChatRoom = require('./ChatRoom')(sequelize, Sequelize);
 const LikeWait = require('./LikeWait')(sequelize, Sequelize);
 
+User.hasMany(WaitMate, {
+  foreignKey: 'id',
+  sourceKey: 'id',
+  onDelete: 'CASCADE',
+});
+WaitMate.belongsTo(User, { foreignKey: 'id', targetKey: 'id' });
+
+User.hasMany(Proxy, {
+  foreignKey: 'id',
+  sourceKey: 'id',
+  onDelete: 'CASCADE',
+});
+Proxy.belongsTo(User, { foreignKey: 'id', targetKey: 'id' });
+
+User.hasMany(Review, {
+  foreignKey: 'id',
+  sourceKey: 'id',
+  onDelete: 'CASCADE',
+});
+RequestList.belongsTo(User, { foreignKey: 'id', targetKey: 'id' });
+
+Proxy.hasOne(ChatRoom, {
+  foreignKey: 'proxyId',
+  sourceKey: 'proxyId',
+  onDelete: 'CASCADE',
+});
+ChatRoom.belongsTo(Proxy, { foreignKey: 'proxyId', targetKey: 'proxyId' });
+
+WaitMate.hasOne(ChatRoom, {
+  foreignKey: 'wmId',
+  sourceKey: 'wmId',
+  onDelete: 'CASCADE',
+});
+ChatRoom.belongsTo(WaitMate, { foreignKey: 'wmId', targetKey: 'wmId' });
+
+Proxy.hasMany(LikeWait, {
+  foreignKey: 'proxyId',
+  sourceKey: 'proxyId',
+  onDelete: 'CASCADE',
+});
+LikeWait.belongsTo(Proxy, { foreignKey: 'proxyId', targetKey: 'proxyId' });
+
+WaitMate.hasMany(LikeWait, {
+  foreignKey: 'wmId',
+  sourceKey: 'wmId',
+  onDelete: 'CASCADE',
+});
+LikeWait.belongsTo(WaitMate, { foreignKey: 'wmId', targetKey: 'wmId' });
+
+
 db.User = User;
 db.Proxy = Proxy;
 db.WaitMate = WaitMate;
