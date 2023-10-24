@@ -4,12 +4,13 @@ const session = require('express-session');
 const dotenv = require('dotenv');
 dotenv.config();
 const app = express();
-const PORT = 8000;
+const Router = require('./routes');
+const PORT = 8080;
 const cors = require('cors');
 require('dotenv').config();
 
 // 익스프레스에서 json 사용하도록 해줌
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cors());
 app.use('/api', Router);
@@ -25,7 +26,7 @@ sequelize
   .sync({ force: false })
   .then(() => {
     app.listen(PORT, () => {
-      console.log('8000 port is running');
+      console.log('8080 port is running');
     });
   })
   .catch(() => {
