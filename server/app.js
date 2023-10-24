@@ -9,7 +9,7 @@ const cors = require('cors');
 require('dotenv').config();
 
 // 익스프레스에서 json 사용하도록 해줌
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors());
 app.use('/api', Router);
@@ -31,6 +31,3 @@ sequelize
   .catch(() => {
     console.log('데이터 베이스 연결 실패');
   });
-
-
-
