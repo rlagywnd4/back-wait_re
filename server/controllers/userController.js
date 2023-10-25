@@ -1,5 +1,6 @@
 const { User, Review, Proxy, WaitMate }  = require('../models');
 const bcryptjs = require('bcryptjs');
+const axios = require('axios');
 const jwt = require('jsonwebtoken');
 
 const inValidSignup = async (columnName, value) => {
@@ -15,7 +16,7 @@ const inValidSignup = async (columnName, value) => {
     where : condition
   });
   return response ? `${columnName}값이 이미 존재합니다.` : false
-}
+};
 const accessDecode = async (token) => {
   await jwt.verify(token, process.env.SECRET_KEY, async (err, decoded) => {
     const response = await User.findOne({
@@ -24,8 +25,7 @@ const accessDecode = async (token) => {
     })
     return response
   })
-}
-
+};
 exports.register = async (req, res) => {
   try {
     const { userId, password, nickname, email } = req.body;
@@ -55,8 +55,7 @@ exports.register = async (req, res) => {
     console.log(err);
     res.status(500).json({error :err.message});
   }
-}
-
+};
 exports.login = async (req, res) => {
   try {
     const {userId, password} = req.body
@@ -86,8 +85,7 @@ exports.login = async (req, res) => {
     console.log(err)
     res.status(500).json({ message: '알 수 없는 서버 에러 입니다.' })
   }
-}
-
+};
 exports.myInfo = async (req, res) => {
   try {
     const access = req.cookies?.access
@@ -115,8 +113,7 @@ exports.myInfo = async (req, res) => {
     console.log(err)
     res.status(500).json({ message: '알 수 없는 서버 에러 입니다.' })
   }
-}
-
+};
 exports.userInfo = async (req, res) => {
   try {
     const id = req.params?.userId
@@ -138,8 +135,7 @@ exports.userInfo = async (req, res) => {
     console.log(err)
     res.status(500).json({ message: '알 수 없는 서버 에러 입니다.' })
   }
-}
-
+};
 exports.updateUserInfo = async (req, res) => {
   try {
     const access = req.cookies?.access
@@ -182,8 +178,7 @@ exports.updateUserInfo = async (req, res) => {
     console.log(err)
     res.status(500).json({ message: '알 수 없는 서버 에러 입니다.' })
   }
-}
-
+};
 exports.deleteUser = async (req, res) => {
   try {
     const access = req.cookies?.access
@@ -204,4 +199,35 @@ exports.deleteUser = async (req, res) => {
     console.log(err)
     res.status(500).json({ message: '알 수 없는 서버 에러 입니다.' })
   }
-}
+};
+exports.kakaoUser = async (req, res) => {
+  // res.redirect('/user/kakaoResult')
+  // res.send('hello kakao')
+  res.send('')
+};
+
+exports.kakaoResult = async (req, res) => {
+  try {
+    const code = req.query?.code;
+    const response = await axios.post(
+      'https://kauth.kakao.com/oauth/token',
+      {
+        grant_type: 'authorization_code',
+        client_id: `${process.env.KAKAO_REST_API_KEY}`,
+        redirect_uri: 'http://localhost:8080/user/kakao/login',
+        code: `${code}`,
+      },
+      {
+        headers: {
+          'Content-type': 'application/x-www-form-urlencoded;charset=utf-8',
+        },
+      },
+    );
+    // res.send(response)
+    console.log(response)
+    res.redirect('http://localhost:3000/user/register') // 
+  } catch (err) {
+    console.log(err)
+  }
+};
+// window.location.href=`https://kauth.kakao.com/oauth/authorize?redirect_uri=http://localhost:8080/user/kakao/login&client_id=${process.env.REACT_APP_KAKAO_REST_API}&response_type=code`

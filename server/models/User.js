@@ -9,12 +9,12 @@ const User = (Sequelize, DataTypes) => {
         },
         userId: {
           type: DataTypes.STRING(150),
-          allowNull: false,
+          allowNull : true,
           comment: '유저 아이디',
         },
         password: {
           type: DataTypes.STRING(255),
-          allowNull: false,
+          allowNull : true,
           comment: '패스워드',
         },
         nickname: {
@@ -31,6 +31,12 @@ const User = (Sequelize, DataTypes) => {
            type: DataTypes.STRING(150),
            allowNull : true,
            comment : '사진'
+        },
+        social : {
+          type: DataTypes.STRING(150),
+          allowNull : false,
+          default : 'general',
+          comment : '소셜 로그인 구분을 위한 필드'
         }
       },
       {
