@@ -1,6 +1,9 @@
 const express = require('express');
+
 const session = require('express-session');
+
 const dotenv = require('dotenv');
+const cookieParser = require('cookie-parser');
 dotenv.config();
 const app = express();
 const Router = require('./routes');
@@ -9,10 +12,10 @@ const cors = require('cors');
 require('dotenv').config();
 
 // 익스프레스에서 json 사용하도록 해줌
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(cookieParser());
 app.use(cors());
-app.use('/api', Router);
 
 // router 설정
 const home = require('./routes/index');
