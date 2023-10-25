@@ -1,3 +1,4 @@
+const { TimeoutError } = require('sequelize');
 const { WaitMate } = require('../models');
 
 // waitMate 조회(waitMateDetail페이지에서 사용)
@@ -53,6 +54,33 @@ exports.deleteWaitMate = async (req, res) => {
         wmId: wmId,
       },
     });
+    res.send({ result: 'success' });
+  } catch (e) {
+    console.error('Error fetching WaitMate data:', e);
+    res.status(500).send('Internal Server Error');
+  }
+};
+
+// waitMate 수정
+exports.patchWaitMate = async (req, res) => {
+  try {
+    const { wmId, title, wmAddress, waitTime, description, pay, photo } =
+      req.body;
+    const patchWaitMate = await WaitMate.update(
+      {
+        title: title,
+        wmAddress: wmAddress,
+        waitTime: waitTime,
+        description: description,
+        pay: pay,
+        photo: photo,
+      },
+      {
+        where: {
+          wmId: wmId,
+        },
+      }
+    );
     res.send({ result: 'success' });
   } catch (e) {
     console.error('Error fetching WaitMate data:', e);

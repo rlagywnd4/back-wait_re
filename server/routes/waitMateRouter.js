@@ -8,6 +8,8 @@ waitMateRouter.get('/', waitMateController.getWaitMate);
 waitMateRouter.post('/', waitMateController.postWaitMate);
 // waitMate 삭제
 waitMateRouter.delete('/:wmId', waitMateController.deleteWaitMate);
+// waitMate 수정
+waitMateRouter.patch('/', waitMateController.patchWaitMate);
 
 // waitMate 목록 조회
 waitMateRouter.get('/list', waitMateController.getWaitMateList);

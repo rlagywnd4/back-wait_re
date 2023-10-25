@@ -60,25 +60,60 @@ paths:
       responses:
         '201':
           description: 웨이트메이트 등록 완료
-  ############################################################################################
-  delete:
-    summary: 웨이트메이트 삭제
-    tags:
-      - WaitMate
-    requestBody:
-      required: true
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              wmId:
-                type: integer
-            required:
-              - wmId
-    responses:
-      '201':
-        description: 웨이트메이트 삭제 성공
+    ############################################################################################
+    delete:
+      summary: 웨이트메이트 삭제
+      tags:
+        - WaitMate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                wmId:
+                  type: integer
+              required:
+                - wmId
+      responses:
+        '201':
+          description: 웨이트메이트 삭제 성공
+    ############################################################################################
+    patch:
+      summary: 웨이트메이트 수정
+      tags:
+        - WaitMate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                wmId:
+                  type: integer
+                title:
+                  type: string
+                wmAddress:
+                  type: string
+                waitTime:
+                  type: string
+                description:
+                  type: string
+                pay:
+                  type: integer
+                photo:
+                  type: string
+              required:
+                - wmId
+                - title
+                - wmAddress
+                - waitTime
+                - description
+      responses:
+        '201':
+          description: 웨이트메이트 수정 성공
   ############################################################################################
   /waitMate/list:
     get:
