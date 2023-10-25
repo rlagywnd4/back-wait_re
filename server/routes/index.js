@@ -3,7 +3,8 @@ const { swaggerUi, specs } = require('../swagger');
 const Router = express.Router();
 const userRouter = require('./userRouter');
 const waitMateRouter = require('./waitMateRouter');
-
+Router.get('/test', (req, res) => {
+  res.send("hello world")
 Router.get('', (req, res) => {
   res.send('hello world');
 });
