@@ -2,11 +2,11 @@ const express = require('express')
 const userRouter = express.Router()
 const userController = require('../controllers/userController')
 
-userRouter.get('', (req, res) => {
-  res.send("user router")
-})
+
 userRouter.post('/register', userController.register)
 userRouter.post('/login', userController.login)
+userRouter.get('/myinfo', userController.myInfo)
+userRouter.get('/:userId', userController.userInfo)
 userRouter.put('/:id', userController.put)
 
 

@@ -1,4 +1,4 @@
-const { User }  = require('../models');
+const { User, Review, Proxy, WaitMate }  = require('../models');
 const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -48,21 +48,86 @@ exports.register = async (req, res) => {
 }
 
 exports.login = async (req, res) => {
-  const {userId, password} = req.body
-  const response = await User.findOne({
-    where : {userId : userId, password : password},
-    attributes : ['id', 'userId']
-  })
-  const data = response?.dataValues
-  const token = jwt.sign(data, process.env.SECRET_KEY)
-  res.cookie('access', token, {
-    maxAge : 24 * 60 * 60 * 1000,
-    Path : '/'
-  })
-  res.status(200).json(data)
+  try {
+    const {userId, password} = req.body
+    let user = await User.findOne({
+      where : {userId : userId},
+      attributes : ['id', 'userId', 'password']
+    });
+    user = user?.dataValues
+    if (!user) {
+      return res.status(401).json({ message: '회원가입되지 않은 유저입니다.' });
+    }
+    const isPasswordValid = await bcryptjs.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: '올바르지 않은 비밀번호 입니다.' });
+    }
+    const userInfo = {};
+    userInfo['userId'] = user.userId;
+    userInfo['id'] = user.id;
+    const token = jwt.sign(userInfo, process.env.SECRET_KEY);
+    res.cookie('access', token, {
+      maxAge : 24 * 60 * 60 * 1000,
+      Path : '/'
+    })
+    res.status(200).json({ ...user, password : '' })
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({ message: '알 수 없는 서버 에러 입니다.' })
+  }
 }
 
 exports.put = (req, res) => {
   res.send('1')
 }
 
+exports.myInfo = async (req, res) => {
+  try {
+    const access = req.cookies?.access
+    if (!access) {
+      res.status(401).json({message : '로그인을 먼저 해주세요'})
+    }
+    await jwt.verify(access, process.env.SECRET_KEY, async (err, decoded) => {
+      if (err) {
+        res.status(403).json({message : '유효하지 않은 토큰입니다.'})
+      }
+      const id = decoded?.id
+      const response = await User.findOne({
+        where : {id},
+        attributes : ['userId', 'email', 'nickname', 'photo', 'createdAt', 'updatedAt'],
+        include : [
+          {model : Review},
+          {model : Proxy},
+          {model : WaitMate},
+        ],
+      })
+      res.send(response)
+    })
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({ message: '알 수 없는 서버 에러 입니다.' })
+  }
+}
+
+exports.userInfo = async (req, res) => {
+  try {
+    const id = req.params?.userId
+    const response = await User.findOne({
+      where : {id},
+      attributes : ['userId', 'email', 'nickname', 'photo', 'createdAt', 'updatedAt'],
+      include : [
+        {model : Review},
+        {model : Proxy},
+        {model : WaitMate},
+      ],
+    })
+    if (!response) {
+      res.status(404).json({message : '존재하지 않는 사용자 입니다.'})
+    } else {
+      res.send(response)
+    }
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({ message: '알 수 없는 서버 에러 입니다.' })
+  }
+}
