@@ -1,6 +1,7 @@
 tags:
   - name: WaitMate
     description: 웨이트메이트와 관련된 API 모음
+############################################################################################
 paths:
   /waitMate:
     post:
@@ -40,3 +41,22 @@ paths:
       responses:
         '201':
           description: 웨이트메이트 등록 완료
+    ############################################################################################
+    get:
+      summary: 웨이트메이트 목록 조회
+      tags:
+        - WaitMate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                wmId:
+                  type: integer
+              required:
+                - wmId
+      responses:
+        '201':
+          description: 웨이트메이트 목록 조회 성공
