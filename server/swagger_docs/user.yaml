@@ -1,0 +1,36 @@
+tags:
+  - name: User
+    description: 유저와 관련된 API 모음
+paths:
+  /user/register:
+    post:
+      summary: 새로운 유저 등록
+      tags:
+        - User
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                password:
+                  type: string
+                nickname:
+                  type: string
+                email:
+                  type: string
+              required:
+                - userId
+                - password
+                - nickname
+                - email
+      responses:
+        '201':
+          description: 회원 가입 완료
+        '400':
+          description: 잘못된 데이터 전송
+        '500':
+          description: 알 수 없는 서버 에러
