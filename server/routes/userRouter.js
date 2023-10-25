@@ -12,4 +12,5 @@ userRouter.get('/kakao/login', userController.kakaoResult);
 userRouter.get('/:userId', userController.userInfo);
 
 
+
 module.exports = userRouter;
