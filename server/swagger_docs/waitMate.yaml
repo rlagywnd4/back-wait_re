@@ -4,6 +4,25 @@ tags:
 ############################################################################################
 paths:
   /waitMate:
+    get:
+      summary: 웨이트메이트 조회
+      tags:
+        - WaitMate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                wmId:
+                  type: integer
+              required:
+                - wmId
+      responses:
+        '201':
+          description: 웨이트메이트 조회 성공
+    ############################################################################################
     post:
       summary: 새로운 웨이트메이트 등록
       tags:
@@ -41,25 +60,25 @@ paths:
       responses:
         '201':
           description: 웨이트메이트 등록 완료
-    ############################################################################################
-    get:
-      summary: 웨이트메이트 조회
-      tags:
-        - WaitMate
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                wmId:
-                  type: integer
-              required:
-                - wmId
-      responses:
-        '201':
-          description: 웨이트메이트 조회 성공
+  ############################################################################################
+  delete:
+    summary: 웨이트메이트 삭제
+    tags:
+      - WaitMate
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              wmId:
+                type: integer
+            required:
+              - wmId
+    responses:
+      '201':
+        description: 웨이트메이트 삭제 성공
   ############################################################################################
   /waitMate/list:
     get:

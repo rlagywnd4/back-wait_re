@@ -18,24 +18,6 @@ exports.getWaitMate = async (req, res) => {
   }
 };
 
-// waitMate목록 조회
-exports.getWaitMateList = async (req, res) => {
-  try {
-    const { wmAddress } = req.query;
-    console.log(req.query);
-    const waitMates = await WaitMate.findAll({
-      where: {
-        wmAddress,
-      },
-    });
-
-    res.json(waitMates);
-  } catch (e) {
-    console.error('Error fetching WaitMate data:', e);
-    res.status(500).send('Internal Server Error');
-  }
-};
-
 // waitMate를 DB에 등록
 exports.postWaitMate = async (req, res) => {
   try {
@@ -59,5 +41,39 @@ exports.postWaitMate = async (req, res) => {
     }
   } catch (e) {
     console.log('error:', e);
+  }
+};
+
+// waitMate 삭제
+exports.deleteWaitMate = async (req, res) => {
+  try {
+    const { wmId } = req.params;
+    const deleteWaitMate = await WaitMate.destroy({
+      where: {
+        wmId: wmId,
+      },
+    });
+    res.send({ result: 'success' });
+  } catch (e) {
+    console.error('Error fetching WaitMate data:', e);
+    res.status(500).send('Internal Server Error');
+  }
+};
+
+// waitMate목록 조회
+exports.getWaitMateList = async (req, res) => {
+  try {
+    const { wmAddress } = req.query;
+    console.log(req.query);
+    const waitMates = await WaitMate.findAll({
+      where: {
+        wmAddress,
+      },
+    });
+
+    res.json(waitMates);
+  } catch (e) {
+    console.error('Error fetching WaitMate data:', e);
+    res.status(500).send('Internal Server Error');
   }
 };
