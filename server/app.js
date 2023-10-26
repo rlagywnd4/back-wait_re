@@ -16,6 +16,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors());
+app.use(express.static('public'));
 
 // router 설정
 const home = require('./routes/index');
