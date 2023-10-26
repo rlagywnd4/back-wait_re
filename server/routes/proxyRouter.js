@@ -2,30 +2,12 @@ const express = require('express');
 const proxyRouter = express.Router();
 const proxyController = require('../controllers/proxyController');
 
-/**
- * @swagger
- * tags:
- *   name: Proxy
- *   description: 프록시 관련 API
- */
-
-/**
- * @swagger
- * /proxy:
- *   post:
- *     summary: 프록시(글)쓰기 불러오기
- *     tags: [Proxy]
- *     responses:
- *       '200':
- *         description: Successful response
- *         content:
- *           application/json:
- *             example:
- *               message: 'Hello, Swagger!'
- */
+//프록시 글 등록
 proxyRouter.post('/register', proxyController.input.postRegister);
 
+//프록시 글 리스트 뽑아오기
 proxyRouter.get('/getter', proxyController.output.getProxyAll);
+//프록시 특정 글 보기
 proxyRouter.get('/getter/:proxyId', proxyController.output.getProxyOne);
 
 //등록된 프록시를 변경
