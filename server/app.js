@@ -31,7 +31,7 @@ app.use('/', home);
 const { sequelize } = require('./models');
 
 sequelize
-  .sync({ force: false })
+  .sync({ alter: true })
   .then(() => {
     app.listen(PORT, () => {
       console.log('8080 port is running');
