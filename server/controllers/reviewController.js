@@ -61,9 +61,65 @@ exports.getReview = async (req, res) => {
     res.status(500).json({ message : '알 수 없는 서버 에러' });
   }
 };
-exports.updateReview = (req, res) => {
+exports.updateReview = async (req, res) => {
   try {
-
+    const reviewId = Number(req.params?.reviewId);
+    const review = await Review.findOne({where : {reviewId}});
+    console.log(review)
+    if (!review) {
+      res.status(404).json({ message : '존재하지 않는 리뷰입니다.' });
+    };
+    const userInfo = await Common.cookieUserinfo(req);
+    if (!userInfo) {
+      res.status(401).json({ message : '로그인을 먼저 진행해 주세요' });
+      return ;
+    };
+    let newScore = req.body?.score;
+    newScore = Number(newScore);
+    if (newScore > 5 || newScore < 0 || isNaN(newScore)) {
+      res.status(400).json({ message : '리뷰 점수값이 올바르지 않습니다.' });
+      return ;
+    };
+    const oldScore = review?.dataValues?.score;
+    const id = review?.dataValues?.id;
+    if (!newScore) {
+      res.status(400).json({ message : '바꾸려는 점수가 입력되지 않았습니다.' });
+      return ;
+    };
+    console.log(review.dataValues.writerId, userInfo.id)
+    if (review.dataValues.writerId !== String(userInfo.id)) {
+      res.status(403).json({ message : '오직 작성자만 리뷰 수정이 가능합니다' });
+      return ;
+    };
+    const response = await Review.update({
+      score : newScore
+    }, { 
+      where : {reviewId : reviewId}
+    });
+    if (response) {
+      const user = await User.findOne({
+        where : {id : review.dataValues.id}
+      })
+      const {count, _ } = await Review.findAndCountAll({
+        where: { id },
+      });
+      const oldUserScore = user?.dataValues?.score;
+      const userNewScore = ((oldUserScore * count) - oldScore + newScore) / count;
+      await User.update({
+        score : userNewScore,
+      }, {
+        where : { id }
+      })
+      .then(() => {
+        res.status(201).json({message : '리뷰 수정이 완료되었습니다.'});
+      })
+      .catch((err) => {
+        console.log(err);
+        throw new Error();
+      });
+    } else {
+      throw new Error();
+    }
   } catch (err) {
     console.log(err);
     res.status(500).json({ message : '알 수 없는 서버 에러' });
