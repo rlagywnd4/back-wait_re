@@ -85,7 +85,6 @@ exports.updateReview = async (req, res) => {
       res.status(400).json({ message : '바꾸려는 점수가 입력되지 않았습니다.' });
       return ;
     };
-    console.log(review.dataValues.writerId, userInfo.id)
     if (review.dataValues.writerId !== String(userInfo.id)) {
       res.status(403).json({ message : '오직 작성자만 리뷰 수정이 가능합니다' });
       return ;
@@ -144,7 +143,6 @@ exports.deleteReview = async (req, res) => {
     const user = await User.findOne({
       where : {id : review.dataValues.id}
     })
-    console.log(user)
     const {count, _ } = await Review.findAndCountAll({
       where: {id : review.dataValues.id},
     });
