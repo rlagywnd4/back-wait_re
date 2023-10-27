@@ -35,7 +35,7 @@ const User = (Sequelize, DataTypes) => {
         social : {
           type: DataTypes.STRING(150),
           allowNull : false,
-          default : 'general',
+          defaultValue : 'general',
           comment : '소셜 로그인 구분을 위한 필드'
         }
       },

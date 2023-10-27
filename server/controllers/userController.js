@@ -1,6 +1,6 @@
 const { User, Review, Proxy, WaitMate }  = require('../models');
-const bcryptjs = require('bcryptjs');
 const Common = require('../common');
+const bcryptjs = require('bcryptjs');
 const axios = require('axios');
 const jwt = require('jsonwebtoken');
 
@@ -53,7 +53,7 @@ exports.register = async (req, res) => {
         nickname,
         email
       });
-      res.status(201).send('회원 가입 완료');
+      res.status(201).json({ message : '회원 가입 완료' });
     }
   } catch (err) {
     console.log(err);
@@ -127,66 +127,51 @@ exports.userInfo = async (req, res) => {
 };
 exports.updateUserInfo = async (req, res) => {
   try {
-    const access = req.cookies?.access
-    if (!access) {
-      res.status(401).json({message : '로그인을 먼저 해주세요'})
-    }
+    const userInfo = await Common.cookieUserinfo(req);
+    console.log(userInfo)
+    if (!userInfo) {
+      res.status(401).json({message : '로그인을 먼저 해주세요'});
+    };
     if (req.body.userId) {
-      res.status(403).json({message : '아이디는 변경할 수 없습니다.'})
-    } else if (req.body.password) {
-      await jwt.verify(access, process.env.SECRET_KEY, async (err, decoded) => {
-        if (err) {
-          res.status(403).json({message : '유효하지 않은 토큰입니다.'})
-        }
-        const hashedPassword = await bcryptjs.hash(req.body.password, 10);
-        const response = await User.update({password : hashedPassword}, {
-          where : {id : decoded.id}
-        })
-        if (response) {
-          res.status(201).json({message : '업데이트가 완료되었습니다.'})
-        } else {
-          res.status(400).json({message : '이미 존재하는 값이거나 존재하지 않는 필드이름 입니다.'})
-        }
-      })
+      res.status(403).json({message : '아이디는 변경할 수 없습니다.'});
+    };
+    if (req.body.password) {
+      req.body.password = await bcryptjs.hash(req.body.password, 10);
+    };
+    const response = await User.update(req.body, {
+      where : {id : userInfo.id}
+    });
+    if (response) {
+      res.status(201).json({message : '업데이트가 완료되었습니다.'});
     } else {
-      await jwt.verify(access, process.env.SECRET_KEY, async (err, decoded) => {
-        if (err) {
-          res.status(403).json({message : '유효하지 않은 토큰입니다.'})
-        }
-        const response = await User.update(req.body, {
-          where : {id : decoded.id}
-        })
-        if (response) {
-          res.status(201).json({message : '업데이트가 완료되었습니다.'})
-        } else {
-          res.status(400).json({message : '이미 존재하는 값이거나 존재하지 않는 필드이름 입니다.'})
-        }
-      })
+      res.status(400).json({message : '이미 존재하는 값이거나 존재하지 않는 필드이름 입니다.'});
     }
-  } catch (err) {
-    console.log(err)
-    res.status(500).json({ message: '알 수 없는 서버 에러 입니다.' })
+  }
+  catch (err) {
+    console.log(err);
+    res.status(500).json({ message: '알 수 없는 서버 에러 입니다.' });
   }
 };
 exports.deleteUser = async (req, res) => {
   try {
-    const access = req.cookies?.access
-    if (!access) {
-      res.status(401).json({message : '로그인을 먼저 해주세요'})
+    const userInfo = await Common.cookieUserinfo(req);
+    if (!userInfo) {
+      res.status(401).json({message : '로그인을 먼저 해주세요'});
     } else {
-      await jwt.verify(access, process.env.SECRET_KEY, async (err, decoded) => {
-        if (err) {
-          res.status(403).json({message : '유효하지 않은 토큰입니다.'})
-        }
-        const response = await User.destroy({
-          where : {id : decoded.id}
-        })
-        res.status(204).send()
+      await User.destroy({
+        where : {id : userInfo.id}
       })
+      .then((_) => {
+        res.status(204).send();
+      })
+      .catch((err) => {
+        console.log(err)
+        res.status(403).json({message : '훼손된 토큰입니다. 다시 로그인 해주세요'});
+      });
     }
   } catch (err) {
-    console.log(err)
-    res.status(500).json({ message: '알 수 없는 서버 에러 입니다.' })
+    console.log(err);
+    res.status(500).json({ message: '알 수 없는 서버 에러 입니다.' });
   }
 };
 exports.kakaoResult = async (req, res) => {
