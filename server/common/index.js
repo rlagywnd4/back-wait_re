@@ -19,14 +19,14 @@ exports.cookieUserinfo = async (req) => {
       const id = decoded?.id
       const userInfo = await User.findOne({
         where : {id},
-        attributes : ['userId', 'email', 'nickname', 'photo', 'createdAt', 'updatedAt'],
+        attributes : ['id', 'userId', 'email', 'nickname', 'photo', 'createdAt', 'updatedAt'],
         include : [
           {model : Review},
           {model : Proxy},
           {model : WaitMate},
         ],
       })
-      resolve(userInfo)
+      resolve(userInfo.dataValues)
     })
   })
 }
