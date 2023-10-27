@@ -45,9 +45,17 @@ exports.createReview = async (req, res) => {
     res.status(500).json({ message : '알 수 없는 서버 에러' });
   };
 };
-exports.getReview = (req, res) => {
+exports.getReview = async (req, res) => {
   try {
-
+    const reviewId = req?.params?.reviewId;
+    if (!reviewId) {
+      res.status(404).json({ message : '존재하지 않는 리뷰입니다.'});
+      return ;
+    };
+    const review = await Review.findOne({
+      where : { reviewId }
+    });
+    res.status(200).json({ review });
   } catch (err) {
     console.log(err);
     res.status(500).json({ message : '알 수 없는 서버 에러' });
