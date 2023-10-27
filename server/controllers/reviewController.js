@@ -65,7 +65,6 @@ exports.updateReview = async (req, res) => {
   try {
     const reviewId = Number(req.params?.reviewId);
     const review = await Review.findOne({where : {reviewId}});
-    console.log(review)
     if (!review) {
       res.status(404).json({ message : '존재하지 않는 리뷰입니다.' });
     };
@@ -125,9 +124,47 @@ exports.updateReview = async (req, res) => {
     res.status(500).json({ message : '알 수 없는 서버 에러' });
   }
 };
-exports.deleteReview = (req, res) => {
+exports.deleteReview = async (req, res) => {
   try {
-
+    const reviewId = Number(req.params?.reviewId);
+    const userInfo = await Common.cookieUserinfo(req);
+    if (!userInfo) {
+      res.status(401).json({ message : '로그인을 먼저 진행해 주세요' });
+      return ;
+    };
+    const review = await Review.findOne({where : { reviewId }});
+    if (!review) {
+      res.status(404).json({ message : '리뷰가 존재하지 않습니다.' });
+      return ;
+    }
+    if (String(userInfo.id) !== review.dataValues.writerId) {
+      res.status(403).json({ message : '오직 작성자만 리뷰를 삭제할 수 있습니다.' });
+      return ;
+    }
+    const user = await User.findOne({
+      where : {id : review.dataValues.id}
+    })
+    console.log(user)
+    const {count, _ } = await Review.findAndCountAll({
+      where: {id : review.dataValues.id},
+    });
+    const oldScore = review.dataValues.score;
+    const oldUserScore = user?.dataValues?.score;
+    const userNewScore = ((oldUserScore * count) - oldScore) / (count - 1);
+    await User.update({
+      score : userNewScore,
+    }, {
+      where : {id : review.dataValues.id}
+    })
+    await Review.destroy({
+      where : { reviewId }
+    })
+    .then(() => {
+      res.status(204).json({ message : '정상적으로 삭제가 완료되었습니다.' });
+    })
+    .catch(() => {
+      throw new Error();
+    })
   } catch (err) {
     console.log(err);
     res.status(500).json({ message : '알 수 없는 서버 에러' });
