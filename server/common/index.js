@@ -16,9 +16,9 @@ exports.cookieUserinfo = async (req) => {
       if (err) {
         return reject({})
       }
-      const id = decoded?.id
+      const id = decoded?.id;
       const userInfo = await User.findOne({
-        where : {id},
+        where : { id },
         attributes : ['id', 'userId', 'email', 'nickname', 'photo', 'createdAt', 'updatedAt'],
         include : [
           {model : Review},

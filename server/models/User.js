@@ -37,6 +37,11 @@ const User = (Sequelize, DataTypes) => {
           allowNull : false,
           defaultValue : 'general',
           comment : '소셜 로그인 구분을 위한 필드'
+        },
+        score : {
+          type : DataTypes.FLOAT,
+          defaultValue : 0,
+          comment : '사용자가 받은 평균 점수'
         }
       },
       {

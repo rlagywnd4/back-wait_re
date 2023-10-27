@@ -96,7 +96,7 @@ exports.myInfo = async (req, res) => {
     if (!userInfo) {
       res.status(401).json({message : '로그인을 먼저 해주세요'})
     } else {
-      res.json(userInfo)
+      res.json(userInfo);
     }
   } catch (err) {
     console.log(err)
