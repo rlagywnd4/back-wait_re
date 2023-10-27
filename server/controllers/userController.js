@@ -1,5 +1,6 @@
 const { User, Review, Proxy, WaitMate }  = require('../models');
 const bcryptjs = require('bcryptjs');
+const Common = require('../common');
 const axios = require('axios');
 const jwt = require('jsonwebtoken');
 
@@ -25,6 +26,9 @@ const accessDecode = async (token) => {
     })
     return response
   })
+};
+const kakaoLogin = async () => {
+  
 };
 exports.register = async (req, res) => {
   try {
@@ -88,26 +92,11 @@ exports.login = async (req, res) => {
 };
 exports.myInfo = async (req, res) => {
   try {
-    const access = req.cookies?.access
-    if (!access) {
+    const userInfo = await Common.cookieUserinfo(req);
+    if (!userInfo) {
       res.status(401).json({message : '로그인을 먼저 해주세요'})
     } else {
-      await jwt.verify(access, process.env.SECRET_KEY, async (err, decoded) => {
-        if (err) {
-          res.status(403).json({message : '유효하지 않은 토큰입니다.'})
-        }
-        const id = decoded?.id
-        const response = await User.findOne({
-          where : {id},
-          attributes : ['userId', 'email', 'nickname', 'photo', 'createdAt', 'updatedAt'],
-          include : [
-            {model : Review},
-            {model : Proxy},
-            {model : WaitMate},
-          ],
-        })
-        res.send(response)
-      })
+      res.json(userInfo)
     }
   } catch (err) {
     console.log(err)
@@ -200,12 +189,6 @@ exports.deleteUser = async (req, res) => {
     res.status(500).json({ message: '알 수 없는 서버 에러 입니다.' })
   }
 };
-exports.kakaoUser = async (req, res) => {
-  // res.redirect('/user/kakaoResult')
-  // res.send('hello kakao')
-  res.send('')
-};
-
 exports.kakaoResult = async (req, res) => {
   try {
     const code = req.query?.code;
@@ -214,7 +197,7 @@ exports.kakaoResult = async (req, res) => {
       {
         grant_type: 'authorization_code',
         client_id: `${process.env.KAKAO_REST_API_KEY}`,
-        redirect_uri: 'http://localhost:8080/user/kakao/login',
+        redirect_uri: 'http://localhost:8080/user/kakao',
         code: `${code}`,
       },
       {
@@ -223,11 +206,56 @@ exports.kakaoResult = async (req, res) => {
         },
       },
     );
-    // res.send(response)
-    console.log(response)
-    res.redirect('http://localhost:3000/user/register') // 
+    const {access_token, token_type, refresh_token, expires_in, refresh_token_expires_in} = response.data;
+    const info = await axios.get('https://kapi.kakao.com/v2/user/me', 
+    {
+      headers : {
+        'Authorization' : `${token_type} ${access_token}`,
+        'Content-type' : 'application/x-www-form-urlencoded;charset=utf-8'
+      }
+    });
+    const kakaoId = info?.data?.id;
+    const kakaoProperties = info?.data?.properties;
+    let kakaoUser = await User.findOne({
+      where : {userId : kakaoId, social : 'kakao'}
+    });
+    if (!kakaoUser) {
+      kakaoUser = await User.create({
+        userId : kakaoId,
+        nickname : `${kakaoProperties.nickname}`,
+        email : `${kakaoId}@kakao.com`,
+        social : 'kakao',
+      })
+    }
+    const userInfo = {};
+    userInfo['id'] = kakaoUser?.id;
+    userInfo['nickname'] = kakaoUser?.nickname;
+    const token = jwt.sign(userInfo, process.env.SECRET_KEY);
+    res.cookie('access', token, {
+      maxAge : 24 * 60 * 60 * 1000,
+      Path : '/'
+    })
+    // res.redirect(`http://localhost:3000/main`);
+    res.redirect(`http://localhost:3000/main?token=${token}`);
   } catch (err) {
-    console.log(err)
+    console.log(err);
   }
 };
 // window.location.href=`https://kauth.kakao.com/oauth/authorize?redirect_uri=http://localhost:8080/user/kakao/login&client_id=${process.env.REACT_APP_KAKAO_REST_API}&response_type=code`
+exports.kakaoUserRegister = async (req, res) => {
+  res.send('');
+};
+exports.kakaoUserLogin = async (req, res) => {
+  // const userInfo = {};
+  // userInfo['id'] = kakaoUser?.id;
+  // userInfo['nickname'] = kakaoUser?.nickname;
+  // const token = jwt.sign(userInfo, process.env.SECRET_KEY);
+  // res.cookie('access', token, {
+  //   maxAge : 24 * 60 * 60 * 1000,
+  //   Path : '/'
+  // })
+  // res.status(200).send({...token})
+};
+exports.sendKakaoData = async (req, res) => {
+  res.json({kakaoId, kakaoProperties});
+};
