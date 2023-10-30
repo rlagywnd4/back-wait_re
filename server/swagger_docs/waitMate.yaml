@@ -1,28 +1,39 @@
 tags:
   - name: WaitMate
     description: 웨이트메이트와 관련된 API 모음
-############################################################################################
+
 paths:
-  /waitMate:
+  /waitMate/detail:
     get:
-      summary: 웨이트메이트 조회
+      summary: waitMateDetail 조회
       tags:
         - WaitMate
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                wmId:
-                  type: integer
-              required:
-                - wmId
+      parameters:
+        - in: query
+          name: wmId
+          schema:
+            type: integer
+          required: true
+          description: wmId
       responses:
-        '201':
-          description: 웨이트메이트 조회 성공
-    ############################################################################################
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              example:
+                waitMate:
+                  wmId: 2
+                  title: '사람구합니다.'
+                  wmAddress: '서울시 송파구'
+                  waitTime: '1024'
+                  description: '배고파요'
+                  pay: 123
+                  photo: null
+                  createdAt: '2023-10-24T12:49:13.000Z'
+                  updatedAt: '2023-10-24T12:49:13.000Z'
+                  id: 3
+
+  /waitMate:
     post:
       summary: 새로운 웨이트메이트 등록
       tags:
@@ -58,28 +69,32 @@ paths:
                 - waitTime
                 - description
       responses:
-        '201':
-          description: 웨이트메이트 등록 완료
-    ############################################################################################
+        '200':
+          description: 웨이트메이트 등록 성공
+          content:
+            application/json:
+              example:
+                result: 'success'
+
     delete:
       summary: 웨이트메이트 삭제
       tags:
         - WaitMate
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                wmId:
-                  type: integer
-              required:
-                - wmId
+      parameters:
+        - in: query
+          name: wmId
+          schema:
+            type: integer
+          required: true
+          description: wmId
       responses:
         '201':
           description: 웨이트메이트 삭제 성공
-    ############################################################################################
+          content:
+            application/json:
+              example:
+                result: 'success'
+
     patch:
       summary: 웨이트메이트 수정
       tags:
@@ -114,31 +129,44 @@ paths:
       responses:
         '201':
           description: 웨이트메이트 수정 성공
-  ############################################################################################
+          content:
+            application/json:
+              example:
+                result: 'success'
+
   /waitMate/list:
     get:
       summary: 웨이트메이트 목록 조회
       tags:
         - WaitMate
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                wmAddress:
-                  type: string
-                order:
-                  type: string
-                pageNum:
-                  type: integer
-                option:
-                  type: string
-              required:
-                - wmAddress
-                - order
-                - pageNum
+      parameters:
+        - in: query
+          name: wmAddress
+          schema:
+            type: string
+          required: true
+          description: 웨이트메이트 주소
+        - in: query
+          name: order
+          schema:
+            type: string
+          required: true
+          description: 정렬 기준
+        - in: query
+          name: pageNum
+          schema:
+            type: integer
+          required: true
+          description: 페이지 숫자
+        - in: query
+          name: option
+          schema:
+            type: string
+          description: 이전, 다음 버튼인지
       responses:
         '201':
           description: 웨이트메이트 목록 조회 성공
+          content:
+            application/json:
+              example:
+                result: 'success'
