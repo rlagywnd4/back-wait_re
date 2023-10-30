@@ -1,15 +1,17 @@
 const express = require('express');
 const userRouter = express.Router();
 const userController = require('../controllers/userController');
+const Common = require('../common');
 
-userRouter.put('', userController.updateUserInfo);
+userRouter.put('', Common.upload(`profileImg/`).single('profileImg'), userController.updateUserInfo);
 userRouter.delete('', userController.deleteUser);
-userRouter.post('/register', userController.register);
+userRouter.post('/register', Common.upload(`profileImg/`).single('profileImg'), userController.register);
 userRouter.post('/login', userController.login);
 userRouter.get('/myinfo', userController.myInfo);
 userRouter.get('/kakao', userController.kakaoResult);
 userRouter.get('/kakao/data', userController.sendKakaoData);
 userRouter.get('/kakao/login', userController.kakaoUserLogin);
+userRouter.post('/img', Common.upload(`profileImg/`).single('profileImg'),  userController.uploadImage);
 
 userRouter.get('/:userId', userController.userInfo);
 

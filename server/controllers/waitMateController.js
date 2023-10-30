@@ -1,20 +1,45 @@
 const { TimeoutError } = require('sequelize');
-const { WaitMate } = require('../models');
+const { Op } = require('sequelize');
+const { WaitMate, ChatRoom } = require('../models');
 
-// waitMate 조회(waitMateDetail페이지에서 사용)
-exports.getWaitMate = async (req, res) => {
+// waitMateDetail 조회
+exports.getWaitMateDetail = async (req, res) => {
   // wmAddress를 요청에 받고 응답 값에는 id(user)를 보내 글쓴 주인인지 확인
   try {
     const { wmId } = req.query;
+    // WaitMateDetail페이지
     const waitMate = await WaitMate.findOne({
       where: {
         wmId,
       },
     });
 
-    res.json(waitMate);
+    //최근 채용 횟수(6개월전 ~ 현재)
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+    const recentHiresCount = await WaitMate.findAll({
+      where: {
+        id: waitMate.id,
+        updatedAt: {
+          [Op.between]: [sixMonthsAgo, new Date()],
+        },
+      },
+    });
+
+    // 지원자수
+    const waitMateApply = await ChatRoom.findAll({
+      where: {
+        wmId: wmId,
+      },
+    });
+
+    res.send({
+      waitMate: waitMate,
+      recentHiresCount: recentHiresCount.length,
+      waitMateApplyCount: waitMateApply.length,
+    });
   } catch (e) {
-    console.error('Error fetching WaitMate data:', e);
+    console.error('Error WaitMate data:', e);
     res.status(500).send('Internal Server Error');
   }
 };
@@ -41,14 +66,15 @@ exports.postWaitMate = async (req, res) => {
       res.send({ result: 'fail' });
     }
   } catch (e) {
-    console.log('error:', e);
+    console.error('Error WaitMate data:', e);
+    res.status(500).send('Internal Server Error');
   }
 };
 
 // waitMate 삭제
 exports.deleteWaitMate = async (req, res) => {
   try {
-    const { wmId } = req.params;
+    const { wmId } = req.query;
     const deleteWaitMate = await WaitMate.destroy({
       where: {
         wmId: wmId,
@@ -56,7 +82,7 @@ exports.deleteWaitMate = async (req, res) => {
     });
     res.send({ result: 'success' });
   } catch (e) {
-    console.error('Error fetching WaitMate data:', e);
+    console.error('Error WaitMate data:', e);
     res.status(500).send('Internal Server Error');
   }
 };
@@ -83,7 +109,7 @@ exports.patchWaitMate = async (req, res) => {
     );
     res.send({ result: 'success' });
   } catch (e) {
-    console.error('Error fetching WaitMate data:', e);
+    console.error('Error WaitMate data:', e);
     res.status(500).send('Internal Server Error');
   }
 };
@@ -105,6 +131,7 @@ exports.getWaitMateList = async (req, res) => {
   // 한 페이지에 보여주고자하는 컨텐츠, 한 페이지에 보여주고자하는 첫 페이지의 값(숫자), 마지막 페이지의 값(숫자)
   try {
     // order는 updatedAt(최신순), pay(시급순), count(조회수) 셋중 하나
+    // option은 이전, 다음 버튼을 눌렀을 경우
     let { wmAddress, order, pageNum, option } = req.query;
     const waitMateCountPerPage = 4; // 한 페이지에 보여줄 컨텐츠 개수
     const pageCountPerPage = 5; // 한 페이지에 보여줄 페이지 개수
@@ -166,7 +193,7 @@ exports.getWaitMateList = async (req, res) => {
       lastPageNum: lastPageNum,
     });
   } catch (e) {
-    console.error('Error fetching WaitMate data:', e);
+    console.error('Error WaitMate data:', e);
     res.status(500).send('Internal Server Error');
   }
 };
