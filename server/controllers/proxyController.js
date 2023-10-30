@@ -1,4 +1,4 @@
-const {Proxy} = require('../models');
+const {Proxy, WaitMate} = require('../models');
 const Room = require('../schema/Room');
 const ChatData = require('../schema/ChatData');
 const jwt = require('jsonwebtoken');
@@ -136,6 +136,25 @@ const output = {
         });
         console.log(proxy);
         return res.send(proxy);
+    },
+
+    // 특정한 구의 정보값들을 불러오는 방법
+    getAddressAll : async (req,res)=>{
+        try{
+        const userInfo = Common.cookieUserinfo(req);
+        const result = await WaitMate.findOne({
+            where : {id : userInfo.id}
+        });
+        const proxyList = await Proxy.findAll({
+            where : {proxyAddress : result.wmAddress}
+        });
+        if(proxyList){
+            res.status({list: proxyList})
+        }
+        } catch(err){
+            console.error(err);
+            res.status(500).json({message : '연결하지 못했습니다'});
+        }
     },
 
     // proxy 하나의 정보를 가져오는 값
