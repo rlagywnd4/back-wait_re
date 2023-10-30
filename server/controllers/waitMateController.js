@@ -1,18 +1,42 @@
 const { TimeoutError } = require('sequelize');
-const { WaitMate } = require('../models');
+const { Op } = require('sequelize');
+const { WaitMate, ChatRoom } = require('../models');
 
-// waitMate 조회(waitMateDetail페이지에서 사용)
+// waitMateDetail 조회
 exports.getWaitMateDetail = async (req, res) => {
   // wmAddress를 요청에 받고 응답 값에는 id(user)를 보내 글쓴 주인인지 확인
   try {
-    const { wmId } = req.query;
+    const { wmId, id } = req.query;
     const waitMate = await WaitMate.findOne({
       where: {
         wmId,
       },
     });
 
-    res.send({ waitMate: waitMate });
+    //최근 채용 횟수(6개월전 ~ 현재)
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+    const recentHiresCount = await WaitMate.findAll({
+      where: {
+        id: id,
+        updatedAt: {
+          [Op.between]: [sixMonthsAgo, new Date()],
+        },
+      },
+    });
+
+    // 지원자수
+    const waitMateApply = await ChatRoom.findAll({
+      where: {
+        wmId: wmId,
+      },
+    });
+
+    res.send({
+      waitMate: waitMate,
+      recentHiresCount: recentHiresCount.length,
+      waitMateApplyCount: recentHiresCount.length,
+    });
   } catch (e) {
     console.error('Error WaitMate data:', e);
     res.status(500).send('Internal Server Error');
@@ -95,7 +119,6 @@ exports.patchWaitMate = async (req, res) => {
 exports.getWaitMateList = async (req, res) => {
   // 고려할 점: 프론트에서 페이지네이션 구현 예정
   // 조회순, 시급순, 최신순
-  console.log('hihih142341241234243ihih');
   // 페이지네이션 고려한 설계
   // 필요한 데이터:
   // 페이지, 우선순위, 주소
@@ -108,12 +131,10 @@ exports.getWaitMateList = async (req, res) => {
   try {
     // order는 updatedAt(최신순), pay(시급순), count(조회수) 셋중 하나
     // option은 이전, 다음 버튼을 눌렀을 경우
-    console.log('hihihihih');
     let { wmAddress, order, pageNum, option } = req.query;
     const waitMateCountPerPage = 4; // 한 페이지에 보여줄 컨텐츠 개수
     const pageCountPerPage = 5; // 한 페이지에 보여줄 페이지 개수
     console.log(req.query);
-    console.log('hi--------------------h');
     const waitMates = await WaitMate.findAll({
       where: {
         wmAddress,
