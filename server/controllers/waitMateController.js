@@ -6,14 +6,27 @@ const path = require('path'); //경로에 관한 내장 모듈
 exports.getWaitMateDetail = async (req, res) => {
   // wmAddress를 요청에 받고 응답 값에는 id(user)를 보내 글쓴 주인인지 확인
   try {
-    const { wmId } = req.query;
+    let isLikeWait = false;
+    const { wmId, id } = req.query;
     const waitMate = await WaitMate.findOne({
       where: {
         wmId,
       },
     });
 
-    res.send({ waitMate: waitMate });
+    const likeWait = await likeWait.findOne({
+      where: {
+        wmId: wmId,
+        proxyId: id,
+      },
+    });
+
+    if (likeWait) {
+      isLikeWait = true;
+    } else {
+      isLikeWait = false;
+    }
+    res.send({ waitMate: waitMate, isLikeWait: isLikeWait });
   } catch (e) {
     console.error('Error WaitMate data:', e);
     res.status(500).send('Internal Server Error');
