@@ -32,6 +32,8 @@ paths:
                   createdAt: '2023-10-24T12:49:13.000Z'
                   updatedAt: '2023-10-24T12:49:13.000Z'
                   id: 3
+                recentHiresCount: 3
+                waitMateApplyCount: 2
         '500':
           description: Internal Server Error
           content:
