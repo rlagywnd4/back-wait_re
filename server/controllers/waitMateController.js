@@ -6,7 +6,7 @@ const { WaitMate, ChatRoom } = require('../models');
 exports.getWaitMateDetail = async (req, res) => {
   // wmAddress를 요청에 받고 응답 값에는 id(user)를 보내 글쓴 주인인지 확인
   try {
-    const { wmId, id } = req.query;
+    const { wmId } = req.query;
     // WaitMateDetail페이지
     const waitMate = await WaitMate.findOne({
       where: {
@@ -19,7 +19,7 @@ exports.getWaitMateDetail = async (req, res) => {
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
     const recentHiresCount = await WaitMate.findAll({
       where: {
-        id: id,
+        id: waitMate.id,
         updatedAt: {
           [Op.between]: [sixMonthsAgo, new Date()],
         },
@@ -36,7 +36,7 @@ exports.getWaitMateDetail = async (req, res) => {
     res.send({
       waitMate: waitMate,
       recentHiresCount: recentHiresCount.length,
-      waitMateApplyCount: recentHiresCount.length,
+      waitMateApplyCount: waitMateApply.length,
     });
   } catch (e) {
     console.error('Error WaitMate data:', e);
