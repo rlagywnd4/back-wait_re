@@ -1,5 +1,6 @@
 const { TimeoutError } = require('sequelize');
 const { WaitMate } = require('../models');
+const path = require('path'); //경로에 관한 내장 모듈
 
 // waitMate 조회(waitMateDetail페이지에서 사용)
 exports.getWaitMateDetail = async (req, res) => {
@@ -24,6 +25,7 @@ exports.postWaitMate = async (req, res) => {
   try {
     const { id, title, wmAddress, waitTime, description, pay, photo } =
       req.body;
+    console.log('filename=', req.file.filename);
     // DB에 waitMate 등록
     const insertWaitMate = await WaitMate.create({
       id: id,
@@ -32,7 +34,8 @@ exports.postWaitMate = async (req, res) => {
       waitTime: waitTime,
       description: description,
       pay: pay,
-      photo: photo,
+      // photo: path.join(__dirname, '../public/waitMateImg', req.file.filename),
+      photo: req.file.filename,
     });
     if (insertWaitMate) {
       res.send({ result: 'success' });
