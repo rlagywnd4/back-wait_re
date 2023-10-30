@@ -1,7 +1,6 @@
 const express = require('express');
 
-const session = require('express-session');
-
+const mongooseConnect = require('./schema');
 const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
 dotenv.config();
@@ -23,6 +22,7 @@ app.use(cors({
 
 app.use(express.static('public'));
 
+mongooseConnect();
 // router 설정
 const home = require('./routes/index');
 app.use('/', home);

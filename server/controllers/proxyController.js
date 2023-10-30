@@ -1,4 +1,6 @@
 const {Proxy} = require('../models');
+const Room = require('../schema/Room');
+const ChatData = require('../schema/ChatData');
 const jwt = require('jsonwebtoken');
 
 const input = {
@@ -133,6 +135,22 @@ const input = {
         } catch(err){
             console.error(err);
             res.status(500).json({message : '알 수 없는 서버 에러입니다.'});
+        }
+    },
+
+    mongooseTest: async (req, res) => {
+        try {
+            const newRoom = new Room({
+                wmId: req.body.wmId,
+                proxyId: req.body.proxyId,
+            });
+    
+            const room = await newRoom.save(); // 비동기로 저장하고 결과를 받음
+            console.log('room 저장 성공', room);
+            res.status(201).json(room); // 성공 응답 보내기
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: '방 생성 실패' }); // 오류 응답 보내기
         }
     }
 }
