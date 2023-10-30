@@ -14,7 +14,7 @@ exports.getWaitMateDetail = async (req, res) => {
 
     res.send({ waitMate: waitMate });
   } catch (e) {
-    console.error('Error fetching WaitMate data:', e);
+    console.error('Error WaitMate data:', e);
     res.status(500).send('Internal Server Error');
   }
 };
@@ -41,7 +41,8 @@ exports.postWaitMate = async (req, res) => {
       res.send({ result: 'fail' });
     }
   } catch (e) {
-    console.log('error:', e);
+    console.error('Error WaitMate data:', e);
+    res.status(500).send('Internal Server Error');
   }
 };
 
@@ -56,7 +57,7 @@ exports.deleteWaitMate = async (req, res) => {
     });
     res.send({ result: 'success' });
   } catch (e) {
-    console.error('Error fetching WaitMate data:', e);
+    console.error('Error WaitMate data:', e);
     res.status(500).send('Internal Server Error');
   }
 };
@@ -83,7 +84,7 @@ exports.patchWaitMate = async (req, res) => {
     );
     res.send({ result: 'success' });
   } catch (e) {
-    console.error('Error fetching WaitMate data:', e);
+    console.error('Error WaitMate data:', e);
     res.status(500).send('Internal Server Error');
   }
 };
@@ -170,7 +171,7 @@ exports.getWaitMateList = async (req, res) => {
       lastPageNum: lastPageNum,
     });
   } catch (e) {
-    console.error('Error fetching WaitMate data:', e);
+    console.error('Error WaitMate data:', e);
     res.status(500).send('Internal Server Error');
   }
 };
