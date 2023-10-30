@@ -7,6 +7,7 @@ exports.getWaitMateDetail = async (req, res) => {
   // wmAddress를 요청에 받고 응답 값에는 id(user)를 보내 글쓴 주인인지 확인
   try {
     const { wmId, id } = req.query;
+    // WaitMateDetail페이지
     const waitMate = await WaitMate.findOne({
       where: {
         wmId,
