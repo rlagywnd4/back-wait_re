@@ -1,5 +1,9 @@
 const jwt = require('jsonwebtoken');
 const { User, Review, Proxy, WaitMate } = require('../models');
+const fs = require('fs');
+const path = require('path');
+const multer = require('multer');
+
 /**
  * 사용자 정보를 가져오는 함수.
  * @param {Object} req - Express의 요청 객체
@@ -29,4 +33,33 @@ exports.cookieUserinfo = async (req) => {
       resolve(userInfo.dataValues)
     })
   })
+};
+
+const storage = (folderName) => {
+  return multer.diskStorage({
+    destination: async (req, file, cb) => {
+      const filePath = path.join(__dirname, `../public/${folderName}`);
+      try {
+        await fs.promises.mkdir(filePath, {recursive : true});
+        cb(null, filePath);
+      } catch (err) {
+        console.log(err);
+        cb(err);
+      }
+    },
+    filename: async (req, file, cb) => {
+      try {
+        // console.log(req)
+        const extname = file.mimetype.split('/')[1];
+        cb(null, `1.${extname}`);
+      } catch (err) {
+        console.log(err);
+        cb(err);
+      }
+    }
+  })
+};
+
+exports.upload = (folderName) => {
+  return multer({ storage: storage(folderName) });
 }

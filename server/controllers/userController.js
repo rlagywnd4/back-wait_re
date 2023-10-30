@@ -33,6 +33,7 @@ const kakaoLogin = async () => {
 exports.register = async (req, res) => {
   try {
     const { userId, password, nickname, email } = req.body;
+    console.log(req.file);
     const userInfo = { userId, password, nickname, email }
     const errMessages = []
     await Promise.all(
@@ -69,11 +70,12 @@ exports.login = async (req, res) => {
     });
     user = user?.dataValues
     if (!user) {
-      return res.status(401).json({ message: '회원가입되지 않은 유저입니다.' });
+      res.status(401).json({ message: '회원가입되지 않은 유저입니다.' });
+      return ;
     }
     const isPasswordValid = await bcryptjs.compare(password, user.password);
     if (!isPasswordValid) {
-      return res.status(401).json({ message: '올바르지 않은 비밀번호 입니다.' });
+      res.status(401).json({ message: '올바르지 않은 비밀번호 입니다.' });
     } else {
       const userInfo = {};
       userInfo['userId'] = user.userId;
@@ -128,7 +130,6 @@ exports.userInfo = async (req, res) => {
 exports.updateUserInfo = async (req, res) => {
   try {
     const userInfo = await Common.cookieUserinfo(req);
-    console.log(userInfo)
     if (!userInfo) {
       res.status(401).json({message : '로그인을 먼저 해주세요'});
     };
@@ -243,4 +244,9 @@ exports.kakaoUserLogin = async (req, res) => {
 };
 exports.sendKakaoData = async (req, res) => {
   res.json({kakaoId, kakaoProperties});
+};
+
+exports.uploadImage = async (req, res) => {
+  // console.log(req.file)
+  res.send("")
 };
