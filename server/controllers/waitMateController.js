@@ -1,16 +1,31 @@
 const path = require('path'); //경로에 관한 내장 모듈
 const { Op } = require('sequelize');
-const { WaitMate, ChatRoom } = require('../models');
+const { WaitMate, ChatRoom, LikeWait, Proxy } = require('../models');
 
 // waitMateDetail 조회
 exports.getWaitMateDetail = async (req, res) => {
   // wmAddress를 요청에 받고 응답 값에는 id(user)를 보내 글쓴 주인인지 확인
   try {
-    const { wmId } = req.query;
-    // WaitMateDetail페이지
+    let isLikeWait = false;
+    const { wmId, id } = req.query;
     const waitMate = await WaitMate.findOne({
       where: {
         wmId,
+      },
+    });
+
+    // 프록시 아이디를 갖기 위함(프록시 아이디를 바로 받을 수 있으면 받기)
+    const getProxyId = await Proxy.findOne({
+      where: {
+        id: id,
+      },
+    });
+
+    // 찜을 했는지 체크
+    const likeWait = await LikeWait.findOne({
+      where: {
+        wmId: wmId,
+        proxyId: getProxyId.proxyId,
       },
     });
 
@@ -33,11 +48,21 @@ exports.getWaitMateDetail = async (req, res) => {
       },
     });
 
-    res.send({
-      waitMate: waitMate,
-      recentHiresCount: recentHiresCount.length,
-      waitMateApplyCount: waitMateApply.length,
-    });
+    if (likeWait) {
+      res.send({
+        waitMate: waitMate,
+        recentHiresCount: recentHiresCount.length,
+        waitMateApplyCount: waitMateApply.length,
+        isLikeWait: true,
+      });
+    } else {
+      res.send({
+        waitMate: waitMate,
+        recentHiresCount: recentHiresCount.length,
+        waitMateApplyCount: waitMateApply.length,
+        isLikeWait: false,
+      });
+    }
   } catch (e) {
     console.error('Error WaitMate data:', e);
     res.status(500).send('Internal Server Error');
