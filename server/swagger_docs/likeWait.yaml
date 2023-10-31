@@ -12,15 +12,15 @@ paths:
         content:
           application/json:
             schema:
-            type: object
-            properties:
-              wmId:
-                type: integer
-              proxyId:
-                type: integer
-            required:
-              - wmId
-              - proxyId
+              type: object
+              properties:
+                wmId:
+                  type: integer
+                proxyId:
+                  type: integer
+              required:
+                - wmId
+                - proxyId
       responses:
         '200':
           description: 관심 등록 성공/실패
