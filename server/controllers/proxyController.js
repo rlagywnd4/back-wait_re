@@ -142,14 +142,18 @@ const output = {
     getAddressAll : async (req,res)=>{
         try{
         const userInfo = Common.cookieUserinfo(req);
-        const result = await WaitMate.findOne({
-            where : {id : userInfo.id}
-        });
-        const proxyList = await Proxy.findAll({
-            where : {proxyAddress : result.wmAddress}
-        });
-        if(proxyList){
-            res.status({list: proxyList})
+        if(!userInfo){
+            res.status(401).json({message : '로그인을 먼저 진행해 주세요'});
+        } else{
+            const result = await WaitMate.findOne({
+                where : {id : userInfo.id}
+            });
+            const proxyList = await Proxy.findAll({
+                where : {proxyAddress : result.wmAddress}
+            });
+            if(proxyList){
+                res.status({list: proxyList})
+            }
         }
         } catch(err){
             console.error(err);

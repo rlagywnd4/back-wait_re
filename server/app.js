@@ -9,7 +9,8 @@ const Router = require('./routes');
 const PORT = 8080;
 const cors = require('cors');
 require('dotenv').config();
-const SocketIo = require('socket.io');
+const setupSocket = require('./socket'); 
+
 
 // 익스프레스에서 json 사용하도록 해줌
 app.use(express.urlencoded({ extended: true }));
@@ -23,7 +24,15 @@ app.use(cors({
 
 app.use(express.static('public'));
 
+//몽구스 연결
 mongooseConnect();
+// 소켓 연결
+const http = require('http');
+const server = http.createServer(app);
+setupSocket(server);
+
+
+
 // router 설정
 const home = require('./routes/index');
 app.use('/', home);
