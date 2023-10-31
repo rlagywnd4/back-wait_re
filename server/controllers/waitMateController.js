@@ -34,6 +34,7 @@ exports.getWaitMateDetail = async (req, res) => {
       where: {
         wmId: wmId,
       },
+      raw: true,
     });
 
     res.send({
