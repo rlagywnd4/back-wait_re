@@ -1,9 +1,6 @@
-
-const { WaitMate } = require('../models');
 const path = require('path'); //경로에 관한 내장 모듈
 const { Op } = require('sequelize');
 const { WaitMate, ChatRoom } = require('../models');
-
 
 // waitMateDetail 조회
 exports.getWaitMateDetail = async (req, res) => {
