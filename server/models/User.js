@@ -24,12 +24,14 @@ const User = (Sequelize, DataTypes) => {
         },
         email: {
           type: DataTypes.STRING(150),
-          allowNull: false,
+          allowNull: true,
+          defaultValue : 'user@email.com',
           comment: '유저 이메일',
         },
         photo: {
            type: DataTypes.STRING(150),
            allowNull : true,
+           defaultValue: 'http://localhost:8080/profileImg/default.png',
            comment : '사진'
         },
         social : {

@@ -32,9 +32,8 @@ const kakaoLogin = async () => {
 };
 exports.register = async (req, res) => {
   try {
-    const { userId, password, nickname, email } = req.body;
-    console.log(req.file);
-    const userInfo = { userId, password, nickname, email }
+    const { userId, password, nickname } = req.body;
+    const userInfo = { userId, password, nickname }
     const errMessages = []
     await Promise.all(
       Object.entries(userInfo).map(async ([k, v]) => {
@@ -45,14 +44,16 @@ exports.register = async (req, res) => {
       })
     );
     if (errMessages.length > 0) {
+      console.log(errMessages)
       res.status(400).json({ errors: errMessages });
     } else {
       const hashedPassword = await bcryptjs.hash(password, 10);
+      const profileImg = req.file?.filename
       await User.create({
         userId,
         password : hashedPassword,
         nickname,
-        email
+        photo : `http://localhost:8080/profileImg/${profileImg}`
       });
       res.status(201).json({ message : '회원 가입 완료' });
     }

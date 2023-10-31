@@ -41,17 +41,33 @@ const storage = (folderName) => {
       const filePath = path.join(__dirname, `../public/${folderName}`);
       try {
         await fs.promises.mkdir(filePath, {recursive : true});
+
         cb(null, filePath);
       } catch (err) {
         console.log(err);
         cb(err);
       }
     },
-    filename: async (req, file, cb) => {
+    filename: (req, file, cb) => {
       try {
-        // console.log(req)
         const extname = file.mimetype.split('/')[1];
-        cb(null, `1.${extname}`);
+        if (extname !== 'jpeg' && extname !== 'png' && extname !== 'jpg') {
+          throw Error('지원하지 않는 파일 형식입니다.');
+        }
+        const profileImgDir = path.join(__dirname, '../public/profileImg/')
+        fs.readdir(profileImgDir, (err, files) => {
+          if (err) {
+            throw new Error(err)
+          }
+          files.forEach((file) => {
+            if (file.startsWith(`${req.body.userId}.`)) {
+              fs.unlink(path.join(profileImgDir, file), err => {
+                if (err) throw err;
+              });
+            }
+          })
+        })
+        cb(null, `${req.body.userId}.${extname}`);
       } catch (err) {
         console.log(err);
         cb(err);
