@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const connect = () => {
-    mongoose.connect(`mongodb://${process.env.MONGOUSER}:${process.env.MONGOPWD}@localhost:27017/admin`, {
+    mongoose.connect(`mongodb://${process.env.MONGOUSER}:${process.env.MONGOPWD}@49.50.166.140:27017/admin`, {
         dbName: 'chat',
         useNewUrlParser: true,
     });
