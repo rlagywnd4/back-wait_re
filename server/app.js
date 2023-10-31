@@ -9,6 +9,7 @@ const Router = require('./routes');
 const PORT = 8080;
 const cors = require('cors');
 require('dotenv').config();
+const SocketIo = require('socket.io');
 
 // 익스프레스에서 json 사용하도록 해줌
 app.use(express.urlencoded({ extended: true }));

@@ -24,13 +24,15 @@ proxyRouter.post('/register', proxyController.input.postRegister);
 proxyRouter.get('/getter', proxyController.output.getProxyAll);
 //프록시 특정 글 보기
 proxyRouter.get('/getter/:proxyId', proxyController.output.getProxyOne);
+//웨이트메이트가 지정한 동까지의 프록시 불러오기
+proxyRouter.get('/realGetter', proxyController.output.getAddressAll);
 
 //등록된 프록시를 변경
 proxyRouter.patch('/update/:id', proxyController.input.updateProxy);
 //등록된 프록시를 삭제
 proxyRouter.delete('/delete/:id', proxyController.input.deleteRegister);
 // 프록시 이미지 등록
-proxyRouter.post('/imgUpload', uploadProxy.single(), proxyController.input.postImgProxy);
+proxyRouter.post('/imgUpload', uploadProxy.single('proxyImg'), proxyController.input.postImgProxy);
 
 
 //몽구스 테스트
