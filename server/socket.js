@@ -1,4 +1,6 @@
 const socketIO = require('socket.io');
+const {ChatData, Room} = require('./schema');
+const {ChatRoom, Proxy, WaitMate, User, Review, LikeWait} = require('./models');
 
 function setupSocket(server) {
   const io = socketIO(server);
@@ -6,18 +8,49 @@ function setupSocket(server) {
   io.on('connection', (socket) => {
     console.log('새로운 소켓 연결이 이루어졌습니다.');
 
-    socket.on('requestChat', (data) => {
-      // 대화 요청 처리 로직
-      // 이벤트 핸들러 내용을 이곳에 이동
-    });
+    socket.on('requestChatRoom', (data) => {
+        // 웨메 및 프록시 정보 추출
+        const { wmId, proxyId } = data;
+      
+        // 방 정보를 데이터베이스에 저장 (Room 모델 사용)
+        const newRoom = new Room({ wmId, proxyId });
+        newRoom.save();
+      
+        // 웨메와 프록시를 해당 방에 연결
+        socket.join(newRoom._id);
+      
+        // 클라이언트에 채팅 방 생성 완료 메시지 보내기
+        socket.emit('chatRoomCreated', { roomId: newRoom._id });
 
-    // 다른 소켓 이벤트 핸들러 등록
-    socket.on('error', ()=>{
-        console.error('소켓 연결에 에러가 났습니다');
-    })
-    socket.on('disconnect', () => {
-      console.log('소켓 연결이 종료되었습니다.');
-    });
+        // 클라이언트에 채팅 생성 메세지 보내기
+        socket.to(newRoom._id).emit('AllMessage', {
+            message : '안녕하세요. 바른말 고운말만 사용해주세요~!'
+        })
+      });
+
+      socket.on('chatting', (data) => {
+        const { room, sender, receiver, messageType, messageContent } = data;
+      
+        // 데이터베이스에 채팅 메시지 저장
+        const chatData = new ChatData({
+          room,
+          sender,
+          receiver,
+          messageType,
+          messageContent,
+        });
+        
+        chatData.save((err) => {
+          if (err) {
+            console.error('채팅 메시지 저장 중 오류 발생: ', err);
+          } else {
+            console.log('채팅 메시지가 성공적으로 저장되었습니다.');
+          }
+        });
+      
+        // 채팅 메시지를 다른 클라이언트에게 보내기 (broadcast 사용)
+        socket.broadcast.emit('chatting', data);
+      });
   });
 }
 
