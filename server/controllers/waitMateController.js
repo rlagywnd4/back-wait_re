@@ -1,12 +1,12 @@
 const path = require('path'); //경로에 관한 내장 모듈
-const { Op } = require('sequelize');
+const { Op, fn, col } = require('sequelize');
 const { WaitMate, ChatRoom } = require('../models');
 
 // waitMateDetail 조회
 exports.getWaitMateDetail = async (req, res) => {
   // wmAddress를 요청에 받고 응답 값에는 id(user)를 보내 글쓴 주인인지 확인
   try {
-    const { wmId } = req.query;
+    const { wmId, id } = req.query;
     // WaitMateDetail페이지
     const waitMate = await WaitMate.findOne({
       where: {
@@ -18,16 +18,19 @@ exports.getWaitMateDetail = async (req, res) => {
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
     const recentHiresCount = await WaitMate.findAll({
+      attributes: [[fn('COUNT', col('*')), 'rowCount']],
       where: {
         id: waitMate.id,
         updatedAt: {
           [Op.between]: [sixMonthsAgo, new Date()],
         },
       },
-    });
+      raw: true,
+    }); // 실행 결과(예시): [ { rowCount: 8 } ]
 
     // 지원자수
     const waitMateApply = await ChatRoom.findAll({
+      attributes: [[fn('COUNT', col('*')), 'rowCount']],
       where: {
         wmId: wmId,
       },
@@ -35,8 +38,8 @@ exports.getWaitMateDetail = async (req, res) => {
 
     res.send({
       waitMate: waitMate,
-      recentHiresCount: recentHiresCount.length,
-      waitMateApplyCount: waitMateApply.length,
+      recentHiresCount: recentHiresCount[0].rowCount,
+      waitMateApplyCount: waitMateApply[0].rowCount,
     });
   } catch (e) {
     console.error('Error WaitMate data:', e);
