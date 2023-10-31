@@ -49,7 +49,7 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               properties:
@@ -68,7 +68,7 @@ paths:
                 pay:
                   type: integer
                 photo:
-                  type: string
+                  type: file
               required:
                 - wmId
                 - id
