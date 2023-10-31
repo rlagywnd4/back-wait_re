@@ -18,7 +18,7 @@ exports.cookieUserinfo = async (req) => {
   return new Promise(async (resolve, reject) => {
     await jwt.verify(access, process.env.SECRET_KEY, async (err, decoded) => {
       if (err) {
-        return reject({})
+        return resolve({})
       }
       const id = decoded?.id;
       const userInfo = await User.findOne({
@@ -49,9 +49,21 @@ const storage = (folderName) => {
     },
     filename: async (req, file, cb) => {
       try {
-        // console.log(req)
+        const userInfo = await exports.cookieUserinfo(req);
         const extname = file.mimetype.split('/')[1];
-        cb(null, `1.${extname}`);
+        const userId = userInfo.userId ? userInfo.userId : req.body.userId;
+        if (extname !== 'jpeg' && extname !== 'png' && extname !== 'jpg') {
+          throw Error('지원하지 않는 파일 형식입니다.');
+        }
+        const profileImgDir = path.join(__dirname, '../public/profileImg/');
+        const files = await fs.promises.readdir(profileImgDir);
+        const deletePromises = files.map((file) => {
+          if (file.startsWith(`${userId}.`)) {
+            return fs.promises.unlink(path.join(profileImgDir, file));
+          }
+        });
+        await Promise.all(deletePromises);
+        cb(null, `${userId}.${extname}`);
       } catch (err) {
         console.log(err);
         cb(err);
