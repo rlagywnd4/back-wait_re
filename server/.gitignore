@@ -5,7 +5,7 @@ package-lock.json
 env/
 .DS_Store
 **/.DS_Store
-public/*.png
-public/*.jpg
-public/*.jpeg
-!public/default.png
+public/**/*.png
+public/**/*.jpg
+public/**/*.jpeg
+!public/profileImg/default.png

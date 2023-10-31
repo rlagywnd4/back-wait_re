@@ -18,7 +18,7 @@ exports.cookieUserinfo = async (req) => {
   return new Promise(async (resolve, reject) => {
     await jwt.verify(access, process.env.SECRET_KEY, async (err, decoded) => {
       if (err) {
-        return reject({})
+        return resolve({})
       }
       const id = decoded?.id;
       const userInfo = await User.findOne({
@@ -41,33 +41,29 @@ const storage = (folderName) => {
       const filePath = path.join(__dirname, `../public/${folderName}`);
       try {
         await fs.promises.mkdir(filePath, {recursive : true});
-
         cb(null, filePath);
       } catch (err) {
         console.log(err);
         cb(err);
       }
     },
-    filename: (req, file, cb) => {
+    filename: async (req, file, cb) => {
       try {
+        const userInfo = await exports.cookieUserinfo(req);
         const extname = file.mimetype.split('/')[1];
+        const userId = userInfo.userId ? userInfo.userId : req.body.userId;
         if (extname !== 'jpeg' && extname !== 'png' && extname !== 'jpg') {
           throw Error('지원하지 않는 파일 형식입니다.');
         }
-        const profileImgDir = path.join(__dirname, '../public/profileImg/')
-        fs.readdir(profileImgDir, (err, files) => {
-          if (err) {
-            throw new Error(err)
+        const profileImgDir = path.join(__dirname, '../public/profileImg/');
+        const files = await fs.promises.readdir(profileImgDir);
+        const deletePromises = files.map((file) => {
+          if (file.startsWith(`${userId}.`)) {
+            return fs.promises.unlink(path.join(profileImgDir, file));
           }
-          files.forEach((file) => {
-            if (file.startsWith(`${req.body.userId}.`)) {
-              fs.unlink(path.join(profileImgDir, file), err => {
-                if (err) throw err;
-              });
-            }
-          })
-        })
-        cb(null, `${req.body.userId}.${extname}`);
+        });
+        await Promise.all(deletePromises);
+        cb(null, `${userId}.${extname}`);
       } catch (err) {
         console.log(err);
         cb(err);

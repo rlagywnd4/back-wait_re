@@ -64,7 +64,7 @@ exports.register = async (req, res) => {
 };
 exports.login = async (req, res) => {
   try {
-    const {userId, password} = req.body
+    const { userId, password } = req.body
     let user = await User.findOne({
       where : {userId : userId},
       attributes : ['id', 'userId', 'password']
@@ -84,9 +84,12 @@ exports.login = async (req, res) => {
       const token = jwt.sign(userInfo, process.env.SECRET_KEY);
       res.cookie('access', token, {
         maxAge : 24 * 60 * 60 * 1000,
-        Path : '/'
-      })
-      res.status(200).json({ ...user, password : '' })
+        path : '/',
+        sameSite: 'None',
+        secure : true,
+        domain: 'localhost',
+      });
+      res.status(200).json({ userInfo });
     }
   } catch (err) {
     console.log(err)
@@ -131,16 +134,26 @@ exports.userInfo = async (req, res) => {
 exports.updateUserInfo = async (req, res) => {
   try {
     const userInfo = await Common.cookieUserinfo(req);
-    if (!userInfo) {
+    if (Object.keys(userInfo).length === 0) {
       res.status(401).json({message : '로그인을 먼저 해주세요'});
+      return ;
     };
     if (req.body.userId) {
       res.status(403).json({message : '아이디는 변경할 수 없습니다.'});
+      return ;
     };
     if (req.body.password) {
       req.body.password = await bcryptjs.hash(req.body.password, 10);
     };
-    const response = await User.update(req.body, {
+    for (const [k,v] of Object.entries(req.body)) {
+      if (k !== 'userId') {
+        userInfo[k] = v;
+      }
+    }
+    if (req.file?.filename) {
+      userInfo['photo'] = `http://localhost:8080/profileImg/${req.file?.filename}`
+    }
+    const response = await User.update(userInfo, {
       where : {id : userInfo.id}
     });
     if (response) {
