@@ -1,6 +1,6 @@
 const path = require('path'); //경로에 관한 내장 모듈
 const { Op, fn, col } = require('sequelize');
-const { WaitMate, ChatRoom } = require('../models');
+const { WaitMate, ChatRoom, ViewCount } = require('../models');
 
 // waitMateDetail 조회
 exports.getWaitMateDetail = async (req, res) => {
@@ -12,6 +12,28 @@ exports.getWaitMateDetail = async (req, res) => {
       where: {
         wmId,
       },
+    });
+
+    // 조회수db에서 id가 같은 것이 있는지 확인 findone
+    const isSameId = await ViewCount.findOne({
+      where: {
+        id: id,
+      },
+    });
+    // 없으면 db에 추가
+    if (!isSameId) {
+      const addViewCount = await ViewCount.create({
+        id: id,
+        wmId: wmId,
+      });
+    }
+    // 조회수db에서 wmId기준으로 모든 데이터 수를 가져옴
+    const viewCount = await ViewCount.findAll({
+      attributes: [[fn('COUNT', col('*')), 'rowCount']],
+      where: {
+        wmId: wmId,
+      },
+      raw: true,
     });
 
     //최근 채용 횟수(6개월전 ~ 현재)
@@ -41,6 +63,7 @@ exports.getWaitMateDetail = async (req, res) => {
       waitMate: waitMate,
       recentHiresCount: recentHiresCount[0].rowCount,
       waitMateApplyCount: waitMateApply[0].rowCount,
+      viewCount: viewCount[0].rowCount,
     });
   } catch (e) {
     console.error('Error WaitMate data:', e);

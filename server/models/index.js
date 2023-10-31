@@ -89,6 +89,7 @@ db.WaitMate = WaitMate;
 db.Review = Review;
 db.ChatRoom = ChatRoom;
 db.LikeWait = LikeWait;
+db.ViewCount = ViewCount;
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
