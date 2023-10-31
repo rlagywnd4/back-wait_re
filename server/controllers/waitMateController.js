@@ -1,16 +1,23 @@
 const path = require('path'); //경로에 관한 내장 모듈
 const { Op } = require('sequelize');
-const { WaitMate, ChatRoom } = require('../models');
+const { WaitMate, ChatRoom, LikeWait } = require('../models');
 
 // waitMateDetail 조회
 exports.getWaitMateDetail = async (req, res) => {
   // wmAddress를 요청에 받고 응답 값에는 id(user)를 보내 글쓴 주인인지 확인
   try {
-    const { wmId } = req.query;
+    const { wmId, id } = req.query;
     // WaitMateDetail페이지
     const waitMate = await WaitMate.findOne({
       where: {
         wmId,
+      },
+    });
+
+    // 찜을 했는지 체크
+    const likeWait = await LikeWait.findOne({
+      where: {
+        id: id,
       },
     });
 
@@ -33,11 +40,21 @@ exports.getWaitMateDetail = async (req, res) => {
       },
     });
 
-    res.send({
-      waitMate: waitMate,
-      recentHiresCount: recentHiresCount.length,
-      waitMateApplyCount: waitMateApply.length,
-    });
+    if (likeWait) {
+      res.send({
+        waitMate: waitMate,
+        recentHiresCount: recentHiresCount.length,
+        waitMateApplyCount: waitMateApply.length,
+        isLikeWait: true,
+      });
+    } else {
+      res.send({
+        waitMate: waitMate,
+        recentHiresCount: recentHiresCount.length,
+        waitMateApplyCount: waitMateApply.length,
+        isLikeWait: false,
+      });
+    }
   } catch (e) {
     console.error('Error WaitMate data:', e);
     res.status(500).send('Internal Server Error');
