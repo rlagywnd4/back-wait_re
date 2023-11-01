@@ -37,6 +37,11 @@ const WaitMate = (Sequelize, DataTypes) => {
         allowNull: true,
         comment: '사진',
       },
+      count: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+        comment: '조회수',
+      },
     },
     {
       tableName: 'waitMate',

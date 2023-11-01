@@ -31,6 +31,18 @@ exports.getWaitMateDetail = async (req, res) => {
       raw: true,
     });
 
+    // db에 조회수 업데이트
+    const patchWaitMateCount = await WaitMate.update(
+      {
+        count: viewCount[0].rowCount,
+      },
+      {
+        where: {
+          wmId: wmId,
+        },
+      }
+    );
+
     //최근 채용 횟수(6개월전 ~ 현재)
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
