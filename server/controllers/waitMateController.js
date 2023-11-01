@@ -1,11 +1,13 @@
 const path = require('path'); //경로에 관한 내장 모듈
 const { Op, fn, col } = require('sequelize');
-const { WaitMate, ChatRoom, ViewCount } = require('../models');
+const { WaitMate, ChatRoom, LikeWait, Proxy, ViewCount } = require('../models');
+
 
 // waitMateDetail 조회
 exports.getWaitMateDetail = async (req, res) => {
   // wmAddress를 요청에 받고 응답 값에는 id(user)를 보내 글쓴 주인인지 확인
   try {
+    let isLikeWait = false;
     const { wmId, id } = req.query;
     // WaitMateDetail페이지
     const waitMate = await WaitMate.findOne({
@@ -45,6 +47,21 @@ exports.getWaitMateDetail = async (req, res) => {
       );
     }
 
+    // 프록시 아이디를 갖기 위함(프록시 아이디를 바로 받을 수 있으면 받기)
+    const getProxyId = await Proxy.findOne({
+      where: {
+        id: id,
+      },
+    });
+
+    // 찜을 했는지 체크
+    const likeWait = await LikeWait.findOne({
+      where: {
+        wmId: wmId,
+        proxyId: getProxyId.proxyId,
+      },
+    });
+
     //최근 채용 횟수(6개월전 ~ 현재)
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
@@ -68,12 +85,24 @@ exports.getWaitMateDetail = async (req, res) => {
       raw: true,
     });
 
-    res.send({
-      waitMate: waitMate,
+
+    if (likeWait) {
+      res.send({
+        waitMate: waitMate,
       recentHiresCount: recentHiresCount[0].rowCount,
       waitMateApplyCount: waitMateApply[0].rowCount,
-      viewCount: viewCount[0].rowCount,
-    });
+        viewCount: viewCount[0].rowCount,
+        isLikeWait: true,
+      });
+    } else {
+      res.send({
+        waitMate: waitMate,
+      recentHiresCount: recentHiresCount[0].rowCount,
+      waitMateApplyCount: waitMateApply[0].rowCount,
+        viewCount: viewCount[0].rowCount,
+        isLikeWait: false,
+      });
+    }
   } catch (e) {
     console.error('Error WaitMate data:', e);
     res.status(500).send('Internal Server Error');

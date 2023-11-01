@@ -48,12 +48,10 @@ exports.register = async (req, res) => {
       res.status(400).json({ errors: errMessages });
     } else {
       const hashedPassword = await bcryptjs.hash(password, 10);
-      const profileImg = req.file?.filename
       await User.create({
         userId,
         password : hashedPassword,
-        nickname,
-        photo : `http://localhost:8080/profileImg/${profileImg}`
+        nickname
       });
       res.status(201).json({ message : '회원 가입 완료' });
     }
@@ -236,31 +234,37 @@ exports.kakaoResult = async (req, res) => {
       Path : '/'
     })
     // res.redirect(`http://localhost:3000/main`);
-    res.redirect(`http://localhost:3000/main?token=${token}`);
+    res.redirect(`http://localhost:3000/main`);
   } catch (err) {
     console.log(err);
   }
 };
 // window.location.href=`https://kauth.kakao.com/oauth/authorize?redirect_uri=http://localhost:8080/user/kakao/login&client_id=${process.env.REACT_APP_KAKAO_REST_API}&response_type=code`
-exports.kakaoUserRegister = async (req, res) => {
-  res.send('');
+exports.checkUserId = async (req, res) => {
+  try {
+    const { userId } = req.body;
+    const user = await User.findOne({ where: { userId } });
+    if (user) {
+      res.status(400).json({ message: '이미 존재하는 userId입니다.' });
+      return;
+    };
+    res.status(200).json({ message : '사용가능한 userId입니다.' });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: '알 수 없는 서버 에러' });
+  }
 };
-exports.kakaoUserLogin = async (req, res) => {
-  // const userInfo = {};
-  // userInfo['id'] = kakaoUser?.id;
-  // userInfo['nickname'] = kakaoUser?.nickname;
-  // const token = jwt.sign(userInfo, process.env.SECRET_KEY);
-  // res.cookie('access', token, {
-  //   maxAge : 24 * 60 * 60 * 1000,
-  //   Path : '/'
-  // })
-  // res.status(200).send({...token})
-};
-exports.sendKakaoData = async (req, res) => {
-  res.json({kakaoId, kakaoProperties});
-};
-
-exports.uploadImage = async (req, res) => {
-  // console.log(req.file)
-  res.send("")
+exports.checkNickname = async (req, res) => {
+  try {
+    const { nickname } = req.body;
+    const user = await User.findOne({ where: { nickname } });
+    if (user) {
+      res.status(400).json({ message: '이미 존재하는 nickname입니다.' });
+      return;
+    };
+    res.status(200).json({ message : '사용가능한 nickname입니다.' });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: '알 수 없는 서버 에러' });
+  }
 };

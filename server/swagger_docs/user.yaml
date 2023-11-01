@@ -280,95 +280,73 @@ paths:
                 example : '알 수 없는 서버 에러 입니다.'
   /user:
     put:
-      summary: 사용자 정보 업데이트
-      description: 로그인한 사용자의 정보를 업데이트합니다.
       tags:
         - User
+      summary: 유저의 정보 업데이트
+      description: 유저의 정보를 업데이트합니다.
+      consumes:
+        - multipart/form-data
+      produces:
+        - application/json
       parameters:
-        - name: Cookie
+        - name: Authorization
           in: header
-          description: 로그인 토큰 (access)
+          description: User's JWT token
           required: true
-        - name: body
-          in: body
-          required: true
-          description: 업데이트할 사용자 정보를 담은 객체
+          type: string
+        - name: userId
+          in: formData
+          description: User ID
+          type: string
+        - name: password
+          in: formData
+          description: User's new password
+          type: string
+        - name: photo
+          in: formData
+          description: User's new photo
+          type: file
+      responses:
+        '201':
+          description: Successfully updated user information.
           schema:
             type: object
             properties:
-              nickname:
+              message:
                 type: string
-                description: 새로운 닉네임 (선택 사항)
-              password:
+                example: 업데이트가 완료되었습니다.
+        '401':
+          description: Unauthorized. User needs to login first.
+          schema:
+            type: object
+            properties:
+              message:
                 type: string
-                description: 새로운 비밀번호 (선택 사항)
-              email:
+                example: 로그인을 먼저 해주세요.
+        '403':
+          description: Forbidden. User ID cannot be changed.
+          schema:
+            type: object
+            properties:
+              message:
                 type: string
-                format: email
-                description: 새로운 이메일 주소 (선택 사항)
-              photo:
+                example: 아이디는 변경할 수 없습니다.
+        '400':
+          description: Bad Request. The field name does not exist or the value already exists.
+          schema:
+            type: object
+            properties:
+              message:
                 type: string
-                description: 새로운 프로필 사진 URL (선택 사항)
-          example:
-            nickname: "새로운 닉네임"
-            email: "newemail@example.com"
-            photo: "https://example.com/newphoto.jpg"
-      responses:
-        200:
-          description: 사용자 정보 업데이트 성공
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    description: 업데이트 성공 메시지
-                    example: '사용자 정보가 업데이트되었습니다.'
-        400:
-          description: 존재하지 않는 필드이거나, 이미 그 값임.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    description: 오류 메시지
-                    example: '이미 존재하는 값이거나 존재하지 않는 필드이름 입니다.'
-        401:
-          description: 인증 오류
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    description: 오류 메시지
-                    example: '로그인을 먼저 해주세요'
-        403:
-          description: 권한 오류
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    description: 오류 메시지
-                    example: '아이디는 변경할 수 없습니다.'
-        500:
-          description: 서버 오류
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    description: 오류 메시지
-                    example: '알 수 없는 서버 에러 입니다.'
+                example: 이미 존재하는 값이거나 존재하지 않는 필드이름 입니다.
+        '500':
+          description: Internal Server Error. Unknown server error.
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: 알 수 없는 서버 에러 입니다.
     delete:
       summary: 사용자 탈퇴
       description: 현재 로그인한 사용자의 계정을 탈퇴합니다.
@@ -415,3 +393,101 @@ paths:
                     type: string
                     description: 오류 메시지
                     example: '알 수 없는 서버 에러 입니다.'
+  /check/userId:
+    post:
+      tags:
+        - User
+      summary: userId 중복 체크
+      description: 입력한 userId가 이미 존재하는지 체크합니다.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - userId
+              properties:
+                userId:
+                  type: string
+                  example: '유저 아이디'
+      responses:
+        '200':
+          description: 사용가능한 userId
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: '사용가능한 userId입니다.'
+        '400':
+          description: 이미 존재하는 userId
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: '이미 존재하는 userId입니다.'
+        '500':
+          description: 서버 에러
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: '알 수 없는 서버 에러'
+  /check/nickname:
+    post:
+      tags:
+        - User
+      summary: nickname 중복 체크
+      description: 입력한 nickname이 이미 존재하는지 체크합니다.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - nickname
+              properties:
+                nickname:
+                  type: string
+                  example: '유저 닉네임'
+      responses:
+        '200':
+          description: 사용가능한 nickname
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: '사용가능한 nickname입니다.'
+        '400':
+          description: 이미 존재하는 nickname
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: '이미 존재하는 nickname입니다.'
+        '500':
+          description: 서버 에러
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: '알 수 없는 서버 에러'

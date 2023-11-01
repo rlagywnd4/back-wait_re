@@ -5,16 +5,17 @@ const userRouter = require('./userRouter');
 const waitMateRouter = require('./waitMateRouter');
 const proxyRouter = require('./proxyRouter');
 const reviewRouter = require('./reviewRouter');
+const likeWaitRouter = require('./likeWaitRouter');
 
 Router.get('', (req, res) => {
-  res.send("hello world")
+  res.send('hello world');
 });
-
 
 Router.use('/proxy', proxyRouter);
 Router.use('/user', userRouter);
 Router.use('/waitMate', waitMateRouter);
 Router.use('/review', reviewRouter);
+Router.use('/likeWait', likeWaitRouter);
 Router.use('/swagger', swaggerUi.serve, swaggerUi.setup(specs));
 
 module.exports = Router;
