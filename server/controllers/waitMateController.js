@@ -14,11 +14,13 @@ exports.getWaitMateDetail = async (req, res) => {
       },
     });
 
-    // 조회수db에서 id가 같은 것이 있는지 확인 findone
-    const isSameId = await ViewCount.findOne({
+    // 조회수db에서 id가 같은 것이 있는지 확인
+    const isSameId = await ViewCount.findOrCreate({
       where: {
         id: id,
+        wmId: wmId,
       },
+      defaults: { id: id, wmId: wmId },
     });
     // 없으면 db에 추가
     if (!isSameId) {
