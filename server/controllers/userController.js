@@ -234,7 +234,7 @@ exports.kakaoResult = async (req, res) => {
       Path : '/'
     })
     // res.redirect(`http://localhost:3000/main`);
-    res.redirect(`http://localhost:3000/main`);
+    res.redirect(`http://localhost:3000/waitMate/list`);
   } catch (err) {
     console.log(err);
   }
