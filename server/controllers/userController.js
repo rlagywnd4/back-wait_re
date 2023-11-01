@@ -66,11 +66,11 @@ exports.login = async (req, res) => {
     let user = await User.findOne({
       where : {userId : userId},
     });
-    user = user?.dataValues
+    user = user?.dataValues;
     if (!user) {
       res.status(401).json({ message: '회원가입되지 않은 유저입니다.' });
       return ;
-    }
+    };
     const isPasswordValid = await bcryptjs.compare(password, user.password);
     if (!isPasswordValid) {
       res.status(401).json({ message: '올바르지 않은 비밀번호 입니다.' });
@@ -203,6 +203,9 @@ exports.kakaoResult = async (req, res) => {
         },
       },
     );
+    if (response.status !== 200) {
+      throw new Error('카카오 서버 에러')
+    };
     const {access_token, token_type, refresh_token, expires_in, refresh_token_expires_in} = response.data;
     const info = await axios.get('https://kapi.kakao.com/v2/user/me', 
     {
@@ -211,6 +214,9 @@ exports.kakaoResult = async (req, res) => {
         'Content-type' : 'application/x-www-form-urlencoded;charset=utf-8'
       }
     });
+    if (info.status !== 200) {
+      throw new Error('카카오 서버 에러')
+    };
     const kakaoId = info?.data?.id;
     const kakaoProperties = info?.data?.properties;
     let kakaoUser = await User.findOne({
@@ -233,7 +239,28 @@ exports.kakaoResult = async (req, res) => {
       Path : '/'
     })
     // res.redirect(`http://localhost:3000/main`);
-    res.redirect(`http://localhost:3000/waitMate/list`);
+    // res.redirect(`http://localhost:3000/waitMate/list`);
+    // const userInfo = kakaoUser.dataValues
+    res.send(`
+    <html>
+      <body>
+        <h1 
+          style="
+            position:absolute; 
+            top:50%; 
+            left:50%; 
+            transform:translate(-50%,-50%)
+            ">
+          로그인 중...</h1>
+        <script>
+          const reload = () => {
+            return setTimeout(() => {window.location.href='http://localhost:3000/waitMate/list'}, 1000)
+          }
+          reload();
+        </script>
+      </body>
+    </html>
+  `)
   } catch (err) {
     console.log(err);
   }
@@ -267,3 +294,10 @@ exports.checkNickname = async (req, res) => {
     res.status(500).json({ message: '알 수 없는 서버 에러' });
   }
 };
+exports.temp = (req, res) => {
+  res.redirect(`https://kauth.kakao.com/oauth/authorize?redirect_uri=http://localhost:8080/user/kakao&client_id=${process.env.KAKAO_REST_API_KEY}&response_type=code`)
+}
+exports.logOut = () => {
+  res.clearCookie('access');
+  res.redirect('/');
+}

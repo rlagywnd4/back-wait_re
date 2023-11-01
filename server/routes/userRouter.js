@@ -9,8 +9,10 @@ userRouter.post('/register', userController.register);
 userRouter.post('/login', userController.login);
 userRouter.get('/myinfo', userController.myInfo);
 userRouter.get('/kakao', userController.kakaoResult);
+userRouter.get('/temp', userController.temp);
 userRouter.post('/check/nickname', userController.checkNickname);
 userRouter.post('/check/userId', userController.checkUserId);
+userRouter.get('/logout', userController.logOut);
 
 userRouter.get('/:userId', userController.userInfo);
 
