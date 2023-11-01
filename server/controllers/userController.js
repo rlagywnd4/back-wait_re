@@ -234,33 +234,12 @@ exports.kakaoResult = async (req, res) => {
       Path : '/'
     })
     // res.redirect(`http://localhost:3000/main`);
-    res.redirect(`http://localhost:3000/main?token=${token}`);
+    res.redirect(`http://localhost:3000/main`);
   } catch (err) {
     console.log(err);
   }
 };
 // window.location.href=`https://kauth.kakao.com/oauth/authorize?redirect_uri=http://localhost:8080/user/kakao/login&client_id=${process.env.REACT_APP_KAKAO_REST_API}&response_type=code`
-exports.kakaoUserRegister = async (req, res) => {
-  res.send('');
-};
-exports.kakaoUserLogin = async (req, res) => {
-  // const userInfo = {};
-  // userInfo['id'] = kakaoUser?.id;
-  // userInfo['nickname'] = kakaoUser?.nickname;
-  // const token = jwt.sign(userInfo, process.env.SECRET_KEY);
-  // res.cookie('access', token, {
-  //   maxAge : 24 * 60 * 60 * 1000,
-  //   Path : '/'
-  // })
-  // res.status(200).send({...token})
-};
-exports.sendKakaoData = async (req, res) => {
-  res.json({kakaoId, kakaoProperties});
-};
-exports.uploadImage = async (req, res) => {
-  // console.log(req.file)
-  res.send("")
-};
 exports.checkUserId = async (req, res) => {
   try {
     const { userId } = req.body;
