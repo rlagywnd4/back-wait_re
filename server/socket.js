@@ -1,10 +1,16 @@
+
 const socketIO = require('socket.io');
 const {ChatData, Room} = require('./schema');
 const {ChatRoom, Proxy, WaitMate, User, Review, LikeWait} = require('./models');
 
-function setupSocket(server) {
-  const io = socketIO(server);
-
+function setupSocket(server ) {
+  const io = socketIO(server, {
+    cors: {
+      origin: ['http://localhost:3000'],
+      methods: ["GET","POST"],
+    }
+  });
+  console.log('소켓 시작');
   io.on('connection', (socket) => {
     console.log('새로운 소켓 연결이 이루어졌습니다.');
 
@@ -29,27 +35,21 @@ function setupSocket(server) {
       });
 
       socket.on('chatting', (data) => {
-        const { room, sender, receiver, messageType, messageContent } = data;
-      
-        // 데이터베이스에 채팅 메시지 저장
-        const chatData = new ChatData({
-          room,
-          sender,
-          receiver,
-          messageType,
-          messageContent,
-        });
-        
-        chatData.save((err) => {
-          if (err) {
-            console.error('채팅 메시지 저장 중 오류 발생: ', err);
-          } else {
-            console.log('채팅 메시지가 성공적으로 저장되었습니다.');
-          }
-        });
-      
-        // 채팅 메시지를 다른 클라이언트에게 보내기 (broadcast 사용)
+        try {
+          // 데이터베이스에 채팅 메시지 저장
+          const chatData = new ChatData({
+            room,
+            sender,
+            receiver,
+            messageType,
+            messageContent,
+          });
+          chatData.save();
+          // 채팅 메시지를 다른 클라이언트에게 보내기 (broadcast 사용)
         socket.broadcast.emit('chatting', data);
+        } catch (error) {
+          console.error('채팅 메시지 저장 중 오류 발생: ', error);
+        }
       });
   });
 }
