@@ -20,6 +20,10 @@ exports.createReview = async (req, res) => {
       res.status(400).json({ message : '점수가 존재하지 않습니다.' });
       return ;
     };
+    if (score > 5 || score < 0) {
+      res.status(400).json({ message : '유효하지 않은 점수입니다.' });
+      return ;
+    }
     if (!user) {
       res.status(400).json({ message : '리뷰의 대상이 정해져 있지 않습니다.' });
       return ;

@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { User, Review, Proxy, WaitMate } = require('../models');
+const { User, Review, Proxy, WaitMate, LikeWait, ChatRoom } = require('../models');
 const fs = require('fs');
 const path = require('path');
 const multer = require('multer');
@@ -27,7 +27,8 @@ exports.cookieUserinfo = async (req) => {
         include : [
           {model : Review},
           {model : Proxy},
-          {model : WaitMate},
+          {model : WaitMate, include : [{model : LikeWait}]},
+          {model : ChatRoom}
         ],
       })
       resolve(userInfo.dataValues)
