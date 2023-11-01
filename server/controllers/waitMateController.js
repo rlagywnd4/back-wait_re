@@ -14,7 +14,7 @@ exports.getWaitMateDetail = async (req, res) => {
       },
     });
 
-    // 조회수db에서 id가 같은 것이 있는지 확인
+    // 조회수db에서 id가 같은 것이 있는지 확인 없으면 추가
     const isSameId = await ViewCount.findOrCreate({
       where: {
         id: id,
@@ -22,13 +22,6 @@ exports.getWaitMateDetail = async (req, res) => {
       },
       defaults: { id: id, wmId: wmId },
     });
-    // 없으면 db에 추가
-    if (!isSameId) {
-      const addViewCount = await ViewCount.create({
-        id: id,
-        wmId: wmId,
-      });
-    }
     // 조회수db에서 wmId기준으로 모든 데이터 수를 가져옴
     const viewCount = await ViewCount.findAll({
       attributes: [[fn('COUNT', col('*')), 'rowCount']],
@@ -107,6 +100,11 @@ exports.deleteWaitMate = async (req, res) => {
   try {
     const { wmId } = req.query;
     const deleteWaitMate = await WaitMate.destroy({
+      where: {
+        wmId: wmId,
+      },
+    });
+    const deleteViewCount = await ViewCount.destroy({
       where: {
         wmId: wmId,
       },
