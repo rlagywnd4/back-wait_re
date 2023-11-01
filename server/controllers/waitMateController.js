@@ -31,17 +31,19 @@ exports.getWaitMateDetail = async (req, res) => {
       raw: true,
     });
 
-    // db에 조회수 업데이트
-    const patchWaitMateCount = await WaitMate.update(
-      {
-        count: viewCount[0].rowCount,
-      },
-      {
-        where: {
-          wmId: wmId,
+    // id추가시 db에 조회수 업데이트
+    if (isSameId[isSameId.length - 1]) {
+      const patchWaitMateCount = await WaitMate.update(
+        {
+          count: viewCount[0].rowCount,
         },
-      }
-    );
+        {
+          where: {
+            wmId: wmId,
+          },
+        }
+      );
+    }
 
     //최근 채용 횟수(6개월전 ~ 현재)
     const sixMonthsAgo = new Date();
