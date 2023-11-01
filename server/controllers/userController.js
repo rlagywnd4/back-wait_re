@@ -259,8 +259,35 @@ exports.kakaoUserLogin = async (req, res) => {
 exports.sendKakaoData = async (req, res) => {
   res.json({kakaoId, kakaoProperties});
 };
-
 exports.uploadImage = async (req, res) => {
   // console.log(req.file)
   res.send("")
+};
+exports.checkUserId = async (req, res) => {
+  try {
+    const { userId } = req.body;
+    const user = await User.findOne({ where: { userId } });
+    if (user) {
+      res.status(400).json({ message: '이미 존재하는 userId입니다.' });
+      return;
+    };
+    res.status(200).json({ message : '사용가능한 userId입니다.' });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: '알 수 없는 서버 에러' });
+  }
+};
+exports.checkNickname = async (req, res) => {
+  try {
+    const { nickname } = req.body;
+    const user = await User.findOne({ where: { nickname } });
+    if (user) {
+      res.status(400).json({ message: '이미 존재하는 nickname입니다.' });
+      return;
+    };
+    res.status(200).json({ message : '사용가능한 nickname입니다.' });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: '알 수 없는 서버 에러' });
+  }
 };
