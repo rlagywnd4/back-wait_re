@@ -5,7 +5,7 @@ const Common = require('../common');
 
 userRouter.put('', Common.upload(`profileImg/`).single('profileImg'), userController.updateUserInfo);
 userRouter.delete('', userController.deleteUser);
-userRouter.post('/register', Common.upload(`profileImg/`).single('profileImg'), userController.register);
+userRouter.post('/register', userController.register);
 userRouter.post('/login', userController.login);
 userRouter.get('/myinfo', userController.myInfo);
 userRouter.get('/kakao', userController.kakaoResult);

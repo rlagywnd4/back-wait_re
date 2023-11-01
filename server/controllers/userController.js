@@ -48,12 +48,10 @@ exports.register = async (req, res) => {
       res.status(400).json({ errors: errMessages });
     } else {
       const hashedPassword = await bcryptjs.hash(password, 10);
-      const profileImg = req.file?.filename
       await User.create({
         userId,
         password : hashedPassword,
-        nickname,
-        photo : `http://localhost:8080/profileImg/${profileImg}`
+        nickname
       });
       res.status(201).json({ message : '회원 가입 완료' });
     }
