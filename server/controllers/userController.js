@@ -65,7 +65,6 @@ exports.login = async (req, res) => {
     const { userId, password } = req.body
     let user = await User.findOne({
       where : {userId : userId},
-      attributes : ['id', 'userId', 'password']
     });
     user = user?.dataValues
     if (!user) {
@@ -87,7 +86,7 @@ exports.login = async (req, res) => {
         secure : true,
         domain: 'localhost',
       });
-      res.status(200).json({ userInfo });
+      res.status(200).json({ user });
     }
   } catch (err) {
     console.log(err)
