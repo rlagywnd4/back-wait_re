@@ -1,6 +1,7 @@
 const path = require('path'); //경로에 관한 내장 모듈
-const { Op } = require('sequelize');
-const { WaitMate, ChatRoom, LikeWait, Proxy } = require('../models');
+const { Op, fn, col } = require('sequelize');
+const { WaitMate, ChatRoom, LikeWait, Proxy, ViewCount } = require('../models');
+
 
 // waitMateDetail 조회
 exports.getWaitMateDetail = async (req, res) => {
@@ -8,11 +9,43 @@ exports.getWaitMateDetail = async (req, res) => {
   try {
     let isLikeWait = false;
     const { wmId, id } = req.query;
+    // WaitMateDetail페이지
     const waitMate = await WaitMate.findOne({
       where: {
         wmId,
       },
     });
+
+    // 조회수db에서 id가 같은 것이 있는지 확인 없으면 추가
+    const isSameId = await ViewCount.findOrCreate({
+      where: {
+        id: id,
+        wmId: wmId,
+      },
+      defaults: { id: id, wmId: wmId },
+    });
+    // 조회수db에서 wmId기준으로 모든 데이터 수를 가져옴
+    const viewCount = await ViewCount.findAll({
+      attributes: [[fn('COUNT', col('*')), 'rowCount']],
+      where: {
+        wmId: wmId,
+      },
+      raw: true,
+    });
+
+    // id추가시 db에 조회수 업데이트
+    if (isSameId[isSameId.length - 1]) {
+      const patchWaitMateCount = await WaitMate.update(
+        {
+          count: viewCount[0].rowCount,
+        },
+        {
+          where: {
+            wmId: wmId,
+          },
+        }
+      );
+    }
 
     // 프록시 아이디를 갖기 위함(프록시 아이디를 바로 받을 수 있으면 받기)
     const getProxyId = await Proxy.findOne({
@@ -33,33 +66,40 @@ exports.getWaitMateDetail = async (req, res) => {
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
     const recentHiresCount = await WaitMate.findAll({
+      attributes: [[fn('COUNT', col('*')), 'rowCount']],
       where: {
         id: waitMate.id,
         updatedAt: {
           [Op.between]: [sixMonthsAgo, new Date()],
         },
       },
-    });
+      raw: true,
+    }); // 실행 결과(예시): [ { rowCount: 8 } ]
 
     // 지원자수
     const waitMateApply = await ChatRoom.findAll({
+      attributes: [[fn('COUNT', col('*')), 'rowCount']],
       where: {
         wmId: wmId,
       },
+      raw: true,
     });
+
 
     if (likeWait) {
       res.send({
         waitMate: waitMate,
-        recentHiresCount: recentHiresCount.length,
-        waitMateApplyCount: waitMateApply.length,
+      recentHiresCount: recentHiresCount[0].rowCount,
+      waitMateApplyCount: waitMateApply[0].rowCount,
+        viewCount: viewCount[0].rowCount,
         isLikeWait: true,
       });
     } else {
       res.send({
         waitMate: waitMate,
-        recentHiresCount: recentHiresCount.length,
-        waitMateApplyCount: waitMateApply.length,
+      recentHiresCount: recentHiresCount[0].rowCount,
+      waitMateApplyCount: waitMateApply[0].rowCount,
+        viewCount: viewCount[0].rowCount,
         isLikeWait: false,
       });
     }
@@ -103,6 +143,11 @@ exports.deleteWaitMate = async (req, res) => {
   try {
     const { wmId } = req.query;
     const deleteWaitMate = await WaitMate.destroy({
+      where: {
+        wmId: wmId,
+      },
+    });
+    const deleteViewCount = await ViewCount.destroy({
       where: {
         wmId: wmId,
       },

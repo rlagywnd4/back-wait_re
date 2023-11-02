@@ -18,6 +18,7 @@ const WaitMate = require('./WaitMate')(sequelize, Sequelize);
 const Review = require('./Review')(sequelize, Sequelize);
 const ChatRoom = require('./ChatRoom')(sequelize, Sequelize);
 const LikeWait = require('./LikeWait')(sequelize, Sequelize);
+const ViewCount = require('./ViewCount')(sequelize, Sequelize);
 
 User.hasMany(WaitMate, {
   foreignKey: 'id',
@@ -68,6 +69,19 @@ WaitMate.hasMany(LikeWait, {
 });
 LikeWait.belongsTo(WaitMate, { foreignKey: 'wmId', targetKey: 'wmId' });
 
+User.hasMany(ViewCount, {
+  foreignKey: 'id',
+  sourceKey: 'id',
+  onDelete: 'CASCADE',
+});
+ViewCount.belongsTo(User, { foreignKey: 'id', targetKey: 'id' });
+
+WaitMate.hasMany(ViewCount, {
+  foreignKey: 'wmId',
+  sourceKey: 'wmId',
+  onDelete: 'CASCADE',
+});
+ViewCount.belongsTo(WaitMate, { foreignKey: 'wmId', targetKey: 'wmId' });
 
 db.User = User;
 db.Proxy = Proxy;
@@ -75,6 +89,7 @@ db.WaitMate = WaitMate;
 db.Review = Review;
 db.ChatRoom = ChatRoom;
 db.LikeWait = LikeWait;
+db.ViewCount = ViewCount;
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
