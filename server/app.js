@@ -9,7 +9,7 @@ const PORT = 8080;
 const cors = require('cors');
 require('dotenv').config();
 const setupSocket = require('./socket.js');
-const http = require('http'); 
+const http = require('http');
 
 // 익스프레스에서 json 사용하도록 해줌
 app.use(express.urlencoded({ extended: true }));
@@ -17,10 +17,12 @@ app.use(express.json());
 app.use(cookieParser());
 
 //cors 설정
-app.use(cors({
-  origin: 'http://localhost:3000',
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: 'http://localhost:3000',
+    credentials: true,
+  })
+);
 
 app.use(express.static('public'));
 
@@ -35,11 +37,10 @@ sequelize.sync({ force: false });
 
 // 소켓 연결 (http 서버를 생성하고 소켓 서버로 사용)
 const server = http.createServer(app);
-setupSocket(server); 
+setupSocket(server);
 
 //몽구스 연결
 mongooseConnect();
-
 
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
