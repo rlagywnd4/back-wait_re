@@ -81,9 +81,14 @@ exports.getWaitMateDetail = async (req, res) => {
 // waitMate를 DB에 등록
 exports.postWaitMate = async (req, res) => {
   try {
-    const { id, title, wmAddress, waitTime, description, pay, photo } =
-      req.body;
-    console.log('filename=', req.file.filename);
+    const { id, title, wmAddress, waitTime, description, pay } = req.body;
+    let photo;
+    if (!req.file) {
+      photo =
+        'C:\\Users\\user\\Documents\\back-wait\\server\\public\\profileImg\\default.png';
+    } else {
+      photo = req.file.filename;
+    }
     // DB에 waitMate 등록
     const insertWaitMate = await WaitMate.create({
       id: id,
@@ -93,7 +98,7 @@ exports.postWaitMate = async (req, res) => {
       description: description,
       pay: pay,
       // photo: path.join(__dirname, '../public/waitMateImg', req.file.filename),
-      photo: req.file.filename,
+      photo: photo,
     });
     if (insertWaitMate) {
       res.send({ result: 'success' });
@@ -110,18 +115,18 @@ exports.postWaitMate = async (req, res) => {
 // waitMate 삭제
 exports.deleteWaitMate = async (req, res) => {
   try {
-    const { wmId } = req.query;
+    const { wmId, id } = req.query;
     const deleteWaitMate = await WaitMate.destroy({
       where: {
         wmId: wmId,
+        id: id,
       },
     });
-    const deleteViewCount = await ViewCount.destroy({
-      where: {
-        wmId: wmId,
-      },
-    });
-    res.send({ result: 'success' });
+    if (deleteWaitMate) {
+      res.send({ result: 'success' });
+    } else {
+      res.send({ result: 'fail' });
+    }
   } catch (e) {
     console.error('Error WaitMate data:', e);
     res.status(500).send('Internal Server Error');
@@ -177,9 +182,14 @@ exports.getWaitMateList = async (req, res) => {
     const waitMateCountPerPage = 4; // 한 페이지에 보여줄 컨텐츠 개수
     const pageCountPerPage = 5; // 한 페이지에 보여줄 페이지 개수
     console.log(req.query);
+    if (!pageNum) {
+      pageNum = 1;
+    }
     const waitMates = await WaitMate.findAll({
       where: {
-        wmAddress,
+        wmAddress: {
+          [Op.like]: `%${wmAddress}%`,
+        },
       },
       order: [[order, 'DESC']],
     });
