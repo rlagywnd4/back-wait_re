@@ -24,7 +24,7 @@ const uploadWaitMate = multer({
 waitMateRouter.get('/detail', waitMateController.getWaitMateDetail);
 // waitMate(글) 등록
 waitMateRouter.post(
-  '/',
+  '/register',
   uploadWaitMate.single('waitMateImg'),
   waitMateController.postWaitMate
 );

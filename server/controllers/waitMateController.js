@@ -2,13 +2,12 @@ const path = require('path'); //경로에 관한 내장 모듈
 const { Op, fn, col } = require('sequelize');
 const { WaitMate, ChatRoom, LikeWait, Proxy, ViewCount } = require('../models');
 
-
 // waitMateDetail 조회
 exports.getWaitMateDetail = async (req, res) => {
   // wmAddress를 요청에 받고 응답 값에는 id(user)를 보내 글쓴 주인인지 확인
   try {
     let isLikeWait = false;
-    const { wmId, id } = req.query;
+    const { wmId, proxyId } = req.query;
     // WaitMateDetail페이지
     const waitMate = await WaitMate.findOne({
       where: {
@@ -16,52 +15,34 @@ exports.getWaitMateDetail = async (req, res) => {
       },
     });
 
-    // 조회수db에서 id가 같은 것이 있는지 확인 없으면 추가
-    const isSameId = await ViewCount.findOrCreate({
-      where: {
-        id: id,
-        wmId: wmId,
+    console.log('before Count', waitMate.count);
+    // 조회수 증가
+    const patchWaitMateCount = await WaitMate.update(
+      {
+        count: waitMate.count + 1,
       },
-      defaults: { id: id, wmId: wmId },
-    });
-    // 조회수db에서 wmId기준으로 모든 데이터 수를 가져옴
-    const viewCount = await ViewCount.findAll({
-      attributes: [[fn('COUNT', col('*')), 'rowCount']],
-      where: {
-        wmId: wmId,
-      },
-      raw: true,
-    });
-
-    // id추가시 db에 조회수 업데이트
-    if (isSameId[isSameId.length - 1]) {
-      const patchWaitMateCount = await WaitMate.update(
-        {
-          count: viewCount[0].rowCount,
+      {
+        where: {
+          wmId: wmId,
         },
-        {
-          where: {
-            wmId: wmId,
-          },
-        }
-      );
+      }
+    );
+    waitMate.count += 1;
+
+    //프록시 아이디가 있으면
+    if (proxyId) {
+      // 찜을 했는지 체크
+      const likeWait = await LikeWait.findOne({
+        where: {
+          wmId: wmId,
+          proxyId: proxyId,
+        },
+      });
+
+      if (likeWait) {
+        isLikeWait = true;
+      }
     }
-
-    // 프록시 아이디를 갖기 위함(프록시 아이디를 바로 받을 수 있으면 받기)
-    const getProxyId = await Proxy.findOne({
-      where: {
-        id: id,
-      },
-    });
-
-    // 찜을 했는지 체크
-    const likeWait = await LikeWait.findOne({
-      where: {
-        wmId: wmId,
-        proxyId: getProxyId.proxyId,
-      },
-    });
-
     //최근 채용 횟수(6개월전 ~ 현재)
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
@@ -85,24 +66,12 @@ exports.getWaitMateDetail = async (req, res) => {
       raw: true,
     });
 
-
-    if (likeWait) {
-      res.send({
-        waitMate: waitMate,
+    res.send({
+      waitMate: waitMate,
       recentHiresCount: recentHiresCount[0].rowCount,
       waitMateApplyCount: waitMateApply[0].rowCount,
-        viewCount: viewCount[0].rowCount,
-        isLikeWait: true,
-      });
-    } else {
-      res.send({
-        waitMate: waitMate,
-      recentHiresCount: recentHiresCount[0].rowCount,
-      waitMateApplyCount: waitMateApply[0].rowCount,
-        viewCount: viewCount[0].rowCount,
-        isLikeWait: false,
-      });
-    }
+      isLikeWait: isLikeWait,
+    });
   } catch (e) {
     console.error('Error WaitMate data:', e);
     res.status(500).send('Internal Server Error');
@@ -112,9 +81,14 @@ exports.getWaitMateDetail = async (req, res) => {
 // waitMate를 DB에 등록
 exports.postWaitMate = async (req, res) => {
   try {
-    const { id, title, wmAddress, waitTime, description, pay, photo } =
-      req.body;
-    console.log('filename=', req.file.filename);
+    const { id, title, wmAddress, waitTime, description, pay } = req.body;
+    let photo;
+    if (!req.file) {
+      photo =
+        'C:\\Users\\user\\Documents\\back-wait\\server\\public\\profileImg\\default.png';
+    } else {
+      photo = req.file.filename;
+    }
     // DB에 waitMate 등록
     const insertWaitMate = await WaitMate.create({
       id: id,
@@ -124,7 +98,7 @@ exports.postWaitMate = async (req, res) => {
       description: description,
       pay: pay,
       // photo: path.join(__dirname, '../public/waitMateImg', req.file.filename),
-      photo: req.file.filename,
+      photo: photo,
     });
     if (insertWaitMate) {
       res.send({ result: 'success' });
@@ -141,18 +115,18 @@ exports.postWaitMate = async (req, res) => {
 // waitMate 삭제
 exports.deleteWaitMate = async (req, res) => {
   try {
-    const { wmId } = req.query;
+    const { wmId, id } = req.query;
     const deleteWaitMate = await WaitMate.destroy({
       where: {
         wmId: wmId,
+        id: id,
       },
     });
-    const deleteViewCount = await ViewCount.destroy({
-      where: {
-        wmId: wmId,
-      },
-    });
-    res.send({ result: 'success' });
+    if (deleteWaitMate) {
+      res.send({ result: 'success' });
+    } else {
+      res.send({ result: 'fail' });
+    }
   } catch (e) {
     console.error('Error WaitMate data:', e);
     res.status(500).send('Internal Server Error');
@@ -208,9 +182,14 @@ exports.getWaitMateList = async (req, res) => {
     const waitMateCountPerPage = 4; // 한 페이지에 보여줄 컨텐츠 개수
     const pageCountPerPage = 5; // 한 페이지에 보여줄 페이지 개수
     console.log(req.query);
+    if (!pageNum) {
+      pageNum = 1;
+    }
     const waitMates = await WaitMate.findAll({
       where: {
-        wmAddress,
+        wmAddress: {
+          [Op.like]: `%${wmAddress}%`,
+        },
       },
       order: [[order, 'DESC']],
     });
