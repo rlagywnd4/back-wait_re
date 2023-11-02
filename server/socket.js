@@ -17,7 +17,8 @@ function setupSocket(server ) {
 
     socket.on('message', (data)=>{
       console.log(data);
-
+      
+      socket.broadcast.emit('smessage', data);
       const chatMessage = new ChatData({
         room: data.room,
         sender: data.sender,
@@ -35,6 +36,8 @@ function setupSocket(server ) {
           console.error('메시지 저장 중 오류 발생:', error);
           // 저장 오류 시, 적절한 에러 핸들링
         });
+
+      
     });
   });
 }
