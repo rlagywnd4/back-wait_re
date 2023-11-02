@@ -5,6 +5,20 @@ const jwt = require('jsonwebtoken');
 const Common = require('../common');
 
 const input = {
+    postRegisterTest : async (req,res)=>{
+        try{
+            const postProxy = await Proxy.create({
+                id: req.body.id,
+               proxyAddress: req.body.proxyAddress,
+               gender: req.body.gender,
+               age: req.body.age,
+               proxyMsg: req.body.proxyMsg,
+            });
+           return res.send(postProxy);
+        } catch(err){
+            console.error(err);
+        }
+    },
     // 프록시가 자신의 정보를 등록하는 코드
     postRegister : async (req,res)=>{
         //프록시 생성시에 등록될 정보들
