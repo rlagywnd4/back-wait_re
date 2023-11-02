@@ -82,9 +82,6 @@ exports.login = async (req, res) => {
       res.cookie('access', token, {
         maxAge : 24 * 60 * 60 * 1000,
         path : '/',
-        sameSite: 'None',
-        secure : true,
-        domain: 'localhost',
       });
       res.status(200).json({ user });
     }
@@ -254,7 +251,7 @@ exports.kakaoResult = async (req, res) => {
           로그인 중...</h1>
         <script>
           const reload = () => {
-            return setTimeout(() => {window.location.href='http://localhost:3000/waitMate/list'}, 1000)
+            return setTimeout(() => {window.location.href='http://localhost:3000/map'}, 1000)
           }
           reload();
         </script>

@@ -25,10 +25,9 @@ exports.cookieUserinfo = async (req) => {
         where : { id },
         attributes : ['id', 'userId', 'email', 'nickname', 'photo', 'createdAt', 'updatedAt'],
         include : [
-          {model : Review},
-          {model : Proxy},
-          {model : WaitMate, include : [{model : LikeWait}]},
-          {model : ChatRoom}
+          // {model : Review},
+          // {model : Proxy},
+          // {model : WaitMate},
         ],
       })
       resolve(userInfo.dataValues)
