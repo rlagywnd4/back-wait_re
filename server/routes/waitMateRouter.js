@@ -31,7 +31,11 @@ waitMateRouter.post(
 // waitMate 삭제
 waitMateRouter.delete('/', waitMateController.deleteWaitMate);
 // waitMate 수정
-waitMateRouter.patch('/', waitMateController.patchWaitMate);
+waitMateRouter.patch(
+  '/',
+  uploadWaitMate.single('waitMateImg'),
+  waitMateController.patchWaitMate
+);
 
 // waitMate 목록 조회
 waitMateRouter.get('/list', waitMateController.getWaitMateList);
