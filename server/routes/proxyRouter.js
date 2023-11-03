@@ -24,7 +24,7 @@ proxyRouter.post('/proxyTest', proxyController.input.postRegisterTest);
 //프록시 글 리스트 뽑아오기
 proxyRouter.get('/getter', proxyController.output.getProxyAll);
 //프록시 특정 글 보기
-proxyRouter.get('/getter/:proxyId', proxyController.output.getProxyOne);
+proxyRouter.get('/detail/:proxyId', proxyController.output.getProxyOne);
 //웨이트메이트가 지정한 동까지의 프록시 불러오기
 proxyRouter.get('/realGetter', proxyController.output.getAddressAll);
 
