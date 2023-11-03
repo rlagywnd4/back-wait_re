@@ -5,10 +5,11 @@ const jwt = require('jsonwebtoken');
 const Common = require('../common');
 
 const input = {
+    //프록시 테스트용
     postRegisterTest : async (req,res)=>{
         try{
             const postProxy = await Proxy.create({
-                id: req.body.id,
+               id: req.body.id,
                proxyAddress: req.body.proxyAddress,
                gender: req.body.gender,
                age: req.body.age,
@@ -107,7 +108,7 @@ const input = {
 
                        if(proxyInfo.photo === 'null'){
                         await Proxy.update({
-                            photo : '/public/proxyImg/' + req.file.filename,
+                            photo : '/public/proxyImg/default.jpg',
                         }, {
                             where : {id : {id : userInfo.id}}
                         });
@@ -181,7 +182,7 @@ const output = {
             where : { proxyId : req.params.proxyId},
         });
         console.log('여기는 프록시 입니다' + proxy);
-        return res.send(proxy);
+        return res.send({result : proxy});
     }
 }
 
