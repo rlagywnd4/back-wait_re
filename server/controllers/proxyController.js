@@ -8,18 +8,36 @@ const input = {
     //프록시 테스트용
     postRegisterTest : async (req,res)=>{
         try{
-            const postProxy = await Proxy.create({
-               id: req.body.id,
-               proxyAddress: req.body.proxyAddress,
-               gender: req.body.gender,
-               age: req.body.age,
-               proxyMsg: req.body.proxyMsg,
-            });
-           return res.send(postProxy);
+            console.log('포토값' + req.file.filename);
+            if(req.body.photo === null){
+                const postProxy = await Proxy.create({
+                    id: req.body.id,
+                    title : req.body.title,
+                    proxyAddress: req.body.proxyAddress,
+                    gender: req.body.gender,
+                    age: req.body.age,
+                    proxyMsg: req.body.proxyMsg,
+                    photo : 'http://localhost:8080/public/img/proxyImg/default.png',
+                 });
+                return res.send(postProxy);
+            } else if(req.body.photo !== null){
+                const postProxy = await Proxy.create({
+                    id: req.body.id,
+                    title : req.body.title,
+                    proxyAddress: req.body.proxyAddress,
+                    gender: req.body.gender,
+                    age: req.body.age,
+                    proxyMsg: req.body.proxyMsg,
+                    photo : 'http://localhost:8080/public/proxyImg/' + req.file.filename,
+                 });
+                return res.send(postProxy);
+            }
+            
         } catch(err){
             console.error(err);
         }
     },
+
     // 프록시가 자신의 정보를 등록하는 코드
     postRegister : async (req,res)=>{
         //프록시 생성시에 등록될 정보들
@@ -37,14 +55,30 @@ const input = {
                          res.status(402).json({ message: '이미 등록하신 글이 있습니다' });
                     } else {
                       // 등록 가능한 경우 프록시 생성
-                    const postProxy = await Proxy.create({
-                         id: req.body.id,
-                        proxyAddress: req.body.proxyAddress,
-                        gender: req.body.gender,
-                        age: req.body.age,
-                        proxyMsg: req.body.proxyMsg,
-                     });
-                    return res.send(postProxy);
+                    if(req.body.photo === undefined){
+                        const postProxy = await Proxy.create({
+                            id: req.body.id,
+                            proxyAddress: req.body.proxyAddress,
+                            gender: req.body.gender,
+                            age: req.body.age,
+                            proxyMsg: req.body.proxyMsg,
+                            title : req.body.title,
+                            photo : 'http://localhost:8080/public/proxyImg/default.png'
+                         });
+                        return res.send(postProxy);
+                    } else{
+                        const postProxy = await Proxy.create({
+                            id: req.body.id,
+                            proxyAddress: req.body.proxyAddress,
+                            gender: req.body.gender,
+                            age: req.body.age,
+                            proxyMsg: req.body.proxyMsg,
+                            title : req.body.title,
+                            photo : 'http://localhost:8080/public/proxyImg/' + req.file.filename,
+                         });
+                        return res.send(postProxy);
+                    }
+                    
                     }           
             }
         } catch (e) {
