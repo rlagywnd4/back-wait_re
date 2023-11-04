@@ -4,7 +4,7 @@ const { WaitMate, ChatRoom, LikeWait, Proxy, ViewCount } = require('../models');
 
 // waitMateDetail 조회
 exports.getWaitMateDetail = async (req, res) => {
-  // wmAddress를 요청에 받고 응답 값에는 id(user)를 보내 글쓴 주인인지 확인
+  // wmAddress를 요청에 받고 응답 값에는 id(user)를 보내 글쓴 주인인지 확인(waitMate에 포함됨)
   try {
     let isLikeWait = false;
     const { wmId, proxyId } = req.query;
@@ -15,11 +15,11 @@ exports.getWaitMateDetail = async (req, res) => {
       },
     });
 
-    console.log('before Count', waitMate.count);
     // 조회수 증가
+    waitMate.count += 1;
     const patchWaitMateCount = await WaitMate.update(
       {
-        count: waitMate.count + 1,
+        count: waitMate.count,
       },
       {
         where: {
@@ -27,7 +27,6 @@ exports.getWaitMateDetail = async (req, res) => {
         },
       }
     );
-    waitMate.count += 1;
 
     //프록시 아이디가 있으면
     if (proxyId) {
@@ -84,6 +83,7 @@ exports.postWaitMate = async (req, res) => {
     const { id, title, wmAddress, waitTime, description, pay } = req.body;
     let photo;
     if (!req.file) {
+      // photo경로 나중에 서버올리면 바꿔야함
       photo =
         'C:\\Users\\user\\Documents\\back-wait\\server\\public\\profileImg\\default.png';
     } else {
@@ -97,6 +97,7 @@ exports.postWaitMate = async (req, res) => {
       waitTime: waitTime,
       description: description,
       pay: pay,
+      // photo경로 나중에 서버올리면 바꿔야함
       // photo: path.join(__dirname, '../public/waitMateImg', req.file.filename),
       photo: photo,
     });
@@ -136,24 +137,54 @@ exports.deleteWaitMate = async (req, res) => {
 // waitMate 수정
 exports.patchWaitMate = async (req, res) => {
   try {
-    const { wmId, title, wmAddress, waitTime, description, pay, photo } =
-      req.body;
-    const patchWaitMate = await WaitMate.update(
-      {
-        title: title,
-        wmAddress: wmAddress,
-        waitTime: waitTime,
-        description: description,
-        pay: pay,
-        photo: photo,
-      },
-      {
-        where: {
-          wmId: wmId,
+    const { wmId, title, wmAddress, waitTime, description, pay } = req.body;
+
+    let isSuccess;
+    // 사진이 있으면
+    if (req.file) {
+      const patchWaitMate = await WaitMate.update(
+        {
+          title: title,
+          wmAddress: wmAddress,
+          waitTime: waitTime,
+          description: description,
+          pay: pay,
+          photo: req.file.filename,
         },
+        {
+          where: {
+            wmId: wmId,
+          },
+        }
+      );
+      if (patchWaitMate) {
+        isSuccess = true;
       }
-    );
-    res.send({ result: 'success' });
+    } else {
+      // 사진이 없을때
+      const patchWaitMate = await WaitMate.update(
+        {
+          title: title,
+          wmAddress: wmAddress,
+          waitTime: waitTime,
+          description: description,
+          pay: pay,
+        },
+        {
+          where: {
+            wmId: wmId,
+          },
+        }
+      );
+      if (patchWaitMate) {
+        isSuccess = true;
+      }
+    }
+    if (isSuccess) {
+      res.send({ result: 'success' });
+    } else {
+      res.send({ result: 'fail' });
+    }
   } catch (e) {
     console.error('Error WaitMate data:', e);
     res.status(500).send('Internal Server Error');
