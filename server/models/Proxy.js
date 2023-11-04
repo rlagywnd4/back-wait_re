@@ -7,6 +7,11 @@ const Proxy = (Sequelize, DataTypes) => {
         autoIncrement: true,
         primaryKey: true,
       },
+      title:{
+        type: DataTypes.STRING(250),
+        allowNull : false,
+        comment : '프록시가 올리는 제목'
+      },
       proxyAddress: {
         type: DataTypes.STRING(255),
         allowNull: false,
@@ -29,7 +34,7 @@ const Proxy = (Sequelize, DataTypes) => {
       },
       photo: {
         type: DataTypes.STRING(150),
-        allowNull: true,
+        allowNull: null,
         comment: '사진',
       },
     },
