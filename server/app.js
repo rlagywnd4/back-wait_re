@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
 dotenv.config();
 const app = express();
+const path = require('path');
 const Router = require('./routes');
 const PORT = 8080;
 const cors = require('cors');
@@ -24,7 +25,7 @@ app.use(
   })
 );
 
-app.use(express.static('public'));
+app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // router 설정
 const home = require('./routes/index');

@@ -9,7 +9,7 @@ const input = {
     postRegisterTest : async (req,res)=>{
         try{
             console.log('포토값' + req.file.filename);
-            if(req.body.photo === undefined){
+            if(req.body.photo === null){
                 const postProxy = await Proxy.create({
                     id: req.body.id,
                     title : req.body.title,
