@@ -236,12 +236,12 @@ exports.getWaitMateList = async (req, res) => {
         order: [[order, 'DESC']],
       });
       res.send({
-        waitMates: resWaitMates,
+        waitMates: waitMates,
       });
     } else {
-      const waitMates = await WaitMate.findAll();
+      const waitMates = await WaitMate.findAll({ order: [[order, 'DESC']] });
       res.send({
-        waitMates: resWaitMates,
+        waitMates: waitMates,
       });
     }
   } catch (e) {
