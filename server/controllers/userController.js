@@ -81,7 +81,8 @@ exports.login = async (req, res) => {
       const token = jwt.sign(userInfo, process.env.SECRET_KEY);
       res.cookie('access', token, {
         maxAge : 24 * 60 * 60 * 1000,
-        path : '/',
+        Path : '/',
+        httpOnly : true
       });
       res.status(200).json({ user });
     }
@@ -233,7 +234,8 @@ exports.kakaoResult = async (req, res) => {
     const token = jwt.sign(userInfo, process.env.SECRET_KEY);
     res.cookie('access', token, {
       maxAge : 24 * 60 * 60 * 1000,
-      Path : '/'
+      Path : '/',
+      httpOnly : true
     })
     // res.redirect(`http://localhost:3000/main`);
     // res.redirect(`http://localhost:3000/waitMate/list`);
@@ -295,6 +297,12 @@ exports.temp = (req, res) => {
   res.redirect(`https://kauth.kakao.com/oauth/authorize?redirect_uri=http://localhost:8080/user/kakao&client_id=${process.env.KAKAO_REST_API_KEY}&response_type=code`)
 }
 exports.logOut = () => {
-  res.clearCookie('access');
-  res.redirect('/');
+  try {
+
+    res.clearCookie('access');
+    res.send();
+  } catch (error) {
+    console.log(error)
+    res.status(500);
+  }
 }
