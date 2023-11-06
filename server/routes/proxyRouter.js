@@ -3,6 +3,8 @@ const multer = require('multer');
 const proxyRouter = express.Router();
 const proxyController = require('../controllers/proxyController');
 const path = require('path');
+const chatController = require('../controllers/chatController');
+
 
 // Multer를 위한 저장 엔진을 생성합니다.
 const storage = multer.diskStorage({
@@ -22,16 +24,17 @@ const storage = multer.diskStorage({
   });
 
 //프록시 글 등록
-proxyRouter.post('/register', proxyController.input.postRegister);
+proxyRouter.post('/register', uploadProxy.single('photo'), proxyController.input.postRegister);
 //프록시 글 등록 테스트
 proxyRouter.post('/proxyTest', uploadProxy.single('photo'), proxyController.input.postRegisterTest);
 //프록시 글 리스트 뽑아오기
-proxyRouter.get('/getter', proxyController.output.getProxyAll);
+proxyRouter.get('/list', proxyController.output.getProxyAll);
 //프록시 특정 글 보기
 proxyRouter.get('/detail/:proxyId', proxyController.output.getProxyOne);
 //웨이트메이트가 지정한 동까지의 프록시 불러오기
 proxyRouter.get('/realGetter', proxyController.output.getAddressAll);
-
+// /createRoom 엔드포인트에 컨트롤러 함수를 할당
+proxyRouter.post('/createRoom', chatController.createRoom);
 //등록된 프록시를 변경
 proxyRouter.patch('/update/:id', proxyController.input.updateProxy);
 //등록된 프록시를 삭제
