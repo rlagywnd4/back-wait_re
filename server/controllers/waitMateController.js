@@ -80,7 +80,17 @@ exports.getWaitMateDetail = async (req, res) => {
 // waitMate를 DB에 등록
 exports.postWaitMate = async (req, res) => {
   try {
-    const { id, title, wmAddress, waitTime, description, pay } = req.body;
+    const {
+      id,
+      title,
+      wmAddress,
+      wmDetailAddress,
+      lng,
+      lat,
+      waitTime,
+      description,
+      pay,
+    } = req.body;
     let photo;
     if (!req.file) {
       // photo경로 나중에 서버올리면 바꿔야함
@@ -94,6 +104,9 @@ exports.postWaitMate = async (req, res) => {
       id: id,
       title: title,
       wmAddress: wmAddress,
+      wmDetailAddress: wmDetailAddress,
+      lng: lng,
+      lat: lat,
       waitTime: waitTime,
       description: description,
       pay: pay,
@@ -137,7 +150,17 @@ exports.deleteWaitMate = async (req, res) => {
 // waitMate 수정
 exports.patchWaitMate = async (req, res) => {
   try {
-    const { wmId, title, wmAddress, waitTime, description, pay } = req.body;
+    const {
+      wmId,
+      title,
+      wmAddress,
+      wmDetailAddress,
+      lng,
+      lat,
+      waitTime,
+      description,
+      pay,
+    } = req.body;
 
     let isSuccess;
     // 사진이 있으면
@@ -147,6 +170,9 @@ exports.patchWaitMate = async (req, res) => {
           title: title,
           wmAddress: wmAddress,
           waitTime: waitTime,
+          wmDetailAddress: wmDetailAddress,
+          lng: lng,
+          lat: lat,
           description: description,
           pay: pay,
           photo: req.file.filename,
@@ -166,6 +192,9 @@ exports.patchWaitMate = async (req, res) => {
         {
           title: title,
           wmAddress: wmAddress,
+          wmDetailAddress: wmDetailAddress,
+          lng: lng,
+          lat: lat,
           waitTime: waitTime,
           description: description,
           pay: pay,
