@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 
 const chatDataSchema = new mongoose.Schema({
-    room: {
-        type: mongoose.Schema.Types.ObjectId,
+    roomNumber: {
+        type: Number,
         ref: 'Room',
         required: true,
     },

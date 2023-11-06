@@ -12,7 +12,7 @@ const createRoom = async (data, activeRooms, io, socket) => {
     socket.emit('roomError', 'Room already exists');
     return;
   }
-
+  
   if (
     io.sockets.adapter.rooms.get(data.roomNumber) &&
     io.sockets.adapter.rooms.get(data.roomNumber).size >= 2
