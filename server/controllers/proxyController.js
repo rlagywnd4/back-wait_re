@@ -226,7 +226,35 @@ const output = {
         });
         console.log('여기는 프록시 입니다' + proxy);
         return res.send({result : proxy});
+    },
+
+    // 자신의 채팅방 목록을 가져오는 코드
+    getChattingList: async (req, res) => {
+    try {
+      const userInfo = Common.cookieUserinfo(req);
+      if (userInfo) {
+        const resultList = await Room.find({
+          $or: [
+            { sender: userInfo.id },
+            { receiver: userInfo.id }
+          ]
+        });
+        // 정보가 있는 경우
+        if (resultList && resultList.length > 0) {
+          res.send({ list: resultList });
+        } else {
+          // 정보가 없는 경우
+          res.send({ message: '채팅방 목록이 없습니다.' });
+        }
+      } else {
+        // userInfo가 없는 경우
+        res.send({ message: '사용자 정보를 찾을 수 없습니다.' });
+      }
+    } catch (err) {
+      console.error(err);
+      res.status(500).send({ error: '서버 오류 발생' });
     }
+  }
 }
 
 module.exports = {input, output};

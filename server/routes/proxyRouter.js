@@ -35,6 +35,10 @@ proxyRouter.get('/detail/:proxyId', proxyController.output.getProxyOne);
 proxyRouter.get('/realGetter', proxyController.output.getAddressAll);
 // /createRoom 엔드포인트에 컨트롤러 함수를 할당
 proxyRouter.post('/createRoom', chatController.createRoom);
+
+//등록된 채팅방 정보들을 불러옴
+proxyRouter.get('/listChatting', proxyController.output.getChattingList);
+
 //등록된 프록시를 변경
 proxyRouter.patch('/update/:id', proxyController.input.updateProxy);
 //등록된 프록시를 삭제
