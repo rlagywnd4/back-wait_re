@@ -81,7 +81,8 @@ exports.login = async (req, res) => {
       const token = jwt.sign(userInfo, process.env.SECRET_KEY);
       res.cookie('access', token, {
         maxAge : 24 * 60 * 60 * 1000,
-        path : '/',
+        Path : '/',
+        httpOnly : true
       });
       res.status(200).json({ user });
     }
@@ -233,7 +234,8 @@ exports.kakaoResult = async (req, res) => {
     const token = jwt.sign(userInfo, process.env.SECRET_KEY);
     res.cookie('access', token, {
       maxAge : 24 * 60 * 60 * 1000,
-      Path : '/'
+      Path : '/',
+      httpOnly : true
     })
     // res.redirect(`http://localhost:3000/main`);
     // res.redirect(`http://localhost:3000/waitMate/list`);
