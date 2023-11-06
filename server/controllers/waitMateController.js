@@ -222,88 +222,28 @@ exports.patchWaitMate = async (req, res) => {
 };
 
 // waitMate목록 조회
-// 페이지네이션 구현
-// 이전, 다음 기능도 구현 option = {prev || next}
 exports.getWaitMateList = async (req, res) => {
-  // 고려할 점: 프론트에서 페이지네이션 구현 예정
-  // 조회순, 시급순, 최신순
-  // 페이지네이션 고려한 설계
-  // 필요한 데이터:
-  // 페이지, 우선순위, 주소
-  // 로직:
-  // 주소를 기준으로 우선순위에 따라
-  // 웨메 목록을 모두 불러옴
-  // 페이지에 해당하는 컨텐츠, 현재 페이지, 우선순위를 내보냄
-  // 리턴 값:
-  // 한 페이지에 보여주고자하는 컨텐츠, 한 페이지에 보여주고자하는 첫 페이지의 값(숫자), 마지막 페이지의 값(숫자)
   try {
-    // order는 updatedAt(최신순), pay(시급순), count(조회수) 셋중 하나
-    // option은 이전, 다음 버튼을 눌렀을 경우
-    let { wmAddress, order, pageNum, option } = req.query;
-    const waitMateCountPerPage = 4; // 한 페이지에 보여줄 컨텐츠 개수
-    const pageCountPerPage = 5; // 한 페이지에 보여줄 페이지 개수
+    let { wmAddress, order } = req.query;
     console.log(req.query);
-    if (!pageNum) {
-      pageNum = 1;
-    }
-    const waitMates = await WaitMate.findAll({
-      where: {
-        wmAddress: {
-          [Op.like]: `%${wmAddress}%`,
+    if (wmAddress) {
+      const waitMates = await WaitMate.findAll({
+        where: {
+          wmAddress: {
+            [Op.like]: `%${wmAddress}%`,
+          },
         },
-      },
-      order: [[order, 'DESC']],
-    });
-
-    const allWaitMateLength = waitMates.length; // 컨텐츠 개수
-    const allPageLength = Math.ceil(allWaitMateLength / waitMateCountPerPage); // 총 페이지 수
-    const pageGroup = Math.ceil(pageNum / pageCountPerPage); //화면에 보여질 페이지 그룹
-
-    switch (option) {
-      case 'next':
-        if (pageNum + 5 > allPageLength) {
-          pageNum = allPageLength;
-        } else {
-          pageNum += pageCountPerPage;
-        }
-        break;
-      case 'prev':
-        if (pageNum - 5 <= 0) {
-          pageNum = 1;
-        } else {
-          pageNum -= pageCountPerPage;
-        }
-        break;
-      default:
-        break;
-    }
-    let lastPageNum; // 어떤 한 페이지 그룹의 마지막 페이지 번호
-    let lastWaitMateNum; // 화면에 보여질 마지막 컨텐츠
-    // 어떤 한 페이지 그룹의 첫 페이지 번호
-    const firstPageNum = (pageGroup - 1) * waitMateCountPerPage + 1;
-    // 어떤 한 페이지 그룹의 마지막 페이지 번호
-    if (pageGroup * waitMateCountPerPage > allPageLength) {
-      lastPageNum = allPageLength;
+        order: [[order, 'DESC']],
+      });
+      res.send({
+        waitMates: resWaitMates,
+      });
     } else {
-      lastPageNum = pageGroup * pageCountPerPage;
+      const waitMates = await WaitMate.findAll();
+      res.send({
+        waitMates: resWaitMates,
+      });
     }
-    const resWaitMates = []; // 응답에 보낼 컨텐츠
-    const firstWaitMateNum = waitMateCountPerPage * (pageNum - 1) + 1; // 화면에 보여질 첫 컨텐츠(순서)(숫자임)
-    // 화면에 보여질 마지막 컨텐츠
-    if (pageNum * waitMateCountPerPage > allWaitMateLength) {
-      lastWaitMateNum = allWaitMateLength;
-    } else {
-      lastWaitMateNum = pageNum * waitMateCountPerPage;
-    }
-    for (let i = firstWaitMateNum - 1; i < lastWaitMateNum; i++) {
-      resWaitMates.push(waitMates[i]);
-    }
-    // 한 페이지에 보여주고자하는 컨텐츠, 어떤 한 페이지 그룹의 첫 페이지의 값(숫자), 마지막 페이지의 값(숫자)
-    res.send({
-      waitMates: resWaitMates,
-      firstPageNum: firstPageNum,
-      lastPageNum: lastPageNum,
-    });
   } catch (e) {
     console.error('Error WaitMate data:', e);
     res.status(500).send('Internal Server Error');
