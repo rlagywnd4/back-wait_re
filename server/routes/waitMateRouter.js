@@ -25,7 +25,7 @@ waitMateRouter.get('/detail', waitMateController.getWaitMateDetail);
 // waitMate(글) 등록
 waitMateRouter.post(
   '/register',
-  uploadWaitMate.single('waitMateImg'),
+  uploadWaitMate.single('photo'),
   waitMateController.postWaitMate
 );
 // waitMate 삭제
@@ -33,9 +33,11 @@ waitMateRouter.delete('/', waitMateController.deleteWaitMate);
 // waitMate 수정
 waitMateRouter.patch(
   '/',
-  uploadWaitMate.single('waitMateImg'),
+  uploadWaitMate.single('photo'),
   waitMateController.patchWaitMate
 );
+// waitMate 상태 수정
+waitMateRouter.patch('/state', waitMateController.patchWaitMateState);
 
 // waitMate 목록 조회
 waitMateRouter.get('/list', waitMateController.getWaitMateList);
