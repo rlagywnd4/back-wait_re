@@ -181,19 +181,19 @@ const input = {
 }
 
 const output = {
-    // proxy 정보들을 확인하는 방법
-    getProxyAll : async (req,res)=>{
-        const {address, order} = req.query;
+        // proxy 정보들을 확인하는 방법
+    getProxyAll: async (req, res) => {
+        const { address, order } = req.query;
+        console.log(address, order);
         const proxyAddress = await Proxy.findAll({
-            where: {
-              proxyAddress: {
-                [Op.like]: `%${address}%`,
-              },
+        where: {
+            proxyAddress: {
+            [Op.like]: `%${address}%`,
             },
-            order: [[order, 'DESC']],
-          });
-          console.log(address, proxyAddress);
-        res.send(proxyAddress);
+        },
+        order: [[order, 'DESC']],
+        });
+        res.send({list: proxyAddress});
     },
 
     // 특정한 구의 정보값들을 불러오는 방법

@@ -24,8 +24,9 @@ const createRoom = async (data, activeRooms, io, socket) => {
   try {
     const newRoom = new Room({
       roomNumber: data.roomNumber,
-      proxyId: data.receiver,
-      wmId: data.sender,
+      receiver: data.receiver,
+      sender: data.sender,
+      proxyId : data.proxyId,
     });
 
     await newRoom.save();
