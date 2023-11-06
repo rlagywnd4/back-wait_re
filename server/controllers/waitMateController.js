@@ -79,6 +79,7 @@ exports.getWaitMateDetail = async (req, res) => {
 
 // waitMate를 DB에 등록
 exports.postWaitMate = async (req, res) => {
+  console.log('-----------------------');
   try {
     const {
       id,
@@ -90,7 +91,7 @@ exports.postWaitMate = async (req, res) => {
       waitTime,
       description,
       pay,
-    } = req.body;
+    } = req.body; //photo가 파일 자체가 날라옴
     let photo;
     if (!req.file) {
       // photo경로 나중에 서버올리면 바꿔야함
@@ -303,6 +304,16 @@ exports.getWaitMateList = async (req, res) => {
       firstPageNum: firstPageNum,
       lastPageNum: lastPageNum,
     });
+  } catch (e) {
+    console.error('Error WaitMate data:', e);
+    res.status(500).send('Internal Server Error');
+  }
+};
+
+exports.getWaitMateMapList = async (req, res) => {
+  try {
+    const getWaitMateMapList = await WaitMate.findAll();
+    res.send(getWaitMateMapList);
   } catch (e) {
     console.error('Error WaitMate data:', e);
     res.status(500).send('Internal Server Error');
