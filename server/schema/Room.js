@@ -1,13 +1,21 @@
 const mongoose = require('mongoose');
 
 const roomSchema = new mongoose.Schema({
-    wmId: {
+    sender: {
         type: Number, // 또는 String, 데이터 유형에 따라 변경
         required: true,
     },
-    proxyId: {
+    receiver: {
         type: Number, // 또는 String, 데이터 유형에 따라 변경
         required: true,
+    },
+    proxyId : {
+        type: Number,
+        required : true
+    },
+    roomNumber : {
+        type : Number,
+        required: true
     },
     createdAt: {
         type: Date,

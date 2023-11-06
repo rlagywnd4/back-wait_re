@@ -3,7 +3,7 @@ const socketIO = require('socket.io');
 const ChatData = require('./schema/ChatData');
 const Room = require('./schema/Room');
 const {ChatRoom, Proxy, WaitMate, User, Review, LikeWait} = require('./models');
-const activeRooms = new Set();
+
 
 function setupSocket(server ) {
   const io = socketIO(server, {
@@ -18,9 +18,36 @@ function setupSocket(server ) {
   io.on('connection', (socket) => {
     console.log('새로운 소켓 연결이 이루어졌습니다.');
 
+   
     socket.on('createRoom', async (data) => {
-        chatController.createRoom(data, activeRooms, io, socket);
-      });
+        try {
+          const existingRoom = await Room.findOne({ sender: data.sender, receiver: data.receiver });
+    
+          if (existingRoom) {
+            
+            socket.emit('roomExists', { roomNumber: existingRoom.roomNumber });
+          } else {
+           
+            const roomNumber = Date.now();
+            console.log(roomNumber + '룸넘버입니다');
+    
+            const newRoom = new Room({
+              sender: data.sender,
+              receiver: data.receiver,
+              proxyId: data.proxyId,
+              roomNumber: roomNumber,
+            });
+    
+            await newRoom.save();
+            
+            socket.emit('roomCreated', { roomNumber });
+            socket.join(`room_${roomNumber}`);
+          }
+        } catch (err) {
+          console.error(err);
+        }
+    });
+      
     
 
     socket.on('message', (data)=>{
