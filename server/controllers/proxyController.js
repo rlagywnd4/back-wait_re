@@ -3,7 +3,7 @@ const Room = require('../schema/Room');
 const ChatData = require('../schema/ChatData');
 const jwt = require('jsonwebtoken');
 const Common = require('../common');
-
+const { Op } = require('sequelize');
 
 const input = {
     //프록시 테스트용
@@ -87,6 +87,8 @@ const input = {
             res.status(500).json({ message: '알 수 없는 서버 에러 입니다.' });
         }
     },
+
+
 
     // 등록한 프록시 정보를 업데이트 하는 코드
     updateProxy : async (req,res)=>{
@@ -181,11 +183,17 @@ const input = {
 const output = {
     // proxy 정보들을 확인하는 방법
     getProxyAll : async (req,res)=>{
-        const proxy = await Proxy.findAll({
-            order : [['proxyId', 'DESC']],
-        });
-        console.log(proxy);
-        return res.send(proxy);
+        const {address, order} = req.query;
+        const proxyAddress = await Proxy.findAll({
+            where: {
+              proxyAddress: {
+                [Op.like]: `%${address}%`,
+              },
+            },
+            order: [[order, 'DESC']],
+          });
+          console.log(address, proxyAddress);
+        res.send(proxyAddress);
     },
 
     // 특정한 구의 정보값들을 불러오는 방법
