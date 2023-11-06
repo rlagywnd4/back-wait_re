@@ -297,6 +297,12 @@ exports.temp = (req, res) => {
   res.redirect(`https://kauth.kakao.com/oauth/authorize?redirect_uri=http://localhost:8080/user/kakao&client_id=${process.env.KAKAO_REST_API_KEY}&response_type=code`)
 }
 exports.logOut = () => {
-  res.clearCookie('access');
-  res.redirect('/');
+  try {
+
+    res.clearCookie('access');
+    res.send();
+  } catch (error) {
+    console.log(error)
+    res.status(500);
+  }
 }
