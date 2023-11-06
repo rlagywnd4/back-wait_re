@@ -4,6 +4,7 @@ const ChatData = require('../schema/ChatData');
 const jwt = require('jsonwebtoken');
 const Common = require('../common');
 
+
 const input = {
     //프록시 테스트용
     postRegisterTest : async (req,res)=>{
@@ -17,7 +18,7 @@ const input = {
                     gender: req.body.gender,
                     age: req.body.age,
                     proxyMsg: req.body.proxyMsg,
-                    photo : 'http://localhost:8080/public/img/proxyImg/default.png',
+                    photo : 'http://localhost:8080/public/proxyImg/default.png',
                  });
                 return res.send(postProxy);
             } else if(req.body.photo !== null){
