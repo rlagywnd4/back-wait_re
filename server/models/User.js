@@ -44,6 +44,11 @@ const User = (Sequelize, DataTypes) => {
           type : DataTypes.FLOAT,
           defaultValue : 0,
           comment : '사용자가 받은 평균 점수'
+        },
+        wallet : {
+          type : DataTypes.INTEGER,
+          defaultValue : 1000000,
+          comment : '사용자가 가지고 있는 돈'
         }
       },
       {
