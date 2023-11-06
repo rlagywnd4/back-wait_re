@@ -17,6 +17,21 @@ const WaitMate = (Sequelize, DataTypes) => {
         allowNull: false,
         comment: '웨이트메이트가 원하는 장소',
       },
+      wmDetailAddress: {
+        type: DataTypes.STRING(250),
+        allowNull: false,
+        comment: '웨이트메이트가 원하는 장소의 상세주소',
+      },
+      lng: {
+        type: DataTypes.STRING(250),
+        allowNull: false,
+        comment: '경도',
+      },
+      lat: {
+        type: DataTypes.STRING(250),
+        allowNull: false,
+        comment: '위도',
+      },
       waitTime: {
         type: DataTypes.STRING(250),
         allowNull: false,
