@@ -18,6 +18,7 @@ const WaitMate = require('./WaitMate')(sequelize, Sequelize);
 const Review = require('./Review')(sequelize, Sequelize);
 const ChatRoom = require('./ChatRoom')(sequelize, Sequelize);
 const LikeWait = require('./LikeWait')(sequelize, Sequelize);
+const Payment = require('./Payment')(sequelize, Sequelize);
 
 User.hasMany(WaitMate, {
   foreignKey: 'id',
@@ -60,14 +61,20 @@ Proxy.hasMany(LikeWait, {
   onDelete: 'CASCADE',
 });
 LikeWait.belongsTo(Proxy, { foreignKey: 'proxyId', targetKey: 'proxyId' });
-
 WaitMate.hasMany(LikeWait, {
   foreignKey: 'wmId',
   sourceKey: 'wmId',
   onDelete: 'CASCADE',
 });
 LikeWait.belongsTo(WaitMate, { foreignKey: 'wmId', targetKey: 'wmId' });
-
+Payment.belongsTo(User, {
+  foreignKey: 'payerId',
+  as: 'payer',
+});
+Payment.belongsTo(User, {
+  foreignKey: 'payeeId',
+  as: 'payee',
+});
 db.User = User;
 db.Proxy = Proxy;
 db.WaitMate = WaitMate;

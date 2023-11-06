@@ -1,5 +1,5 @@
 const {User, Review} = require('../models');
-const Common = require('../common')
+const Common = require('../common');
 
 
 exports.createReview = async (req, res) => {
