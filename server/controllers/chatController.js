@@ -12,7 +12,7 @@ const createRoom = async (data, activeRooms, io, socket) => {
     socket.emit('roomError', 'Room already exists');
     return;
   }
-
+  
   if (
     io.sockets.adapter.rooms.get(data.roomNumber) &&
     io.sockets.adapter.rooms.get(data.roomNumber).size >= 2
@@ -24,8 +24,9 @@ const createRoom = async (data, activeRooms, io, socket) => {
   try {
     const newRoom = new Room({
       roomNumber: data.roomNumber,
-      proxyId: data.receiver,
-      wmId: data.sender,
+      receiver: data.receiver,
+      sender: data.sender,
+      proxyId : data.proxyId,
     });
 
     await newRoom.save();

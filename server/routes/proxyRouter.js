@@ -35,13 +35,19 @@ proxyRouter.get('/detail/:proxyId', proxyController.output.getProxyOne);
 proxyRouter.get('/realGetter', proxyController.output.getAddressAll);
 // /createRoom 엔드포인트에 컨트롤러 함수를 할당
 proxyRouter.post('/createRoom', chatController.createRoom);
+
+//등록된 채팅방 정보들을 불러옴
+proxyRouter.get('/listChatting', proxyController.output.getChattingList);
+
 //등록된 프록시를 변경
-proxyRouter.patch('/update/:id', proxyController.input.updateProxy);
+proxyRouter.patch('/update/:id', uploadProxy.single('photo'), proxyController.input.updateProxy);
 //등록된 프록시를 삭제
 proxyRouter.delete('/delete/:id', proxyController.input.deleteRegister);
 // 프록시 이미지 등록
 proxyRouter.post('/imgUpload', uploadProxy.single('photo'), proxyController.input.postImgProxy);
 
+//채팅 데이터 가져오기
+proxyRouter.get('/chat/:roomNumber', proxyController.output.getChatData);
 
 //몽구스 테스트
 proxyRouter.post('/mongoose', proxyController.input.mongooseTest);
