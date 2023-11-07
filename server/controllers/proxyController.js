@@ -6,7 +6,6 @@ const Common = require('../common');
 
 const { Op } = require('sequelize');
 
-
 const input = {
   //프록시 테스트용
   postRegisterTest: async (req, res) => {
@@ -89,54 +88,52 @@ const input = {
     }
   },
 
+  // 등록한 프록시 정보를 업데이트 하는 코드
+  updateProxy: async (req, res) => {
+    try {
+      const userInfo = Common.cookieUserinfo(req);
+      if (!userInfo) {
+        res.status(401).json({ message: '로그인을 먼저 해주세요' });
+      } else {
+        const updateProxy = await Proxy.update(
+          {
+            id: req.body.id,
+            proxyAddress: req.body.proxyAddress,
+            gender: req.body.gender,
+            age: req.body.age,
+            proxyMsg: req.body.proxyMsg,
+            title: req.body.title,
+            photo: 'http://localhost:8080/public/proxyImg/' + req.file.filename,
+          },
+          {
+            where: { id: userInfo.id },
+          }
+        );
+        return res.send(updateProxy);
+      }
+    } catch (err) {
+      console.error(e);
+      res.status(500).json({ message: '알 수 없는 서버 에러 입니다.' });
+    }
+  },
 
-
-
-    // 등록한 프록시 정보를 업데이트 하는 코드
-    updateProxy : async (req,res)=>{
-        try {
-            const userInfo = Common.cookieUserinfo(req);
-            if (!userInfo) {
-                res.status(401).json({ message: '로그인을 먼저 해주세요' });
-            } else {
-                const updateProxy = await Proxy.update({
-                    id: req.body.id,
-                    proxyAddress: req.body.proxyAddress,
-                    gender: req.body.gender,
-                    age: req.body.age,
-                    proxyMsg: req.body.proxyMsg,
-                    title : req.body.title,
-                    photo : 'http://localhost:8080/public/proxyImg/' + req.file.filename,
-                 },
-                {
-                where : {id : userInfo.id},
-                });
-            return res.send(updateProxy);
-             }
-        } catch(err){
-            console.error(e);
-            res.status(500).json({ message: '알 수 없는 서버 에러 입니다.' });
-        }
-    },
-    
-    // 등록한 프록시를 삭제하는 코드
-    deleteRegister : async (req,res)=>{
-        try{
-            const userInfo = Common.cookieUserinfo(req);
-            if(!userInfo){
-                res.status(401).json({message: '로그인을 먼저 시도하십시오'});
-            } else {
-                const deleteProxy = await Proxy.destroy({
-                where : {id : userInfo.id},
-                });
-            res.send({message : deleteProxy});   
-            }
-        } catch(err){
-            console.error(err);
-            res.status(500).json({message: '알 수 없는 서버 에러입니다.'});
-        }
-    },
-
+  // 등록한 프록시를 삭제하는 코드
+  deleteRegister: async (req, res) => {
+    try {
+      const userInfo = Common.cookieUserinfo(req);
+      if (!userInfo) {
+        res.status(401).json({ message: '로그인을 먼저 시도하십시오' });
+      } else {
+        const deleteProxy = await Proxy.destroy({
+          where: { id: userInfo.id },
+        });
+        res.send({ message: deleteProxy });
+      }
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: '알 수 없는 서버 에러입니다.' });
+    }
+  },
 
   // 프록시 사진 등록하는 방법
   postImgProxy: async (req, res) => {
@@ -193,22 +190,40 @@ const input = {
 };
 
 const output = {
-
-        // proxy 정보들을 확인하는 방법
-    getProxyAll: async (req, res) => {
-        const { address, order } = req.query;
-        console.log(address, order);
+  // proxy 정보들을 확인하는 방법
+  getProxyAll: async (req, res) => {
+    try {
+      const { address, order } = req.query;
+      console.log(address, order);
+      if (address) {
         const proxyAddress = await Proxy.findAll({
-        where: {
+          where: {
             proxyAddress: {
-            [Op.like]: `%${address}%`,
+              [Op.like]: `%${address}%`,
             },
-        },
-        order: [[order, 'DESC']],
+          },
+          order: [[order, 'DESC']],
         });
-        res.send({list: proxyAddress});
-    },
-
+        if (proxyAddress) {
+          res.send({ list: proxyAddress });
+        } else {
+          res.send({ message: '정보들을 불러오지 못했습니다.' });
+        }
+      } else {
+        const proxyAddress = await Proxy.findAll({
+          order: [[order, 'DESC']],
+        });
+        if (proxyAddress) {
+          res.send({ list: proxyAddress });
+        } else {
+          res.send({ message: '정보들을 불러오지 못했습니다.' });
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: '정보들을 불러오지 못했습니다.' });
+    }
+  },
 
   // 특정한 구의 정보값들을 불러오는 방법
   getAddressAll: async (req, res) => {
@@ -230,40 +245,41 @@ const output = {
           });
           if (proxyList) {
             res.send({ list: proxyList });
+          } else {
+            res.send({ message: '정보들을 불러오지 못했습니다.' });
           }
         } else {
           //주소가 요청에 없을때
           const proxyList = await Proxy.findAll({ order: [[order, 'DESC']] });
           if (proxyList) {
             res.send({ list: proxyList });
+          } else {
+            res.send({ message: '정보들을 불러오지 못했습니다.' });
           }
         }
-       }
-    } catch(err){
-        console.error(err);
-        res.status(500).json({message: '연결하지 못했습니다'});
+      }
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: '정보값들을 불러오지 못했습니다.' });
     }
-    },
+  },
 
-    // proxy 하나의 정보를 가져오는 값
-    getProxyOne : async (req,res)=>{
-        const proxy = await Proxy.findOne({
-            where : { proxyId : req.params.proxyId},
-        });
-        console.log('여기는 프록시 입니다' + proxy);
-        return res.send({result : proxy});
-    },
+  // proxy 하나의 정보를 가져오는 값
+  getProxyOne: async (req, res) => {
+    const proxy = await Proxy.findOne({
+      where: { proxyId: req.params.proxyId },
+    });
+    console.log('여기는 프록시 입니다' + proxy);
+    return res.send({ result: proxy });
+  },
 
-    // 자신의 채팅방 목록을 가져오는 코드
-    getChattingList: async (req, res) => {
+  // 자신의 채팅방 목록을 가져오는 코드
+  getChattingList: async (req, res) => {
     try {
       const userInfo = Common.cookieUserinfo(req);
       if (userInfo) {
         const resultList = await Room.find({
-          $or: [
-            { sender: userInfo.id },
-            { receiver: userInfo.id }
-          ]
+          $or: [{ sender: userInfo.id }, { receiver: userInfo.id }],
         });
         // 정보가 있는 경우
         if (resultList && resultList.length > 0) {
@@ -282,20 +298,17 @@ const output = {
     }
   },
 
-  getChatData : async (req,res)=>{
-    try{
-        const result = await ChatData.find({
-            roomNumber : req.params.roomNumber,
-        })
-        console.log(result);
-        res.send({list : result});
-    } catch(err){
-        console.error(err);
+  getChatData: async (req, res) => {
+    try {
+      const result = await ChatData.find({
+        roomNumber: req.params.roomNumber,
+      });
+      console.log(result);
+      res.send({ list: result });
+    } catch (err) {
+      console.error(err);
     }
-  }
-}
-
- 
-
+  },
+};
 
 module.exports = { input, output };
