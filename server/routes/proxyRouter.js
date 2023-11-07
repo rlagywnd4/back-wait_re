@@ -46,6 +46,8 @@ proxyRouter.delete('/delete/:id', proxyController.input.deleteRegister);
 // 프록시 이미지 등록
 proxyRouter.post('/imgUpload', uploadProxy.single('photo'), proxyController.input.postImgProxy);
 
+//채팅 데이터 가져오기
+proxyRouter.get('/chat/:roomNumber', proxyController.output.getChatData);
 
 //몽구스 테스트
 proxyRouter.post('/mongoose', proxyController.input.mongooseTest);

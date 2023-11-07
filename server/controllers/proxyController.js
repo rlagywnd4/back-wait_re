@@ -254,6 +254,18 @@ const output = {
       console.error(err);
       res.status(500).send({ error: '서버 오류 발생' });
     }
+  },
+
+  getChatData : async (req,res)=>{
+    try{
+        const result = await ChatData.find({
+            roomNumber : req.params.roomNumber,
+        })
+        console.log(result);
+        res.send({list : result});
+    } catch(err){
+        console.error(err);
+    }
   }
 }
 
