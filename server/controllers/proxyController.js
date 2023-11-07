@@ -98,10 +98,13 @@ const input = {
                 res.status(401).json({ message: '로그인을 먼저 해주세요' });
             } else {
                 const updateProxy = await Proxy.update({
-                proxyAddress : req.body.proxyAddress,
-                gender : req.body.gender,
-                age : req.body.age,
-                proxyMsg : req.body.proxyMsg,
+                    id: req.body.id,
+                    proxyAddress: req.body.proxyAddress,
+                    gender: req.body.gender,
+                    age: req.body.age,
+                    proxyMsg: req.body.proxyMsg,
+                    title : req.body.title,
+                    photo : 'http://localhost:8080/public/proxyImg/' + req.file.filename,
                  },
                 {
                 where : {id : userInfo.id},

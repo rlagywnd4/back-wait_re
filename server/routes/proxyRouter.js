@@ -40,7 +40,7 @@ proxyRouter.post('/createRoom', chatController.createRoom);
 proxyRouter.get('/listChatting', proxyController.output.getChattingList);
 
 //등록된 프록시를 변경
-proxyRouter.patch('/update/:id', proxyController.input.updateProxy);
+proxyRouter.patch('/update/:id', uploadProxy.single('photo'), proxyController.input.updateProxy);
 //등록된 프록시를 삭제
 proxyRouter.delete('/delete/:id', proxyController.input.deleteRegister);
 // 프록시 이미지 등록
