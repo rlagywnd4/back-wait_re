@@ -491,3 +491,27 @@ paths:
                   message:
                     type: string
                     example: '알 수 없는 서버 에러'
+  /logOut:
+    get:
+      tags:
+        - User
+      summary: 로그아웃
+      description: 존재하는 쿠키를 지우고 빈 값을 내보냅니다.
+      parameters:
+        - name: Cookie
+          in: header
+          description: 로그인 토큰 (access)
+          required: true
+      responses:
+        '204':
+          description: 로그아웃 완료
+        '500':
+          description: 서버 에러
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: '알 수 없는 서버 에러'
