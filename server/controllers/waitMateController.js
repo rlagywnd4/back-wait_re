@@ -114,6 +114,7 @@ exports.postWaitMate = async (req, res) => {
       // photo경로 나중에 서버올리면 바꿔야함
       // photo: path.join(__dirname, '../public/waitMateImg', req.file.filename),
       photo: photo,
+      state: 'active',
     });
     if (insertWaitMate) {
       res.send({ result: 'success' });
@@ -161,6 +162,7 @@ exports.patchWaitMate = async (req, res) => {
       waitTime,
       description,
       pay,
+      state,
     } = req.body;
 
     let isSuccess;
@@ -177,6 +179,7 @@ exports.patchWaitMate = async (req, res) => {
           description: description,
           pay: pay,
           photo: req.file.filename,
+          state: state,
         },
         {
           where: {
@@ -199,6 +202,7 @@ exports.patchWaitMate = async (req, res) => {
           waitTime: waitTime,
           description: description,
           pay: pay,
+          state: state,
         },
         {
           where: {
@@ -211,6 +215,31 @@ exports.patchWaitMate = async (req, res) => {
       }
     }
     if (isSuccess) {
+      res.send({ result: 'success' });
+    } else {
+      res.send({ result: 'fail' });
+    }
+  } catch (e) {
+    console.error('Error WaitMate data:', e);
+    res.status(500).send('Internal Server Error');
+  }
+};
+
+// waitMate 상태 변경
+exports.patchWaitMateState = async (req, res) => {
+  try {
+    const { wmId, state } = req.query;
+    const patchWaitMateState = await WaitMate.update(
+      {
+        state: state,
+      },
+      {
+        where: {
+          wmId: wmId,
+        },
+      }
+    );
+    if (patchWaitMateState) {
       res.send({ result: 'success' });
     } else {
       res.send({ result: 'fail' });

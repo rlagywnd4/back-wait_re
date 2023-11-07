@@ -57,6 +57,11 @@ const WaitMate = (Sequelize, DataTypes) => {
         defaultValue: 0,
         comment: '조회수',
       },
+      state: {
+        type: DataTypes.STRING(150),
+        defaultValue: 'active',
+        comment: '상태(예약중(reserved), 거래완료(completed))',
+      },
     },
     {
       tableName: 'waitMate',
