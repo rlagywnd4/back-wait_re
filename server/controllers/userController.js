@@ -306,7 +306,7 @@ exports.checkNickname = async (req, res) => {
 exports.temp = (req, res) => {
   res.redirect(`https://kauth.kakao.com/oauth/authorize?redirect_uri=http://localhost:8080/user/kakao&client_id=${process.env.KAKAO_REST_API_KEY}&response_type=code`)
 }
-exports.logOut = () => {
+exports.logOut = (req, res) => {
   try {
     res.clearCookie('access');
     res.status(204).send();
