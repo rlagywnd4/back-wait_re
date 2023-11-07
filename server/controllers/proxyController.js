@@ -238,6 +238,11 @@ const output = {
             res.send({ list: proxyList });
           }
         }
+       }
+    } catch(err){
+        console.error(err);
+        res.status(500).json({message: '연결하지 못했습니다'});
+    }
     },
 
     // proxy 하나의 정보를 가져오는 값
@@ -289,12 +294,6 @@ const output = {
     }
   }
 }
-      }
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ message: '연결하지 못했습니다' });
-    }
-  },
 
  
 
