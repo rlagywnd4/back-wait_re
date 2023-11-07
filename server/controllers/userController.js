@@ -32,6 +32,11 @@ const kakaoLogin = async () => {
 };
 exports.register = async (req, res) => {
   try {
+    const user = await Common.cookieUserinfo(req);
+    if (!user) {
+      res.status(401).json({message : '이미 로그인된 유저입니다.'});
+      return ;
+    }
     const { userId, password, nickname } = req.body;
     const userInfo = { userId, password, nickname }
     const errMessages = []
@@ -62,6 +67,11 @@ exports.register = async (req, res) => {
 };
 exports.login = async (req, res) => {
   try {
+    const userInfo = await Common.cookieUserinfo(req);
+    if (!userInfo) {
+      res.status(401).json({message : '이미 로그인된 유저입니다.'});
+      return ;
+    }
     const { userId, password } = req.body
     let user = await User.findOne({
       where : {userId : userId},
