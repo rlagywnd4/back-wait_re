@@ -19,7 +19,7 @@ const WaitMate = (Sequelize, DataTypes) => {
       },
       wmDetailAddress: {
         type: DataTypes.STRING(250),
-        allowNull: false,
+        allowNull: true,
         comment: '웨이트메이트가 원하는 장소의 상세주소',
       },
       lng: {
@@ -35,11 +35,11 @@ const WaitMate = (Sequelize, DataTypes) => {
       waitTime: {
         type: DataTypes.STRING(250),
         allowNull: false,
-        comment: '기다려야 하는 시간',
+        comment: '기다리는 날짜',
       },
       description: {
         type: DataTypes.STRING(500),
-        allowNull: false,
+        allowNull: true,
         comment: '장소들에 대한 설명',
       },
       pay: {
@@ -60,7 +60,17 @@ const WaitMate = (Sequelize, DataTypes) => {
       state: {
         type: DataTypes.STRING(150),
         defaultValue: 'active',
-        comment: '상태(예약중(reserved), 거래완료(completed))',
+        comment: '상태(디폴트(active), 예약중(reserved), 거래완료(completed))',
+      },
+      startTime: {
+        type: DataTypes.TIME,
+        allowNull: false,
+        comment: '시작 시간',
+      },
+      endTime: {
+        type: DataTypes.TIME,
+        allowNull: false,
+        comment: '마감 시간',
       },
     },
     {
