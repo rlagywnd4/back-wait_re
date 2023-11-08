@@ -280,7 +280,7 @@ exports.kakaoResult = async (req, res) => {
           로그인 중...</h1>
         <script>
           const reload = () => {
-            return setTimeout(() => {window.location.href='http://ec2-3-39-238-189.ap-northeast-2.compute.amazonaws.com:3000/map'}, 1000)
+            return setTimeout(() => {window.location.href='http://ec2-13-124-56-103.ap-northeast-2.compute.amazonaws.com:3000/map'}, 1000)
           }
           reload();
         </script>
