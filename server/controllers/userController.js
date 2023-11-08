@@ -4,22 +4,30 @@ const bcryptjs = require('bcryptjs');
 const axios = require('axios');
 const jwt = require('jsonwebtoken');
 
+const validReg = {
+  'userId' : /^[A-Za-z0-9]{4,12}$/,
+  'password' : /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/,
+  'nickname' : /^.{2,10}$/
+}
+const isValidate = (item, check) => {
+  return check.test(item);
+};
 const inValidSignup = async (columnName, value) => {
   if (!value) {
     return `${columnName}값이 존재하지 않습니다.`
-  }
+  };
+  if (!isValidate(value, validReg[columnName])) {
+    return `올바르지 않은 ${columnName}값입니다.`
+  };
   if (columnName === 'password') {
     return false
-  }
+  };
   const condition = {};
   condition[columnName] = value;
   const response = await User.findOne({
     where : condition
   });
   return response ? `${columnName}값이 이미 존재합니다.` : false
-};
-const isValidate = (item, check) => {
-  return check.test(item);
 };
 exports.register = async (req, res) => {
   try {
@@ -35,26 +43,15 @@ exports.register = async (req, res) => {
       Object.entries(userInfo).map(async ([k, v]) => {
         const response = await inValidSignup(k, v);
         if (response) {
-          errMessages.push(response);
+          errMessages.push(error.message);
+          throw Error({message : response})
         }
       })
     );
     if (errMessages.length > 0) {
-      console.log(errMessages)
+      console.error(errMessages)
       res.status(400).json({ errors: errMessages });
     } else {
-      if (!isValidate(userId, /^[A-Za-z0-9]{4,12}$/)) {
-        res.status(400).json({message : '올바르지 않은 userId입니다.'});
-        return ;
-      };
-      if (!isValidate(password, /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/)) {
-        res.status(400).json({message : '올바르지 않은 password입니다.'});
-        return ;
-      };
-      if (!isValidate(nickname, /^.{2,10}$/)) {
-        res.status(400).json({message : '올바르지 않은 nickname입니다.'});
-        return ;
-      };
       if (await User.findOne({where : {userId : userId}})) {
         res.status(400).json({message : '이미 존재하는 userId입니다.'});
         return ;
