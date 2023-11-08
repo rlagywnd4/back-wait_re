@@ -19,7 +19,7 @@ const Review = require('./Review')(sequelize, Sequelize);
 const ChatRoom = require('./ChatRoom')(sequelize, Sequelize);
 const LikeWait = require('./LikeWait')(sequelize, Sequelize);
 const Payment = require('./Payment')(sequelize, Sequelize);
-const Reservation = require('./reservation')(sequelize, Sequelize);
+const Reservation = require('./Reservation')(sequelize, Sequelize);
 
 User.hasMany(WaitMate, {
   foreignKey: 'id',
