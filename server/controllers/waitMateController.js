@@ -8,11 +8,6 @@ exports.getWaitMateDetail = async (req, res) => {
   try {
     let isLikeWait = false;
     const { wmId, id } = req.query;
-    const findProxy = await Proxy.findOne({
-      where: {
-        id,
-      },
-    });
     // WaitMateDetail페이지
     const waitMate = await WaitMate.findOne({
       where: {
