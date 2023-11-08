@@ -105,7 +105,7 @@ function setupSocket(server) {
         where: {
           wmId: data.wmId,
         },
-        attributes: ['endTime'],
+        attributes: ['waitTime', 'endTime'],
       });
       console.log(wmEndTime.endTime);
       // setTimeout실행
