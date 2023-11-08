@@ -10,6 +10,11 @@ const User = (Sequelize, DataTypes) => {
         userId: {
           type: DataTypes.STRING(150),
           allowNull : true,
+          unique : true,
+          validate: {
+            is: /^[A-Za-z0-9]{4,12}$/,
+            notEmpty: true, 
+          },
           comment: '유저 아이디',
         },
         password: {
@@ -20,6 +25,11 @@ const User = (Sequelize, DataTypes) => {
         nickname: {
           type: DataTypes.STRING(150),
           allowNull: false,
+          unique : true,
+          validate: {
+            is: /^[A-Za-z0-9]{4,12}$/,
+            notEmpty: true, 
+          },
           comment: '닉네임',
         },
         email: {
