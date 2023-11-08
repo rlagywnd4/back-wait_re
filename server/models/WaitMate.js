@@ -43,7 +43,7 @@ const WaitMate = (Sequelize, DataTypes) => {
         comment: '장소들에 대한 설명',
       },
       pay: {
-        type: DataTypes.STRING(250),
+        type: DataTypes.INTEGER,
         allowNull: true,
         comment: '결제 요금',
       },
