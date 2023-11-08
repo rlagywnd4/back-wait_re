@@ -9,3 +9,4 @@ public/**/*.png
 public/**/*.jpg
 public/**/*.jpeg
 !public/profileImg/default.png
+!public/waitMateImg/waitMateDefaultImg.png
