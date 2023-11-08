@@ -5,7 +5,7 @@ const Room = require('./schema/Room');
 const {ChatRoom, Proxy, WaitMate, User, Review, LikeWait} = require('./models');
 const Common = require('./common');
 
-function setupSocket(server ) {
+function setupSocket(server) {
   const io = socketIO(server, {
     cors: {
       origin: ['http://localhost:3000'],
@@ -59,6 +59,7 @@ function setupSocket(server ) {
         const sender = await User.findOne({ where: { id: room.sender } });
         const receiver = await User.findOne({ where: { id: room.receiver } });
         const proxyData = await Proxy.findOne({ where: {proxyId: room.proxyId}});
+        console.log(proxyData);
         if (!sender || !receiver) {
           socket.emit('roomInfo', { error: '사용자 정보를 찾을 수 없습니다.' });
           return;
@@ -72,7 +73,7 @@ function setupSocket(server ) {
     });
 
     socket.on('message', (data)=>{
-      console.log(data);
+      console.log('아하' + data);
       
       socket.broadcast.emit('smessage', data);
       const chatMessage = new ChatData({
@@ -95,6 +96,8 @@ function setupSocket(server ) {
 
       
     });
+
+
   });
 }
 

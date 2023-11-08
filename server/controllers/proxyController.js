@@ -57,7 +57,7 @@ const input = {
           res.status(402).json({ message: '이미 등록하신 글이 있습니다' });
         } else {
           // 등록 가능한 경우 프록시 생성
-          if (req.body.photo === undefined) {
+          if (req.body.photo === null) {
             const postProxy = await Proxy.create({
               id: req.body.id,
               proxyAddress: req.body.proxyAddress,
@@ -257,7 +257,8 @@ const output = {
     // 자신의 채팅방 목록을 가져오는 코드
     getChattingList: async (req, res) => {
     try {
-      const userInfo = Common.cookieUserinfo(req);
+      const userInfo = await Common.cookieUserinfo(req);
+      console.log(userInfo);
       if (userInfo) {
         const resultList = await Room.find({
           $or: [
@@ -282,6 +283,7 @@ const output = {
     }
   },
 
+  // 모든 채팅 리스트 출력
   getChatData : async (req,res)=>{
     try{
         const result = await ChatData.find({
@@ -292,10 +294,22 @@ const output = {
     } catch(err){
         console.error(err);
     }
-  }
-}
+  },
 
- 
+  //모든 웨이트 메이트 리스트값 적용
+  getWaitMateList : async( req,res)=>{
+    try{
+      const result = await WaitMate.findAll({
+          where : {id : req.params.id}
+      });
+      console.log(result);
+      res.send(result);
+  } catch(err){
+      console.error(err);
+  }
+  }
+
+}
 
 
 module.exports = { input, output };

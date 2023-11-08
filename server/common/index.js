@@ -18,6 +18,7 @@ exports.cookieUserinfo = async (req) => {
   return new Promise(async (resolve, reject) => {
     await jwt.verify(access, process.env.SECRET_KEY, async (err, decoded) => {
       if (err) {
+        console.log(err);
         return resolve({})
       }
       const id = decoded?.id;
