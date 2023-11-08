@@ -1,7 +1,6 @@
-const { Proxy, WaitMate } = require('../models');
+const { Proxy, WaitMate, User } = require('../models');
 const Room = require('../schema/Room');
 const ChatData = require('../schema/ChatData');
-const jwt = require('jsonwebtoken');
 const Common = require('../common');
 
 const { Op } = require('sequelize');
@@ -19,7 +18,7 @@ const input = {
           gender: req.body.gender,
           age: req.body.age,
           proxyMsg: req.body.proxyMsg,
-          photo: 'http://localhost:8080/public/proxyImg/default.png',
+          photo: `${process.env.AWS_HOST}:8080/public/proxyImg/default.png`,
         });
         return res.send(postProxy);
       } else if (req.body.photo !== null) {
@@ -30,7 +29,7 @@ const input = {
           gender: req.body.gender,
           age: req.body.age,
           proxyMsg: req.body.proxyMsg,
-          photo: 'http://localhost:8080/public/proxyImg/' + req.file.filename,
+          photo: `${process.env.AWS_HOST}/public/proxyImg/` + req.file.filename,
         });
         return res.send(postProxy);
       }
@@ -64,7 +63,7 @@ const input = {
               age: req.body.age,
               proxyMsg: req.body.proxyMsg,
               title: req.body.title,
-              photo: 'http://localhost:8080/public/proxyImg/default.png',
+              photo: `${process.env.AWS_HOST}/public/proxyImg/default.png`,
             });
             return res.send(postProxy);
           } else {
@@ -76,7 +75,7 @@ const input = {
               proxyMsg: req.body.proxyMsg,
               title: req.body.title,
               photo:
-                'http://localhost:8080/public/proxyImg/' + req.file.filename,
+                `${process.env.AWS_HOST}/public/proxyImg/` + req.file.filename,
             });
             return res.send(postProxy);
           }
@@ -117,23 +116,53 @@ const input = {
     }
   },
 
-  // 등록한 프록시를 삭제하는 코드
-  deleteRegister: async (req, res) => {
-    try {
-      const userInfo = Common.cookieUserinfo(req);
-      if (!userInfo) {
-        res.status(401).json({ message: '로그인을 먼저 시도하십시오' });
-      } else {
-        const deleteProxy = await Proxy.destroy({
-          where: { id: userInfo.id },
-        });
-        res.send({ message: deleteProxy });
-      }
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ message: '알 수 없는 서버 에러입니다.' });
-    }
-  },
+
+
+    // 등록한 프록시 정보를 업데이트 하는 코드
+    updateProxy : async (req,res)=>{
+        try {
+            const userInfo = Common.cookieUserinfo(req);
+            if (!userInfo) {
+                res.status(401).json({ message: '로그인을 먼저 해주세요' });
+            } else {
+                const updateProxy = await Proxy.update({
+                    id: req.body.id,
+                    proxyAddress: req.body.proxyAddress,
+                    gender: req.body.gender,
+                    age: req.body.age,
+                    proxyMsg: req.body.proxyMsg,
+                    title : req.body.title,
+                    photo : `${process.env.AWS_HOST}/public/proxyImg/` + req.file.filename,
+                 },
+                {
+                where : {id : userInfo.id},
+                });
+            return res.send(updateProxy);
+             }
+        } catch(err){
+            console.error(e);
+            res.status(500).json({ message: '알 수 없는 서버 에러 입니다.' });
+        }
+    },
+    
+    // 등록한 프록시를 삭제하는 코드
+    deleteRegister : async (req,res)=>{
+        try{
+            const userInfo = Common.cookieUserinfo(req);
+            if(!userInfo){
+                res.status(401).json({message: '로그인을 먼저 시도하십시오'});
+            } else {
+                const deleteProxy = await Proxy.destroy({
+                where : {id : userInfo.id},
+                });
+            res.send({message : deleteProxy});   
+            }
+        } catch(err){
+            console.error(err);
+            res.status(500).json({message: '알 수 없는 서버 에러입니다.'});
+        }
+    },
+
 
   // 프록시 사진 등록하는 방법
   postImgProxy: async (req, res) => {
@@ -190,40 +219,79 @@ const input = {
 };
 
 const output = {
+
+        // proxy 정보들을 확인하는 방법
+        getProxyAll: async (req, res) => {
+          const { address, order } = req.query;
+          console.log(address, order);
+      
+          if (order === 'star') {
+              const proxyAddress = await Proxy.findAll({
+                  where: {
+                      proxyAddress: {
+                          [Op.like]: `%${address}%`,
+                      },
+                  },
+                  include: [
+                      {
+                          model: User, 
+                          required: true, 
+                          attributes: ['score'], 
+                      },
+                  ],
+              });
+      
+              res.send({ list: proxyAddress });
+          } else if (order === 'latest'){
+              const proxyAddress = await Proxy.findAll({
+                  where: {
+                      proxyAddress: {
+                          [Op.like]: `%${address}%`,
+                      },
+                  },
+                  order: [[order, 'DESC']],
+              });
+      
+              res.send({ list: proxyAddress });
+          }
+      },
+
+
   // proxy 정보들을 확인하는 방법
-  getProxyAll: async (req, res) => {
-    try {
-      const { address, order } = req.query;
-      console.log(address, order);
-      if (address) {
-        const proxyAddress = await Proxy.findAll({
-          where: {
-            proxyAddress: {
-              [Op.like]: `%${address}%`,
-            },
-          },
-          order: [[order, 'DESC']],
-        });
-        if (proxyAddress) {
-          res.send({ list: proxyAddress });
-        } else {
-          res.send({ message: '정보들을 불러오지 못했습니다.' });
-        }
-      } else {
-        const proxyAddress = await Proxy.findAll({
-          order: [[order, 'DESC']],
-        });
-        if (proxyAddress) {
-          res.send({ list: proxyAddress });
-        } else {
-          res.send({ message: '정보들을 불러오지 못했습니다.' });
-        }
-      }
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ message: '정보들을 불러오지 못했습니다.' });
-    }
-  },
+//   getProxyAll: async (req, res) => {
+//     try {
+//       const { address, order } = req.query;
+//       console.log(address, order);
+//       if (address) {
+//         const proxyAddress = await Proxy.findAll({
+//           where: {
+//             proxyAddress: {
+//               [Op.like]: `%${address}%`,
+//             },
+//           },
+//           order: [[order, 'DESC']],
+//         });
+//         if (proxyAddress) {
+//           res.send({ list: proxyAddress });
+//         } else {
+//           res.send({ message: '정보들을 불러오지 못했습니다.' });
+//         }
+//       } else {
+//         const proxyAddress = await Proxy.findAll({
+//           order: [[order, 'DESC']],
+//         });
+//         if (proxyAddress) {
+//           res.send({ list: proxyAddress });
+//         } else {
+//           res.send({ message: '정보들을 불러오지 못했습니다.' });
+//         }
+//       }
+//     } catch (err) {
+//       console.error(err);
+//       res.status(500).json({ message: '정보들을 불러오지 못했습니다.' });
+//     }
+//   },
+
 
   // 특정한 구의 정보값들을 불러오는 방법
   getAddressAll: async (req, res) => {
@@ -324,7 +392,7 @@ const output = {
   } catch(err){
       console.error(err);
   }
-  }
+  },
 
 }
 

@@ -11,7 +11,7 @@ const options = {
     },
     servers: [
       {
-        url: 'http://localhost:8080', // 요청 URL
+        url: `${process.env.AWS_HOST}:8080`, // 요청 URL
       },
     ],
   },

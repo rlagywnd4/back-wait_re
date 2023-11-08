@@ -17,9 +17,9 @@ let timer; //웨메가 끝나기 전에 소켓 연결이 끊겼을 때를 대비
 function setupSocket(server) {
   const io = socketIO(server, {
     cors: {
-      origin: ['http://localhost:3000'],
-      methods: ['GET', 'POST', 'PATCH', 'DELETE'],
-    },
+      origin: [`${process.env.AWS_HOST}:3000`],
+      methods: ["GET","POST","PATCH","DELETE"],
+    }
   });
   console.log('소켓 시작');
 
@@ -67,9 +67,9 @@ function setupSocket(server) {
         const sender = await User.findOne({ where: { id: room.sender } });
         const receiver = await User.findOne({ where: { id: room.receiver } });
 
-        const proxyData = await Proxy.findOne({
-          where: { proxyId: room.proxyId },
-        });
+
+        const proxyData = await Proxy.findOne({ where: {proxyId: room.proxyId}});
+
         console.log(proxyData);
 
         if (!sender || !receiver) {

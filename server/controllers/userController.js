@@ -175,6 +175,10 @@ exports.updateUserInfo = async (req, res) => {
         userInfo[k] = v;
       }
     }
+
+    if (req.file?.filename) {
+      userInfo['photo'] = `${process.env.AWS_HOST}/profileImg/${req.file?.filename}`
+    }
     const response = await User.update(userInfo, {
       where : {id : userInfo.id}
     });
@@ -322,6 +326,7 @@ exports.checkNickname = async (req, res) => {
 };
 exports.temp = (req, res) => {
   res.redirect(`https://kauth.kakao.com/oauth/authorize?redirect_uri=http://ec2-13-124-56-103.ap-northeast-2.compute.amazonaws.com:8080/user/kakao&client_id=${process.env.KAKAO_REST_API_KEY}&response_type=code`)
+
 }
 exports.logOut = (req, res) => {
   try {
