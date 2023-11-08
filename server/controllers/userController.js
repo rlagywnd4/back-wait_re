@@ -27,13 +27,13 @@ exports.register = async (req, res) => {
     if (!user) {
       res.status(401).json({message : '이미 로그인된 유저입니다.'});
       return ;
-    }
+    };
     const { userId, password, nickname } = req.body;
-    const userInfo = { userId, password, nickname }
-    const errMessages = []
+    const userInfo = { userId, password, nickname };
+    const errMessages = [];
     await Promise.all(
-      Object.entries(userInfo).map(([k, v]) => {
-        const response = inValidSignup(k, v);
+      Object.entries(userInfo).map(async ([k, v]) => {
+        const response = await inValidSignup(k, v);
         if (response) {
           errMessages.push(response);
         }
