@@ -1,4 +1,23 @@
-const { LikeWait, Proxy } = require('../models');
+const { LikeWait } = require('../models');
+
+exports.getLikeWaitList = async (req, res) => {
+  try {
+    const { id } = req.query;
+    const getLikeWaitList = await LikeWait.findAll({
+      where: {
+        id,
+      },
+    });
+    if (getLikeWaitList) {
+      res.send(getLikeWaitList);
+    } else {
+      res.send({ result: 'fail' });
+    }
+  } catch (e) {
+    console.error('Error WaitMate data:', e);
+    res.status(500).send('Internal Server Error');
+  }
+};
 
 exports.postLikeWait = async (req, res) => {
   try {

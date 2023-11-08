@@ -310,3 +310,22 @@ exports.getWaitMateMapList = async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 };
+
+exports.getMyWaitMate = async (req, res) => {
+  try {
+    const { id } = req.query;
+    const myWaitMates = await WaitMate.findAll({
+      where: {
+        id,
+      },
+    });
+    if (myWaitMates) {
+      res.send(myWaitMates);
+    } else {
+      res.send({ result: 'fail' });
+    }
+  } catch (e) {
+    console.error('Error WaitMate data:', e);
+    res.status(500).send('Internal Server Error');
+  }
+};

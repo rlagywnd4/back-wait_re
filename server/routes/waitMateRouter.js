@@ -45,4 +45,7 @@ waitMateRouter.get('/list', waitMateController.getWaitMateList);
 // waitMate 전체 조회
 waitMateRouter.get('/mapList', waitMateController.getWaitMateMapList);
 
+// 내가 등록한 waitMate
+waitMateRouter.get('/myWaitMate', waitMateController.getMyWaitMate);
+
 module.exports = waitMateRouter;
