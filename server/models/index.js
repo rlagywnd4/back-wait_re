@@ -56,12 +56,12 @@ WaitMate.hasOne(ChatRoom, {
 });
 ChatRoom.belongsTo(WaitMate, { foreignKey: 'wmId', targetKey: 'wmId' });
 
-Proxy.hasMany(LikeWait, {
-  foreignKey: 'proxyId',
-  sourceKey: 'proxyId',
+User.hasMany(LikeWait, {
+  foreignKey: 'id',
+  sourceKey: 'id',
   onDelete: 'CASCADE',
 });
-LikeWait.belongsTo(Proxy, { foreignKey: 'proxyId', targetKey: 'proxyId' });
+LikeWait.belongsTo(User, { foreignKey: 'id', targetKey: 'id' });
 WaitMate.hasMany(LikeWait, {
   foreignKey: 'wmId',
   sourceKey: 'wmId',

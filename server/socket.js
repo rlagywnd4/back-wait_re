@@ -67,6 +67,7 @@ function setupSocket(server) {
         const sender = await User.findOne({ where: { id: room.sender } });
         const receiver = await User.findOne({ where: { id: room.receiver } });
 
+
         const proxyData = await Proxy.findOne({ where: {proxyId: room.proxyId}});
 
         console.log(proxyData);
@@ -83,10 +84,9 @@ function setupSocket(server) {
       }
     });
 
-
-    socket.on('message', (data)=>{
+    socket.on('message', (data) => {
       console.log('아하' + data);
-      
+
       socket.broadcast.emit('smessage', data);
       const chatMessage = new ChatData({
         roomNumber: data.roomNumber,
@@ -106,6 +106,87 @@ function setupSocket(server) {
         });
     });
 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    // 예약중 으로 상태가 변경되었을때
+    socket.on('reserve', async (data) => {
+      console.log('reserve'); // 나중에 지울 것
+      // data는 wmId,proxyId, id(proxy의 id)를 갖고 있음
+      const wmEndTime = await WaitMate.findOne({
+        where: {
+          wmId: data.wmId,
+        },
+        attributes: ['waitTime', 'endTime'],
+      });
+      // 예약 생성
+      const reservation = await Reservation.create({
+        wmId: data.wmId,
+        proxyId: data.proxyId,
+        state: true,
+      });
+      // 웨메 예약중으로 상태 변경
+      const updateWM = await WaitMate.update(
+        {
+          state: 'reserved',
+        },
+        {
+          where: {
+            wmId: data.wmId,
+          },
+        }
+      );
+      console.log(wmEndTime.endTime);
+      // setTimeout실행
+      const alarmTime = new Date();
+      alarmTime.setDate(wmEndTime.waitTime);
+      alarmTime.setTime(wmEndTime.endTime);
+      timer = setTimeout(async () => {
+        socket.emit('review', id); // proxy의 id
+        const changeState = await Reservation.update(
+          {
+            state: false,
+          },
+          {
+            where: {
+              wmId,
+            },
+          }
+        );
+        const updateWM = await WaitMate.update(
+          {
+            state: 'completed',
+          },
+          {
+            where: {
+              wmId: data.wmId,
+            },
+          }
+        );
+      }, alarmTime - Date.now());
+    });
+    // 예약중에서 다시 취소했을때
+    socket.on('deleteReservation', async (data) => {
+      console.log('deleteReservation'); // 나중에 지울 것
+      if (timer) {
+        clearTimeout(timer);
+      }
+      const deleteReservation = await Reservation.delete({
+        where: {
+          wmId: data.wmId,
+        },
+      });
+      // 웨메 상태 변경
+      const updateWM = await WaitMate.update(
+        {
+          state: 'active',
+        },
+        {
+          where: {
+            wmId: data.wmId,
+          },
+        }
+      );
+    });
+
     // 다시 연결 되었을 때를 대비한 코드
     // 가지고 있는 데이터 id
     socket.on('login', async (data) => {
@@ -113,6 +194,9 @@ function setupSocket(server) {
       const wmEndTime = await WaitMate.findAll({
         where: {
           wmId: data.id,
+          waitTime: {
+            [Op.gte]: Date.now(), // 현재 날짜이후만 가져오기
+          },
         },
         attributes: ['waitTime', 'endTime'],
       });
@@ -184,90 +268,12 @@ function setupSocket(server) {
       });
     });
 
-    // 예약중 으로 상태가 변경되었을때
-    socket.on('reserve', async (data) => {
-      console.log('reserve'); // 나중에 지울 것
-      // data는 wmId,proxyId, id(proxy의 id)를 갖고 있음
-      const wmEndTime = await WaitMate.findOne({
-        where: {
-          wmId: data.wmId,
-        },
-        attributes: ['waitTime', 'endTime'],
-      });
-      // 예약 생성
-      const reservation = await Reservation.create({
-        wmId: data.wmId,
-        proxyId: data.proxyId,
-        state: true,
-      });
-      // 웨메 예약중으로 상태 변경
-      const updateWM = await WaitMate.update(
-        {
-          state: 'reserved',
-        },
-        {
-          where: {
-            wmId: data.wmId,
-          },
-        }
-      );
-      console.log(wmEndTime.endTime);
-      // setTimeout실행
-      const alarmTime = new Date();
-      alarmTime.setDate(wmEndTime.waitTime);
-      alarmTime.setTime(wmEndTime.endTime);
-      timer = setTimeout(async () => {
-        socket.emit('review', id); // proxy의 id
-        const changeState = await Reservation.update(
-          {
-            state: false,
-          },
-          {
-            where: {
-              wmId,
-            },
-          }
-        );
-        const updateWM = await WaitMate.update(
-          {
-            state: 'completed',
-          },
-          {
-            where: {
-              wmId: data.wmId,
-            },
-          }
-        );
-      }, alarmTime - Date.now());
-    });
-    // 예약중에서 다시 취소했을때
-    socket.on('deleteReservation', async (data) => {
-      console.log('deleteReservation'); // 나중에 지울 것
-      const deleteReservation = await Reservation.delete({
-        where: {
-          wmId: wmId,
-        },
-      });
-      // 웨메 상태 변경
-      const updateWM = await WaitMate.update(
-        {
-          state: 'active',
-        },
-        {
-          where: {
-            wmId: data.wmId,
-          },
-        }
-      );
-    });
-
+    // 연결 해제시
     socket.on('disconnect', () => {
       if (timer) {
         clearTimeout(timer);
       }
     });
-
-
   });
 }
 

@@ -7,7 +7,7 @@ exports.getWaitMateDetail = async (req, res) => {
   // wmAddress를 요청에 받고 응답 값에는 id(user)를 보내 글쓴 주인인지 확인(waitMate에 포함됨)
   try {
     let isLikeWait = false;
-    const { wmId, proxyId } = req.query;
+    const { wmId, id } = req.query;
     // WaitMateDetail페이지
     const waitMate = await WaitMate.findOne({
       where: {
@@ -28,19 +28,16 @@ exports.getWaitMateDetail = async (req, res) => {
       }
     );
 
-    //프록시 아이디가 있으면
-    if (proxyId) {
-      // 찜을 했는지 체크
-      const likeWait = await LikeWait.findOne({
-        where: {
-          wmId: wmId,
-          proxyId: proxyId,
-        },
-      });
+    // 찜을 했는지 체크
+    const likeWait = await LikeWait.findOne({
+      where: {
+        wmId: wmId,
+        id: id,
+      },
+    });
 
-      if (likeWait) {
-        isLikeWait = true;
-      }
+    if (likeWait) {
+      isLikeWait = true;
     }
     //최근 채용 횟수(6개월전 ~ 현재)
     const sixMonthsAgo = new Date();
@@ -271,6 +268,12 @@ exports.getWaitMateList = async (req, res) => {
           wmAddress: {
             [Op.like]: `%${wmAddress}%`,
           },
+          state: {
+            [Op.not]: `completed`, // state가 completed면 list에서 제외
+          },
+          waitTime: {
+            [Op.gte]: Date.now(), // 현재 날짜이후만 가져오기
+          },
         },
         order: [[order, 'DESC']],
       });
@@ -291,7 +294,16 @@ exports.getWaitMateList = async (req, res) => {
 
 exports.getWaitMateMapList = async (req, res) => {
   try {
-    const getWaitMateMapList = await WaitMate.findAll();
+    const getWaitMateMapList = await WaitMate.findAll({
+      where: {
+        state: {
+          [Op.not]: `completed`, // state가 completed면 list에서 제외
+        },
+        waitTime: {
+          [Op.gte]: Date.now(), // 현재 날짜이후만 가져오기
+        },
+      },
+    });
     res.send(getWaitMateMapList);
   } catch (e) {
     console.error('Error WaitMate data:', e);
