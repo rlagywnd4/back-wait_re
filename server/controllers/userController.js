@@ -219,7 +219,7 @@ exports.kakaoResult = async (req, res) => {
       {
         grant_type: 'authorization_code',
         client_id: `${process.env.KAKAO_REST_API_KEY}`,
-        redirect_uri: 'http://localhost:8080/user/kakao',
+        redirect_uri: 'http://ec2-13-124-56-103.ap-northeast-2.compute.amazonaws.com:8080/user/kakao',
         code: `${code}`,
       },
       {
@@ -280,7 +280,7 @@ exports.kakaoResult = async (req, res) => {
           로그인 중...</h1>
         <script>
           const reload = () => {
-            return setTimeout(() => {window.location.href='http://ec2-3-39-238-189.ap-northeast-2.compute.amazonaws.com:3000/map'}, 1000)
+            return setTimeout(() => {window.location.href='http://ec2-13-124-56-103.ap-northeast-2.compute.amazonaws.com:3000/map'}, 1000)
           }
           reload();
         </script>
@@ -321,7 +321,7 @@ exports.checkNickname = async (req, res) => {
   }
 };
 exports.temp = (req, res) => {
-  res.redirect(`https://kauth.kakao.com/oauth/authorize?redirect_uri=http://ec2-3-39-238-189.ap-northeast-2.compute.amazonaws.com:8080/user/kakao&client_id=${process.env.KAKAO_REST_API_KEY}&response_type=code`)
+  res.redirect(`https://kauth.kakao.com/oauth/authorize?redirect_uri=http://ec2-13-124-56-103.ap-northeast-2.compute.amazonaws.com:8080/user/kakao&client_id=${process.env.KAKAO_REST_API_KEY}&response_type=code`)
 }
 exports.logOut = (req, res) => {
   try {
