@@ -271,6 +271,12 @@ exports.getWaitMateList = async (req, res) => {
           wmAddress: {
             [Op.like]: `%${wmAddress}%`,
           },
+          state: {
+            [Op.not]: `completed`, // state가 completed면 list에서 제외
+          },
+          waitTime: {
+            [Op.gte]: Date.now(), // 현재 날짜이후만 가져오기
+          },
         },
         order: [[order, 'DESC']],
       });
@@ -291,7 +297,16 @@ exports.getWaitMateList = async (req, res) => {
 
 exports.getWaitMateMapList = async (req, res) => {
   try {
-    const getWaitMateMapList = await WaitMate.findAll();
+    const getWaitMateMapList = await WaitMate.findAll({
+      where: {
+        state: {
+          [Op.not]: `completed`, // state가 completed면 list에서 제외
+        },
+        waitTime: {
+          [Op.gte]: Date.now(), // 현재 날짜이후만 가져오기
+        },
+      },
+    });
     res.send(getWaitMateMapList);
   } catch (e) {
     console.error('Error WaitMate data:', e);
