@@ -155,9 +155,6 @@ exports.updateUserInfo = async (req, res) => {
         userInfo[k] = v;
       }
     }
-    if (req.file?.filename) {
-      userInfo['photo'] = `http://localhost:8080/profileImg/${req.file?.filename}`
-    }
     const response = await User.update(userInfo, {
       where : {id : userInfo.id}
     });
@@ -313,5 +310,13 @@ exports.logOut = (req, res) => {
   } catch (error) {
     console.log(error)
     res.status(500);
+  }
+}
+exports.changeProfileImg = (req, res) => {
+  try {
+    res.status(201).message({message : '정상적으로 프로필 이미지가 변경되었습니다.'})
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({message : '알 수 없는 서버 에러'});
   }
 }

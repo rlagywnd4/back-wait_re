@@ -20,13 +20,10 @@ paths:
                   type: string
                 nickname:
                   type: string
-                email:
-                  type: string
               required:
                 - userId
                 - password
                 - nickname
-                - email
       responses:
         '201':
           description: 회원 가입 완료
@@ -284,8 +281,6 @@ paths:
         - User
       summary: 유저의 정보 업데이트
       description: 유저의 정보를 업데이트합니다.
-      consumes:
-        - multipart/form-data
       produces:
         - application/json
       parameters:
@@ -294,18 +289,21 @@ paths:
           description: User's JWT token
           required: true
           type: string
-        - name: userId
-          in: formData
-          description: User ID
-          type: string
-        - name: password
-          in: formData
-          description: User's new password
-          type: string
-        - name: photo
-          in: formData
-          description: User's new photo
-          type: file
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                nickname:
+                  type: string
+              required:
+                - password
+                - nickname
+
       responses:
         '201':
           description: Successfully updated user information.
@@ -515,3 +513,40 @@ paths:
                   message:
                     type: string
                     example: '알 수 없는 서버 에러'
+    /user/profileImg:
+      post:
+        tags:
+          - User
+        summary: 프로필 이미지 변경
+        requestBody:
+          content:
+            multipart/form-data:
+              schema:
+                type: object
+                properties:
+                  profileImg:
+                    type: string
+                    format: binary
+                    description: Profile image file to upload
+        responses:
+          '201':
+            description: 정상적으로 프로필 이미지가 변경되었습니다.
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      example: 정상적으로 프로필 이미지가 변경되었습니다.
+          '500':
+            description: 알 수 없는 서버 에러
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      example: 알 수 없는 서버 에러
+
