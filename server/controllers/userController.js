@@ -4,28 +4,19 @@ const bcryptjs = require('bcryptjs');
 const axios = require('axios');
 const jwt = require('jsonwebtoken');
 
-const accessDecode = async (token) => {
-  const inValidSignup = async (columnName, value) => {
-    if (!value) {
-      return `${columnName}값이 존재하지 않습니다.`
-    }
-    if (columnName === 'password') {
-      return false
-    }
-    const condition = {};
-    condition[columnName] = value;
-    const response = await User.findOne({
-      where : condition
-    });
-    return response ? `${columnName}값이 이미 존재합니다.` : false
-  };
-  await jwt.verify(token, process.env.SECRET_KEY, async (err, decoded) => {
-    const response = await User.findOne({
-      where : {id},
-      attributes : ['userId', 'email', 'nickname', 'photo', 'createdAt', 'updatedAt'],
-    })
-    return response
-  })
+const inValidSignup = async (columnName, value) => {
+  if (!value) {
+    return `${columnName}값이 존재하지 않습니다.`
+  }
+  if (columnName === 'password') {
+    return false
+  }
+  const condition = {};
+  condition[columnName] = value;
+  const response = await User.findOne({
+    where : condition
+  });
+  return response ? `${columnName}값이 이미 존재합니다.` : false
 };
 const isValidate = (item, check) => {
   return check.test(item);
@@ -295,7 +286,6 @@ exports.kakaoResult = async (req, res) => {
     console.log(err);
   }
 };
-// window.location.href=`https://kauth.kakao.com/oauth/authorize?redirect_uri=http://localhost:8080/user/kakao/login&client_id=${process.env.REACT_APP_KAKAO_REST_API}&response_type=code`
 exports.checkUserId = async (req, res) => {
   try {
     const { userId } = req.body;
@@ -324,10 +314,6 @@ exports.checkNickname = async (req, res) => {
     res.status(500).json({ message: '알 수 없는 서버 에러' });
   }
 };
-exports.temp = (req, res) => {
-  res.redirect(`https://kauth.kakao.com/oauth/authorize?redirect_uri=http://ec2-13-124-56-103.ap-northeast-2.compute.amazonaws.com:8080/user/kakao&client_id=${process.env.KAKAO_REST_API_KEY}&response_type=code`)
-
-}
 exports.logOut = (req, res) => {
   try {
     res.clearCookie('access');
@@ -336,7 +322,7 @@ exports.logOut = (req, res) => {
     console.log(error)
     res.status(500);
   }
-}
+};
 exports.changeProfileImg = (req, res) => {
   try {
     res.status(201).message({message : '정상적으로 프로필 이미지가 변경되었습니다.'})
@@ -344,4 +330,4 @@ exports.changeProfileImg = (req, res) => {
     console.log(error);
     res.status(500).json({message : '알 수 없는 서버 에러'});
   }
-}
+};
