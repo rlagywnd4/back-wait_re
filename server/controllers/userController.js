@@ -146,7 +146,7 @@ exports.updateUserInfo = async (req, res) => {
       }
     }
     if (req.file?.filename) {
-      userInfo['photo'] = `http://localhost:8080/profileImg/${req.file?.filename}`
+      userInfo['photo'] = `${process.env.AWS_HOST}/profileImg/${req.file?.filename}`
     }
     const response = await User.update(userInfo, {
       where : {id : userInfo.id}
@@ -192,7 +192,7 @@ exports.kakaoResult = async (req, res) => {
       {
         grant_type: 'authorization_code',
         client_id: `${process.env.KAKAO_REST_API_KEY}`,
-        redirect_uri: 'http://localhost:8080/user/kakao',
+        redirect_uri: `${process.env.AWS_HOST}:8080/user/kakao`,
         code: `${code}`,
       },
       {
@@ -294,7 +294,7 @@ exports.checkNickname = async (req, res) => {
   }
 };
 exports.temp = (req, res) => {
-  res.redirect(`https://kauth.kakao.com/oauth/authorize?redirect_uri=http://localhost:8080/user/kakao&client_id=${process.env.KAKAO_REST_API_KEY}&response_type=code`)
+  res.redirect(`https://kauth.kakao.com/oauth/authorize?redirect_uri=${process.env.AWS_HOST}:8080/user/kakao&client_id=${process.env.KAKAO_REST_API_KEY}&response_type=code`)
 }
 exports.logOut = () => {
   try {

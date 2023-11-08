@@ -48,6 +48,8 @@ proxyRouter.post('/imgUpload', uploadProxy.single('photo'), proxyController.inpu
 
 //채팅 데이터 가져오기
 proxyRouter.get('/chat/:roomNumber', proxyController.output.getChatData);
+// 웨이트메이트 값 가져오기
+proxyRouter.get('/userList', proxyController.output.getWaitMateList);
 
 //몽구스 테스트
 proxyRouter.post('/mongoose', proxyController.input.mongooseTest);

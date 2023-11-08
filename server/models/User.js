@@ -31,7 +31,7 @@ const User = (Sequelize, DataTypes) => {
         photo: {
            type: DataTypes.STRING(150),
            allowNull : true,
-           defaultValue: 'http://localhost:8080/profileImg/default.png',
+           defaultValue: `${process.env.AWS_HOST}:8080/profileImg/default.png`,
            comment : '사진'
         },
         social : {

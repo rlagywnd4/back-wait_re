@@ -8,7 +8,7 @@ const Common = require('./common');
 function setupSocket(server) {
   const io = socketIO(server, {
     cors: {
-      origin: ['http://localhost:3000'],
+      origin: [`${process.env.AWS_HOST}:3000`],
       methods: ["GET","POST","PATCH","DELETE"],
     }
   });
@@ -59,6 +59,7 @@ function setupSocket(server) {
         const sender = await User.findOne({ where: { id: room.sender } });
         const receiver = await User.findOne({ where: { id: room.receiver } });
         const proxyData = await Proxy.findOne({ where: {proxyId: room.proxyId}});
+
         console.log(proxyData);
         if (!sender || !receiver) {
           socket.emit('roomInfo', { error: '사용자 정보를 찾을 수 없습니다.' });

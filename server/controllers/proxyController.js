@@ -1,7 +1,6 @@
-const { Proxy, WaitMate } = require('../models');
+const { Proxy, WaitMate, User } = require('../models');
 const Room = require('../schema/Room');
 const ChatData = require('../schema/ChatData');
-const jwt = require('jsonwebtoken');
 const Common = require('../common');
 
 const { Op } = require('sequelize');
@@ -20,7 +19,7 @@ const input = {
           gender: req.body.gender,
           age: req.body.age,
           proxyMsg: req.body.proxyMsg,
-          photo: 'http://localhost:8080/public/proxyImg/default.png',
+          photo: `${process.env.AWS_HOST}:8080/public/proxyImg/default.png`,
         });
         return res.send(postProxy);
       } else if (req.body.photo !== null) {
@@ -31,7 +30,7 @@ const input = {
           gender: req.body.gender,
           age: req.body.age,
           proxyMsg: req.body.proxyMsg,
-          photo: 'http://localhost:8080/public/proxyImg/' + req.file.filename,
+          photo: `${process.env.AWS_HOST}/public/proxyImg/` + req.file.filename,
         });
         return res.send(postProxy);
       }
@@ -65,7 +64,7 @@ const input = {
               age: req.body.age,
               proxyMsg: req.body.proxyMsg,
               title: req.body.title,
-              photo: 'http://localhost:8080/public/proxyImg/default.png',
+              photo: `${process.env.AWS_HOST}/public/proxyImg/default.png`,
             });
             return res.send(postProxy);
           } else {
@@ -77,7 +76,7 @@ const input = {
               proxyMsg: req.body.proxyMsg,
               title: req.body.title,
               photo:
-                'http://localhost:8080/public/proxyImg/' + req.file.filename,
+                `${process.env.AWS_HOST}/public/proxyImg/` + req.file.filename,
             });
             return res.send(postProxy);
           }
@@ -106,7 +105,7 @@ const input = {
                     age: req.body.age,
                     proxyMsg: req.body.proxyMsg,
                     title : req.body.title,
-                    photo : 'http://localhost:8080/public/proxyImg/' + req.file.filename,
+                    photo : `${process.env.AWS_HOST}/public/proxyImg/` + req.file.filename,
                  },
                 {
                 where : {id : userInfo.id},
@@ -195,19 +194,41 @@ const input = {
 const output = {
 
         // proxy 정보들을 확인하는 방법
-    getProxyAll: async (req, res) => {
-        const { address, order } = req.query;
-        console.log(address, order);
-        const proxyAddress = await Proxy.findAll({
-        where: {
-            proxyAddress: {
-            [Op.like]: `%${address}%`,
-            },
-        },
-        order: [[order, 'DESC']],
-        });
-        res.send({list: proxyAddress});
-    },
+        getProxyAll: async (req, res) => {
+          const { address, order } = req.query;
+          console.log(address, order);
+      
+          if (order === 'star') {
+              const proxyAddress = await Proxy.findAll({
+                  where: {
+                      proxyAddress: {
+                          [Op.like]: `%${address}%`,
+                      },
+                  },
+                  include: [
+                      {
+                          model: User, 
+                          required: true, 
+                          attributes: ['score'], 
+                      },
+                  ],
+              });
+      
+              res.send({ list: proxyAddress });
+          } else if (order === 'latest'){
+              const proxyAddress = await Proxy.findAll({
+                  where: {
+                      proxyAddress: {
+                          [Op.like]: `%${address}%`,
+                      },
+                  },
+                  order: [[order, 'DESC']],
+              });
+      
+              res.send({ list: proxyAddress });
+          }
+      },
+
 
 
   // 특정한 구의 정보값들을 불러오는 방법
@@ -307,7 +328,7 @@ const output = {
   } catch(err){
       console.error(err);
   }
-  }
+  },
 
 }
 
