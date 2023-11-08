@@ -1,7 +1,7 @@
 const axios = require('axios');
 const KAKAO_ADMIN_KEY = process.env.KAKAO_ADMIN_KEY;
 const { WaitMate, User, Payment } = require('../models');
-const currSuver = 'http://localhost:8080';
+const currSuver = 'http://http://ec2-3-39-238-189.ap-northeast-2.compute.amazonaws.com:8080';
 const Common = require('../common');
 
 exports.kakaoPay = async (req, res) => {
@@ -28,7 +28,6 @@ exports.kakaoPay = async (req, res) => {
         'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
       },
     });
-    console.log(kakaoResponse.data.next_redirect_pc_url);
     res.redirect(kakaoResponse.data.next_redirect_pc_url);
   } catch (error) {
     console.log(error);
@@ -37,27 +36,55 @@ exports.kakaoPay = async (req, res) => {
 };
 exports.success = async (req, res) => {
   try {
-    const { plus, pay, minus, title } = req.query;
-    const plusUser = await User.findOne({where : id});
+    const transaction = await sequelize.transaction();
+    let { plus, pay, minus, title } = req.query;
+    plus = parseInt(plus, 10);
+    pay = parseFloat(pay);
+    minus = parseInt(minus, 10);
+    if (isNaN(plus) || isNaN(minus) || isNaN(pay)) {
+      throw new Error('올바르지 못한 타입');
+    }
+    if (typeof title !== 'string') {
+      throw new Error('올바르지 않은 타입');
+    }
+    const plusUser = await User.findOne({where : {id : plus },  transaction });
+    const minusUser = await User.findOne({where : {id : minus },  transaction });
+    if (!plusUser || !minusUser) {
+      throw new Error('올바르지 못한 유저');
+    }
     const plusWallet = plusUser.dataValues.wallet;
-    const minusUser = await User.findOne({where : minus});
     const minusWallet = minusUser.dataValues.wallet;
     if (minusWallet - pay < 0) {
-      res.status(400).json({message : '결제 가능한 금액이 남아 있지 않습니다'});
-      return ;
+      await transaction.rollback();
+      throw new Error('결제 가능한 금액이 남아 있지 않습니다')
     };
-    await User.update({wallet : plusWallet + pay}, {where : {id : plus}});
-    await User.update({wallet : minusWallet - pay}, {where : {id : minus}});
+    await User.update({
+      wallet : plusWallet + pay
+    }, {
+      where : {id : plus}, transaction
+    });
+    await User.update({ wallet : minusWallet - pay}, {
+      where : {id : minus}, transaction});
     await Payment.create({
       title,
       payer : minus,
       payee : plus,
       amount : pay,
-    });
+    }, { transaction });
+    await transaction.commit();
     res.json({message : "결제가 완료되었습니다."});
   } catch (error) {
-    console.log(error);
-    res.status(500).send();
+    if (transaction) {
+      await transaction.rollback();
+    };
+    console.error(error);
+    if (error.message === '결제 가능한 금액이 남아 있지 않습니다') {
+      res.status(400).json({message : '결제 가능한 금액이 남아 있지 않습니다'})
+    } else if (error.message === '올바르지 못한 유저') {
+      res.status(404).json({message : '올바르지 못한 유저'})
+    } else {
+      res.status(500).json({message : '알 수 없는 서버 에러'});
+    }
   };
 };
 exports.cancel = (req, res) => {
