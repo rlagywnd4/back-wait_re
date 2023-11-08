@@ -4,21 +4,21 @@ const bcryptjs = require('bcryptjs');
 const axios = require('axios');
 const jwt = require('jsonwebtoken');
 
-const inValidSignup = async (columnName, value) => {
-  if (!value) {
-    return `${columnName}값이 존재하지 않습니다.`
-  }
-  if (columnName === 'password') {
-    return false
-  }
-  const condition = {};
-  condition[columnName] = value;
-  const response = await User.findOne({
-    where : condition
-  });
-  return response ? `${columnName}값이 이미 존재합니다.` : false
-};
 const accessDecode = async (token) => {
+  const inValidSignup = async (columnName, value) => {
+    if (!value) {
+      return `${columnName}값이 존재하지 않습니다.`
+    }
+    if (columnName === 'password') {
+      return false
+    }
+    const condition = {};
+    condition[columnName] = value;
+    const response = await User.findOne({
+      where : condition
+    });
+    return response ? `${columnName}값이 이미 존재합니다.` : false
+  };
   await jwt.verify(token, process.env.SECRET_KEY, async (err, decoded) => {
     const response = await User.findOne({
       where : {id},
@@ -27,17 +27,22 @@ const accessDecode = async (token) => {
     return response
   })
 };
-const kakaoLogin = async () => {
-  
+const isValidate = (item, check) => {
+  return check.test(item);
 };
 exports.register = async (req, res) => {
   try {
+    const user = await Common.cookieUserinfo(req);
+    if (!user) {
+      res.status(401).json({message : '이미 로그인된 유저입니다.'});
+      return ;
+    }
     const { userId, password, nickname } = req.body;
     const userInfo = { userId, password, nickname }
     const errMessages = []
     await Promise.all(
-      Object.entries(userInfo).map(async ([k, v]) => {
-        const response = await inValidSignup(k, v);
+      Object.entries(userInfo).map(([k, v]) => {
+        const response = inValidSignup(k, v);
         if (response) {
           errMessages.push(response);
         }
@@ -47,6 +52,26 @@ exports.register = async (req, res) => {
       console.log(errMessages)
       res.status(400).json({ errors: errMessages });
     } else {
+      if (!isValidate(userId, /^[A-Za-z0-9]{4,12}$/)) {
+        res.status(400).json({message : '올바르지 않은 userId입니다.'});
+        return ;
+      };
+      if (!isValidate(password, /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/)) {
+        res.status(400).json({message : '올바르지 않은 password입니다.'});
+        return ;
+      };
+      if (!isValidate(nickname, /^.{2,10}$/)) {
+        res.status(400).json({message : '올바르지 않은 nickname입니다.'});
+        return ;
+      };
+      if (await User.findOne({where : {userId : userId}})) {
+        res.status(400).json({message : '이미 존재하는 userId입니다.'});
+        return ;
+      };
+      if (await User.findOne({where : {nickname : nickname}})) {
+        res.status(400).json({message : '이미 존재하는 nickname입니다.'});
+        return ;
+      };
       const hashedPassword = await bcryptjs.hash(password, 10);
       await User.create({
         userId,
@@ -62,6 +87,11 @@ exports.register = async (req, res) => {
 };
 exports.login = async (req, res) => {
   try {
+    const userInfo = await Common.cookieUserinfo(req);
+    if (!userInfo) {
+      res.status(401).json({message : '이미 로그인된 유저입니다.'});
+      return ;
+    }
     const { userId, password } = req.body
     let user = await User.findOne({
       where : {userId : userId},
@@ -145,6 +175,7 @@ exports.updateUserInfo = async (req, res) => {
         userInfo[k] = v;
       }
     }
+
     if (req.file?.filename) {
       userInfo['photo'] = `${process.env.AWS_HOST}/profileImg/${req.file?.filename}`
     }
@@ -253,7 +284,7 @@ exports.kakaoResult = async (req, res) => {
           로그인 중...</h1>
         <script>
           const reload = () => {
-            return setTimeout(() => {window.location.href='http://localhost:3000/map'}, 1000)
+            return setTimeout(() => {window.location.href='http://ec2-3-39-238-189.ap-northeast-2.compute.amazonaws.com:3000/map'}, 1000)
           }
           reload();
         </script>
@@ -295,14 +326,22 @@ exports.checkNickname = async (req, res) => {
 };
 exports.temp = (req, res) => {
   res.redirect(`https://kauth.kakao.com/oauth/authorize?redirect_uri=${process.env.AWS_HOST}:8080/user/kakao&client_id=${process.env.KAKAO_REST_API_KEY}&response_type=code`)
-}
-exports.logOut = () => {
-  try {
 
+}
+exports.logOut = (req, res) => {
+  try {
     res.clearCookie('access');
-    res.send();
+    res.status(204).send();
   } catch (error) {
     console.log(error)
     res.status(500);
+  }
+}
+exports.changeProfileImg = (req, res) => {
+  try {
+    res.status(201).message({message : '정상적으로 프로필 이미지가 변경되었습니다.'})
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({message : '알 수 없는 서버 에러'});
   }
 }
