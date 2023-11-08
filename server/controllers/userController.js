@@ -43,8 +43,7 @@ exports.register = async (req, res) => {
       Object.entries(userInfo).map(async ([k, v]) => {
         const response = await inValidSignup(k, v);
         if (response) {
-          errMessages.push(error.message);
-          throw Error({message : response})
+          errMessages.push(response);
         }
       })
     );
