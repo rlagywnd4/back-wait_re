@@ -10,6 +10,9 @@ const {
   LikeWait,
 } = require('./models');
 const Common = require('./common');
+const Reservation = require('./models/reservation');
+
+let timer; //웨메가 끝나기 전에 소켓 연결이 끊겼을 때를 대비한 변수
 
 function setupSocket(server) {
   const io = socketIO(server, {
@@ -100,15 +103,165 @@ function setupSocket(server) {
         });
     });
 
+    // 다시 연결 되었을 때를 대비한 코드
+    // 가지고 있는 데이터 id
+    socket.on('login', async (data) => {
+      console.log('reviewLogin'); // 나중에 지울 것
+      const wmEndTime = await WaitMate.findAll({
+        where: {
+          wmId: data.id,
+        },
+        attributes: ['waitTime', 'endTime'],
+      });
+      wmEndTime.array.forEach(async (element) => {
+        const reservation = await Reservation.findOne({
+          where: {
+            wmId: wmEndTime.wmId,
+            state: true,
+          },
+        });
+        const findProxy = await Proxy.findOne({
+          where: {
+            proxyId: reservation.proxyId,
+          },
+        });
+        if (reservation) {
+          const alarmTime = new Date();
+          alarmTime.setDate(wmEndTime.waitTime);
+          alarmTime.setTime(wmEndTime.endTime);
+          if (alarmTime > Date.now()) {
+            // 다시 로그인시 alarmTime이 안지난 시점이면
+            timer = setTimeout(async () => {
+              socket.emit('review', findProxy.id); // proxy의 id
+              const changeState = await Reservation.update(
+                {
+                  state: false,
+                },
+                {
+                  where: {
+                    wmId,
+                  },
+                }
+              );
+              const updateWM = await WaitMate.update(
+                {
+                  state: 'completed',
+                },
+                {
+                  where: {
+                    wmId: data.wmId,
+                  },
+                }
+              );
+            }, alarmTime - Date.now());
+          } else {
+            // alarmTime이 지난 시점이면
+            const closeReservation = await Reservation.update(
+              {
+                state: false,
+              },
+              {
+                where: {
+                  wmId,
+                },
+              }
+            );
+            const updateWM = await WaitMate.update(
+              {
+                state: 'completed',
+              },
+              {
+                where: {
+                  wmId: data.wmId,
+                },
+              }
+            );
+          }
+        }
+      });
+    });
+
+    // 예약중 으로 상태가 변경되었을때
     socket.on('reserve', async (data) => {
+      console.log('reserve'); // 나중에 지울 것
+      // data는 wmId,proxyId, id(proxy의 id)를 갖고 있음
       const wmEndTime = await WaitMate.findOne({
         where: {
           wmId: data.wmId,
         },
         attributes: ['waitTime', 'endTime'],
       });
+      // 예약 생성
+      const reservation = await Reservation.create({
+        wmId: data.wmId,
+        proxyId: data.proxyId,
+        state: true,
+      });
+      // 웨메 예약중으로 상태 변경
+      const updateWM = await WaitMate.update(
+        {
+          state: 'reserved',
+        },
+        {
+          where: {
+            wmId: data.wmId,
+          },
+        }
+      );
       console.log(wmEndTime.endTime);
       // setTimeout실행
+      const alarmTime = new Date();
+      alarmTime.setDate(wmEndTime.waitTime);
+      alarmTime.setTime(wmEndTime.endTime);
+      timer = setTimeout(async () => {
+        socket.emit('review', id); // proxy의 id
+        const changeState = await Reservation.update(
+          {
+            state: false,
+          },
+          {
+            where: {
+              wmId,
+            },
+          }
+        );
+        const updateWM = await WaitMate.update(
+          {
+            state: 'completed',
+          },
+          {
+            where: {
+              wmId: data.wmId,
+            },
+          }
+        );
+      }, alarmTime - Date.now());
+    });
+    // 예약중에서 다시 취소했을때
+    socket.on('deleteReview', async (data) => {
+      console.log('deleteReview'); // 나중에 지울 것
+      const deleteReview = await Reservation.delete({
+        where: {
+          wmId: wmId,
+        },
+      });
+      // 웨메 상태 변경
+      const updateWM = await WaitMate.update(
+        {
+          state: 'active',
+        },
+        {
+          where: {
+            wmId: data.wmId,
+          },
+        }
+      );
+    });
+
+    socket.on('disconnect', () => {
+      if (timer) {
+        clearTimeout(timer);
+      }
     });
   });
 }
