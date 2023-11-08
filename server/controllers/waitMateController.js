@@ -88,9 +88,11 @@ exports.postWaitMate = async (req, res) => {
       wmDetailAddress,
       lng,
       lat,
-      waitTime,
+      date,
       description,
       pay,
+      startTime,
+      endTime,
     } = req.body; //photo가 파일 자체가 날라옴
     let photo;
     if (!req.file) {
@@ -108,9 +110,11 @@ exports.postWaitMate = async (req, res) => {
       wmDetailAddress: wmDetailAddress,
       lng: lng,
       lat: lat,
-      waitTime: waitTime,
+      waitTime: date,
       description: description,
       pay: pay,
+      startTime,
+      endTime,
       // photo경로 나중에 서버올리면 바꿔야함
       // photo: path.join(__dirname, '../public/waitMateImg', req.file.filename),
       photo: photo,
@@ -159,10 +163,12 @@ exports.patchWaitMate = async (req, res) => {
       wmDetailAddress,
       lng,
       lat,
-      waitTime,
+      date,
       description,
       pay,
       state,
+      startTime,
+      endTime,
     } = req.body;
 
     let isSuccess;
@@ -172,7 +178,7 @@ exports.patchWaitMate = async (req, res) => {
         {
           title: title,
           wmAddress: wmAddress,
-          waitTime: waitTime,
+          waitTime: date,
           wmDetailAddress: wmDetailAddress,
           lng: lng,
           lat: lat,
@@ -180,6 +186,8 @@ exports.patchWaitMate = async (req, res) => {
           pay: pay,
           photo: req.file.filename,
           state: state,
+          startTime,
+          endTime,
         },
         {
           where: {
@@ -199,10 +207,12 @@ exports.patchWaitMate = async (req, res) => {
           wmDetailAddress: wmDetailAddress,
           lng: lng,
           lat: lat,
-          waitTime: waitTime,
+          waitTime: date,
           description: description,
           pay: pay,
           state: state,
+          startTime,
+          endTime,
         },
         {
           where: {

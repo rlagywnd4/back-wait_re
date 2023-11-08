@@ -32,6 +32,11 @@ const kakaoLogin = async () => {
 };
 exports.register = async (req, res) => {
   try {
+    const user = await Common.cookieUserinfo(req);
+    if (!user) {
+      res.status(401).json({message : '이미 로그인된 유저입니다.'});
+      return ;
+    }
     const { userId, password, nickname } = req.body;
     const userInfo = { userId, password, nickname }
     const errMessages = []
@@ -62,6 +67,11 @@ exports.register = async (req, res) => {
 };
 exports.login = async (req, res) => {
   try {
+    const userInfo = await Common.cookieUserinfo(req);
+    if (!userInfo) {
+      res.status(401).json({message : '이미 로그인된 유저입니다.'});
+      return ;
+    }
     const { userId, password } = req.body
     let user = await User.findOne({
       where : {userId : userId},
@@ -144,9 +154,6 @@ exports.updateUserInfo = async (req, res) => {
       if (k !== 'userId') {
         userInfo[k] = v;
       }
-    }
-    if (req.file?.filename) {
-      userInfo['photo'] = `http://localhost:8080/profileImg/${req.file?.filename}`
     }
     const response = await User.update(userInfo, {
       where : {id : userInfo.id}
@@ -253,7 +260,7 @@ exports.kakaoResult = async (req, res) => {
           로그인 중...</h1>
         <script>
           const reload = () => {
-            return setTimeout(() => {window.location.href='http://localhost:3000/map'}, 1000)
+            return setTimeout(() => {window.location.href='http://ec2-3-39-238-189.ap-northeast-2.compute.amazonaws.com:3000/map'}, 1000)
           }
           reload();
         </script>
@@ -294,15 +301,22 @@ exports.checkNickname = async (req, res) => {
   }
 };
 exports.temp = (req, res) => {
-  res.redirect(`https://kauth.kakao.com/oauth/authorize?redirect_uri=http://localhost:8080/user/kakao&client_id=${process.env.KAKAO_REST_API_KEY}&response_type=code`)
+  res.redirect(`https://kauth.kakao.com/oauth/authorize?redirect_uri=http://ec2-3-39-238-189.ap-northeast-2.compute.amazonaws.com:8080/user/kakao&client_id=${process.env.KAKAO_REST_API_KEY}&response_type=code`)
 }
-exports.logOut = () => {
+exports.logOut = (req, res) => {
   try {
-
     res.clearCookie('access');
-    res.send();
+    res.status(204).send();
   } catch (error) {
     console.log(error)
     res.status(500);
+  }
+}
+exports.changeProfileImg = (req, res) => {
+  try {
+    res.status(201).message({message : '정상적으로 프로필 이미지가 변경되었습니다.'})
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({message : '알 수 없는 서버 에러'});
   }
 }
