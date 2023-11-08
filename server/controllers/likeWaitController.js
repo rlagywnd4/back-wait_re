@@ -3,16 +3,8 @@ const { LikeWait, Proxy } = require('../models');
 exports.postLikeWait = async (req, res) => {
   try {
     const { wmId, id } = req.body;
-    const findProxy = await Proxy.findOne({
-      where: {
-        id,
-      },
-    });
-    if (!findProxy) {
-      res.send('cannot find Proxy');
-    }
     const insertLikeWait = await LikeWait.create({
-      proxyId: findProxy.proxyId,
+      id: id,
       wmId: wmId,
     });
     if (insertLikeWait) {
@@ -29,18 +21,10 @@ exports.postLikeWait = async (req, res) => {
 exports.deleteLikeWait = async (req, res) => {
   try {
     const { wmId, id } = req.query;
-    const findProxy = await Proxy.findOne({
-      where: {
-        id,
-      },
-    });
-    if (!findProxy) {
-      res.send('cannot find Proxy');
-    }
     const deleteLikeWait = await LikeWait.destroy({
       where: {
         wmId: wmId,
-        proxyId: findProxy.proxyId,
+        id: id,
       },
     });
     if (deleteLikeWait) {

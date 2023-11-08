@@ -7,7 +7,12 @@ exports.getWaitMateDetail = async (req, res) => {
   // wmAddress를 요청에 받고 응답 값에는 id(user)를 보내 글쓴 주인인지 확인(waitMate에 포함됨)
   try {
     let isLikeWait = false;
-    const { wmId, proxyId } = req.query;
+    const { wmId, id } = req.query;
+    const findProxy = await Proxy.findOne({
+      where: {
+        id,
+      },
+    });
     // WaitMateDetail페이지
     const waitMate = await WaitMate.findOne({
       where: {
@@ -28,19 +33,16 @@ exports.getWaitMateDetail = async (req, res) => {
       }
     );
 
-    //프록시 아이디가 있으면
-    if (proxyId) {
-      // 찜을 했는지 체크
-      const likeWait = await LikeWait.findOne({
-        where: {
-          wmId: wmId,
-          proxyId: proxyId,
-        },
-      });
+    // 찜을 했는지 체크
+    const likeWait = await LikeWait.findOne({
+      where: {
+        wmId: wmId,
+        id: id,
+      },
+    });
 
-      if (likeWait) {
-        isLikeWait = true;
-      }
+    if (likeWait) {
+      isLikeWait = true;
     }
     //최근 채용 횟수(6개월전 ~ 현재)
     const sixMonthsAgo = new Date();
