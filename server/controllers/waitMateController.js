@@ -93,11 +93,9 @@ exports.postWaitMate = async (req, res) => {
     } = req.body; //photo가 파일 자체가 날라옴
     let photo;
     if (!req.file) {
-      // photo경로 나중에 서버올리면 바꿔야함
-      photo =
-        'C:\\Users\\user\\Documents\\back-wait\\server\\public\\profileImg\\default.png';
+      photo = `/public/proxyImg/waitMateDefaultImg.png`;
     } else {
-      photo = req.file.filename;
+      photo = `/public/proxyImg/` + req.file.filename;
     }
     // DB에 waitMate 등록
     const insertWaitMate = await WaitMate.create({
@@ -112,8 +110,6 @@ exports.postWaitMate = async (req, res) => {
       pay: pay,
       startTime,
       endTime,
-      // photo경로 나중에 서버올리면 바꿔야함
-      // photo: path.join(__dirname, '../public/waitMateImg', req.file.filename),
       photo: photo,
       state: 'active',
     });
@@ -181,7 +177,7 @@ exports.patchWaitMate = async (req, res) => {
           lat: lat,
           description: description,
           pay: pay,
-          photo: req.file.filename,
+          photo: `/public/proxyImg/` + req.file.filename,
           state: state,
           startTime,
           endTime,
