@@ -35,7 +35,7 @@ exports.getPickedWaitMate = async (req, res) => {
         proxyId: getProxyId.proxyId,
       },
     });
-    getPickedWaitMate.array.forEach(async (element) => {
+    getPickedWaitMate.forEach(async (element) => {
       const waitMate = await WaitMate.findOne({
         wmId: element.wmId,
       });
@@ -43,6 +43,39 @@ exports.getPickedWaitMate = async (req, res) => {
     });
     if (getPickedWaitMate) {
       res.send({ waitMateList: waitMateList });
+    } else {
+      res.send({ result: 'fail' });
+    }
+  } catch (e) {
+    console.error('Error WaitMate data:', e);
+    res.status(500).send('Internal Server Error');
+  }
+};
+
+exports.getPickedProxy = async (req, res) => {
+  try {
+    const { id } = req.query;
+    let proxyList = [];
+    const getWMId = await WaitMate.findAll({
+      where: {
+        id,
+      },
+    });
+    getWMId.forEach(async (element) => {
+      const getPickedProxy = await Reservation.findOne({
+        where: {
+          wmId: element.wmId,
+        },
+      });
+      const proxy = await Proxy.findOne({
+        where: {
+          proxyId: element.proxyId,
+        },
+      });
+      proxyList.push(proxy);
+    });
+    if (proxyList[0] !== '') {
+      res.send(proxyList);
     } else {
       res.send({ result: 'fail' });
     }
