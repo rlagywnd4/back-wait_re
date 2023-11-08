@@ -10,7 +10,7 @@ const {
   LikeWait,
 } = require('./models');
 const Common = require('./common');
-const Reservation = require('./models/reservation');
+const Reservation = require('./models/Reservation');
 
 let timer; //웨메가 끝나기 전에 소켓 연결이 끊겼을 때를 대비한 변수
 
@@ -238,9 +238,9 @@ function setupSocket(server) {
       }, alarmTime - Date.now());
     });
     // 예약중에서 다시 취소했을때
-    socket.on('deleteReview', async (data) => {
-      console.log('deleteReview'); // 나중에 지울 것
-      const deleteReview = await Reservation.delete({
+    socket.on('deleteReservation', async (data) => {
+      console.log('deleteReservation'); // 나중에 지울 것
+      const deleteReservation = await Reservation.delete({
         where: {
           wmId: wmId,
         },
