@@ -17,7 +17,7 @@ let timer; //웨메가 끝나기 전에 소켓 연결이 끊겼을 때를 대비
 function setupSocket(server) {
   const io = socketIO(server, {
     cors: {
-      origin: [`${process.env.AWS_HOST}:3000`],
+      origin: [`http://localhost:3000`],
       methods: ["GET","POST","PATCH","DELETE"],
     }
   });
@@ -26,40 +26,42 @@ function setupSocket(server) {
   io.on('connection', async (socket) => {
     console.log('새로운 소켓 연결이 이루어졌습니다.');
 
-    socket.on('createRoom', async (data) => {
-      try {
-        const existingRoom = await Room.findOne({
-          sender: data.sender,
-          receiver: data.receiver,
-        });
-
-        if (existingRoom) {
-          socket.emit('roomExists', { roomNumber: existingRoom.roomNumber });
-        } else {
-          const roomNumber = Date.now();
-          console.log(roomNumber + '룸넘버입니다');
-
-          const newRoom = new Room({
-            sender: data.sender,
-            receiver: data.receiver,
-            proxyId: data.proxyId,
-            roomNumber: roomNumber,
-          });
-
-          await newRoom.save();
-
-          socket.emit('roomCreated', { roomNumber });
-          socket.join(`room_${roomNumber}`);
-        }
-      } catch (err) {
-        console.error(err);
-      }
+  
+    
+      socket.on('createRoom', async (data) => {
+        try {
+          const existingRoom = await Room.findOne({ wmId: data.wmId, proxyId: data.proxyId });
+    
+          if (existingRoom) {
+            
+            socket.emit('roomExists', { roomNumber: existingRoom.roomNumber });
+          } else {
+           
+            const roomNumber = Date.now();
+            console.log(roomNumber + '룸넘버입니다');
+    
+            const newRoom = new Room({
+              sender: data.sender,
+              receiver: data.receiver,
+              proxyId: data.proxyId,
+              wmId : data.wmId,
+              roomNumber: roomNumber,
+            });
+    
+            await newRoom.save();
+            
+            socket.emit('roomCreated', { roomNumber });
+            socket.join(`room_${roomNumber}`);
+          }
+        } catch (err) {
+          console.error(err);
     });
 
     socket.on('getRoomInfo', async (roomNumber) => {
       try {
         const room = await Room.findOne({ roomNumber });
 
+        console.log('룸의 정보값',room);
         if (!room) {
           socket.emit('roomInfo', { error: '채팅방을 찾을 수 없습니다.' });
           return;
@@ -70,14 +72,15 @@ function setupSocket(server) {
 
         const proxyData = await Proxy.findOne({ where: {proxyId: room.proxyId}});
 
+        const wmData = await WaitMate.findOne({where : {wmId : room.wmId}})
+        console.log('웨메 정보값!', wmData);
         console.log(proxyData);
-
         if (!sender || !receiver) {
           socket.emit('roomInfo', { error: '사용자 정보를 찾을 수 없습니다.' });
           return;
         }
+        socket.emit('roomInfo', { sender, receiver, proxyData, wmData});
 
-        socket.emit('roomInfo', { sender, receiver, proxyData });
       } catch (error) {
         console.error('getRoomInfo 에러:', error);
         socket.emit('roomInfo', { error: '서버에서 오류 발생' });

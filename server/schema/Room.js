@@ -13,6 +13,10 @@ const roomSchema = new mongoose.Schema({
         type: Number,
         required : true
     },
+    wmId : {
+        type: Number,
+        required: true
+    },
     roomNumber : {
         type : Number,
         required: true

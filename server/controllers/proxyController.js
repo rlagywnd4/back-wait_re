@@ -370,12 +370,16 @@ const output = {
   },
 
   //모든 웨이트 메이트 리스트값 적용
-  getWaitMateList: async (req, res) => {
-    try {
+
+  getWaitMateList : async( req,res)=>{
+    try{
+      console.log('여기의', req.query.id);
       const result = await WaitMate.findAll({
-        where: { id: req.params.id },
+        where: { id: req.query.id },
+
       });
-      console.log(result);
+      
+      console.log('결과값', result);
       res.send(result);
     } catch (err) {
       console.error(err);
