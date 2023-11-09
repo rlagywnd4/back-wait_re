@@ -393,6 +393,7 @@ const output = {
     }
   },
 
+
   // 모든 채팅 리스트 출력
   getChatData: async (req, res) => {
     try {
@@ -418,6 +419,67 @@ const output = {
       console.error(err);
     }
   },
-};
+
+  // 채팅창에서 딱 하나의 정보값만 가져오는 것 적용
+  getChatDetailOne : async (req, res) => {
+    try {
+      const { roomNumber } = req.params; // 채팅 방번호는 라우트 파라미터로 받아온다고 가정
+  
+      // 해당 방번호의 최신 정보글 가져오기
+      const result = await ChatData.findOne({ roomNumber })
+        .sort({ createdAt: -1 }) 
+        .limit(1);
+      if (!result) {
+        return res.status(404).json({ message: '해당 방번호의 채팅이 없습니다.' });
+      }
+  
+      res.json(result);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: '서버 오류입니다.' });
+    }
+  },
+
+  // 모든 채팅 리스트들 뽑기
+   getChattingListWithLatest : async (req, res) => {
+    try {
+      const userInfo = await Common.cookieUserinfo(req);
+  
+      if (!userInfo) {
+        return res.send({ message: '사용자 정보를 찾을 수 없습니다.' });
+      }
+  
+      const roomList = await Room.find({
+        $or: [{ sender: userInfo.id }, { receiver: userInfo.id }],
+      });
+  
+      if (!roomList || roomList.length === 0) {
+        return res.send({ message: '채팅방 목록이 없습니다.' });
+      }
+  
+      const chatListWithLatest = [];
+  
+      for (const room of roomList) {
+        const latestChat = await ChatData.findOne({ roomNumber: room.roomNumber })
+          .sort({ createdAt: -1 })
+          .limit(1);
+  
+        const latestChatWithNumericSenderReceiver = {
+          roomNumber: room.roomNumber,
+          sender: parseInt(latestChat.sender, 10) || null,
+          receiver: parseInt(latestChat.receiver, 10) || null,
+          latestChat: latestChat || null,
+        };
+  
+        chatListWithLatest.push(latestChatWithNumericSenderReceiver);
+      }
+  
+      res.send({ list: chatListWithLatest });
+    } catch (err) {
+      console.error(err);
+      res.status(500).send({ error: '서버 오류 발생' });
+    }
+  }
+  };
 
 module.exports = { input, output };
