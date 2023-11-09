@@ -223,8 +223,6 @@ const output = {
   getProxyAll: async (req, res) => {
     try {
       const { address, order } = req.query;
-      console.log(address, order);
-
       if (address) {
         //주소가 있을때
         if (order === 'star') {
@@ -244,7 +242,7 @@ const output = {
           });
 
           res.send({ list: proxyAddress });
-        } else if (order === 'latest') {
+        } else if (order === 'updatedAt') {
           const proxyAddress = await Proxy.findAll({
             where: {
               proxyAddress: {
@@ -270,7 +268,7 @@ const output = {
           });
 
           res.send({ list: proxyAddress });
-        } else if (order === 'latest') {
+        } else if (order === 'updatedAt') {
           const proxyAddress = await Proxy.findAll({
             order: [[order, 'DESC']],
           });
@@ -283,41 +281,6 @@ const output = {
       res.status(500).json({ message: '정보값들을 불러오지 못했습니다.' });
     }
   },
-
-  // proxy 정보들을 확인하는 방법
-  //   getProxyAll: async (req, res) => {
-  //     try {
-  //       const { address, order } = req.query;
-  //       console.log(address, order);
-  //       if (address) {
-  //         const proxyAddress = await Proxy.findAll({
-  //           where: {
-  //             proxyAddress: {
-  //               [Op.like]: `%${address}%`,
-  //             },
-  //           },
-  //           order: [[order, 'DESC']],
-  //         });
-  //         if (proxyAddress) {
-  //           res.send({ list: proxyAddress });
-  //         } else {
-  //           res.send({ message: '정보들을 불러오지 못했습니다.' });
-  //         }
-  //       } else {
-  //         const proxyAddress = await Proxy.findAll({
-  //           order: [[order, 'DESC']],
-  //         });
-  //         if (proxyAddress) {
-  //           res.send({ list: proxyAddress });
-  //         } else {
-  //           res.send({ message: '정보들을 불러오지 못했습니다.' });
-  //         }
-  //       }
-  //     } catch (err) {
-  //       console.error(err);
-  //       res.status(500).json({ message: '정보들을 불러오지 못했습니다.' });
-  //     }
-  //   },
 
   // 특정한 구의 정보값들을 불러오는 방법
   getAddressAll: async (req, res) => {
@@ -407,12 +370,15 @@ const output = {
   },
 
   //모든 웨이트 메이트 리스트값 적용
-  getWaitMateList: async (req, res) => {
-    try {
+
+  getWaitMateList : async( req,res)=>{
+    try{
+      console.log('여기의', req.query.id);
       const result = await WaitMate.findAll({
         where: { id: req.query.id },
       });
-      console.log(result);
+      
+      console.log('결과값', result);
       res.send(result);
     } catch (err) {
       console.error(err);

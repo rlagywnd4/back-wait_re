@@ -258,6 +258,9 @@ exports.getWaitMateList = async (req, res) => {
   try {
     let { wmAddress, order } = req.query;
     console.log(req.query);
+    let today = new Date();
+    today.setHours(9, 0, 0, 0);
+    console.log(today);
     if (wmAddress) {
       const waitMates = await WaitMate.findAll({
         where: {
@@ -268,7 +271,7 @@ exports.getWaitMateList = async (req, res) => {
             [Op.not]: `completed`, // state가 completed면 list에서 제외
           },
           waitTime: {
-            [Op.gte]: Date.now(), // 현재 날짜이후만 가져오기
+            [Op.gte]: today, // 현재 날짜이후만 가져오기
           },
         },
         order: [[order, 'DESC']],
@@ -277,7 +280,16 @@ exports.getWaitMateList = async (req, res) => {
         waitMates: waitMates,
       });
     } else {
-      const waitMates = await WaitMate.findAll({ order: [[order, 'DESC']] });
+      const waitMates = await WaitMate.findAll(
+        {
+          where: {
+            waitTime: {
+              [Op.gte]: today, // 현재 날짜이후만 가져오기
+            },
+          },
+        },
+        { order: [[order, 'DESC']] }
+      );
       res.send({
         waitMates: waitMates,
       });
