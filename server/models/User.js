@@ -11,10 +11,6 @@ const User = (Sequelize, DataTypes) => {
           type: DataTypes.STRING(150),
           allowNull : true,
           unique : true,
-          validate: {
-            is: /^[A-Za-z0-9]{4,12}$/,
-            notEmpty: true, 
-          },
           comment: '유저 아이디',
         },
         password: {
@@ -26,10 +22,6 @@ const User = (Sequelize, DataTypes) => {
           type: DataTypes.STRING(150),
           allowNull: false,
           unique : true,
-          validate: {
-            is: /^[A-Za-z0-9]{4,12}$/,
-            notEmpty: true, 
-          },
           comment: '닉네임',
         },
         email: {
@@ -41,7 +33,7 @@ const User = (Sequelize, DataTypes) => {
         photo: {
            type: DataTypes.STRING(150),
            allowNull : true,
-           defaultValue: 'http://ec2-13-124-56-103.ap-northeast-2.compute.amazonaws.com:8080/public/profileImg/default.png',
+           defaultValue: 'https://sesac-projects.site/wapi/public/profileImg/default.png',
            comment : '사진'
         },
         social : {
