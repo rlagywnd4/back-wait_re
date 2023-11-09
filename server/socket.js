@@ -8,7 +8,7 @@ const Common = require('./common');
 function setupSocket(server) {
   const io = socketIO(server, {
     cors: {
-      origin: [`${process.env.AWS_HOST}:3000`],
+      origin: [`http://localhost:3000`],
       methods: ["GET","POST","PATCH","DELETE"],
     }
   });
@@ -21,7 +21,7 @@ function setupSocket(server) {
     
       socket.on('createRoom', async (data) => {
         try {
-          const existingRoom = await Room.findOne({ sender: data.sender, receiver: data.receiver });
+          const existingRoom = await Room.findOne({ wmId: data.wmId, proxyId: data.proxyId });
     
           if (existingRoom) {
             
@@ -35,6 +35,7 @@ function setupSocket(server) {
               sender: data.sender,
               receiver: data.receiver,
               proxyId: data.proxyId,
+              wmId : data.wmId,
               roomNumber: roomNumber,
             });
     
@@ -51,7 +52,7 @@ function setupSocket(server) {
     socket.on('getRoomInfo', async (roomNumber) => {
       try {
         const room = await Room.findOne({ roomNumber });
-  
+        console.log('룸의 정보값',room);
         if (!room) {
           socket.emit('roomInfo', { error: '채팅방을 찾을 수 없습니다.' });
           return;
@@ -59,14 +60,14 @@ function setupSocket(server) {
         const sender = await User.findOne({ where: { id: room.sender } });
         const receiver = await User.findOne({ where: { id: room.receiver } });
         const proxyData = await Proxy.findOne({ where: {proxyId: room.proxyId}});
-
-        console.log(proxyData);
+        const wmData = await WaitMate.findOne({where : {wmId : room.wmId}})
+        console.log('웨메 정보값!', wmData);
         if (!sender || !receiver) {
           socket.emit('roomInfo', { error: '사용자 정보를 찾을 수 없습니다.' });
           return;
         }
 
-        socket.emit('roomInfo', { sender, receiver, proxyData});
+        socket.emit('roomInfo', { sender, receiver, proxyData, wmData});
       } catch (error) {
         console.error('getRoomInfo 에러:', error);
         socket.emit('roomInfo', { error: '서버에서 오류 발생' });
