@@ -99,59 +99,85 @@ function setupSocket(server) {
     ///////////////////////////////////////////////////////////////////////////////////////
     // 예약중 으로 상태가 변경되었을때
     socket.on('reserve', async (data) => {
-      // data는 wmId,proxyId, id(proxy의 id)를 갖고 있음
+      // data는 wmId,proxyId를 갖고 있음
       // 웨메 예약중으로 상태 변경
-      const updateWM = await WaitMate.update(
-        {
-          state: 'reserved',
+      // 웨메 상태 확인
+      const checkWM = await WaitMate.findOne({
+        where: {
+          wmId: data.wmId,
         },
-        {
-          where: {
-            wmId: data.wmId,
+      });
+      if (checkWM.state !== 'completed') {
+        // 거래 완료 상태가 아니면 상태 변경
+        const updateWM = await WaitMate.update(
+          {
+            state: 'reserved',
           },
-        }
-      );
+          {
+            where: {
+              wmId: data.wmId,
+            },
+          }
+        );
+      }
     });
     // 예약중에서 다시 취소했을때
     socket.on('deleteReservation', async (data) => {
-      // 웨메 상태 변경
-      const updateWM = await WaitMate.update(
-        {
-          state: 'active',
+      // 웨메 상태 확인
+      const checkWM = await WaitMate.findOne({
+        where: {
+          wmId: data.wmId,
         },
-        {
-          where: {
-            wmId: data.wmId,
+      });
+      if (checkWM.state !== 'completed') {
+        // 거래 완료 상태가 아니면 상태 변경
+        const updateWM = await WaitMate.update(
+          {
+            state: 'active',
           },
-        }
-      );
+          {
+            where: {
+              wmId: data.wmId,
+            },
+          }
+        );
+      }
     });
     // 거래 완료
     socket.on('completed', async (data) => {
-      const updateWM = await WaitMate.update(
-        {
-          state: 'completed',
+      // 웨메 상태 확인
+      const checkWM = await WaitMate.findOne({
+        where: {
+          wmId: data.wmId,
         },
-        {
-          where: {
-            wmId: data.wmId,
+      });
+      if (checkWM.state !== 'completed') {
+        // 거래 완료 상태가 아니면 상태 변경
+        const updateWM = await WaitMate.update(
+          {
+            state: 'completed',
           },
-        }
-      );
-      const getProxy = await Proxy.findOne({
-        where: {
+          {
+            where: {
+              wmId: data.wmId,
+            },
+          }
+        );
+        const getProxy = await Proxy.findOne({
+          where: {
+            id: data.proxyId,
+          },
+        });
+        const getNickName = await User.findOne({
+          where: {
+            id: data.proxyId,
+          },
+        });
+        socket.emit('startReview', {
           id: data.proxyId,
-        },
-      });
-      const getNickName = await User.findOne({
-        where: {
-          id: data.proxyId,
-        },
-      });
-      socket.emit('startReview', {
-        id: data.proxyId,
-        nickname: getNickName.nickname,
-      });
+          nickname: getNickName.nickname,
+        });
+      }
     });
     // 다시 연결 되었을 때를 대비한 코드
     // 가지고 있는 데이터 id
