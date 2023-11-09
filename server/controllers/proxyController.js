@@ -410,7 +410,7 @@ const output = {
   getWaitMateList: async (req, res) => {
     try {
       const result = await WaitMate.findAll({
-        where: { id: req.params.id },
+        where: { id: req.query.id },
       });
       console.log(result);
       res.send(result);
