@@ -320,7 +320,7 @@ exports.logOut = (req, res) => {
 };
 exports.changeProfileImg = (req, res) => {
   try {
-    res.status(201).message({message : '정상적으로 프로필 이미지가 변경되었습니다.'})
+    res.status(201).send({message : '정상적으로 프로필 이미지가 변경되었습니다.'})
   } catch (error) {
     console.log(error);
     res.status(500).json({message : '알 수 없는 서버 에러'});
