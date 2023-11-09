@@ -61,13 +61,21 @@ User.hasMany(LikeWait, {
   sourceKey: 'id',
   onDelete: 'CASCADE',
 });
-LikeWait.belongsTo(User, { foreignKey: 'id', targetKey: 'id' });
+LikeWait.belongsTo(User, {
+  foreignKey: 'id',
+  targetKey: 'id',
+  allowNull: false,
+});
 WaitMate.hasMany(LikeWait, {
   foreignKey: 'wmId',
   sourceKey: 'wmId',
   onDelete: 'CASCADE',
 });
-LikeWait.belongsTo(WaitMate, { foreignKey: 'wmId', targetKey: 'wmId' });
+LikeWait.belongsTo(WaitMate, {
+  foreignKey: 'wmId',
+  targetKey: 'wmId',
+  allowNull: false,
+});
 Payment.belongsTo(User, {
   foreignKey: 'payerId',
   as: 'payer',
