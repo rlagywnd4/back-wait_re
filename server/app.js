@@ -29,11 +29,11 @@ app.use(
   })
 );
 
-app.use('/public', express.static(path.join(__dirname, '/wapi/public')));
+app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // router 설정
 const home = require('./routes/index');
-app.use('/wapi', home);
+app.use('', home);
 
 //시퀄라이즈 설정
 const { sequelize } = require('./models');
