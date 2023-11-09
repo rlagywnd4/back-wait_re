@@ -8,7 +8,9 @@ exports.kakaoPay = async (req, res) => {
   try {
     const userInfo = await Common.cookieUserinfo(req);
     const { wmId, id } = req.body;
-    const response = await  WaitMate.findOne({where : wmId});
+    console.log('wmId', wmId);
+    const response = await  WaitMate.findOne({where : {wmId: wmId}});
+    console.log('response값', response);
     const {title,  waitTime, pay } = response.dataValues;
     const paymentInfo = {
       cid: 'TC0ONETIME',

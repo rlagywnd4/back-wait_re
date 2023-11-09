@@ -376,7 +376,6 @@ const output = {
       console.log('여기의', req.query.id);
       const result = await WaitMate.findAll({
         where: { id: req.query.id },
-
       });
       
       console.log('결과값', result);
