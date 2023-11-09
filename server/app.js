@@ -20,7 +20,7 @@ app.use(cookieParser());
 //cors 설정
 app.use(
   cors({
-    origin: 'http://localhost:3000',
+    origin: ['http://localhost:3000', 'http://ec2-13-124-56-103.ap-northeast-2.compute.amazonaws.com:3000'],
     credentials: true,
   })
 );
