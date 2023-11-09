@@ -143,7 +143,7 @@ function setupSocket(server) {
           id: data.proxyId,
         },
       });
-      const getNickName = await WaitMate.findOne({
+      const getNickName = await User.findOne({
         where: {
           id: data.proxyId,
         },
