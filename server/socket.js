@@ -15,12 +15,10 @@ let timer; //웨메가 끝나기 전에 소켓 연결이 끊겼을 때를 대비
 function setupSocket(server) {
   const io = socketIO(server, {
     cors: {
-      origin: [
-        'http://localhost:3000',
-        'http://ec2-13-124-56-103.ap-northeast-2.compute.amazonaws.com:3000',
-      ],
-      methods: ['GET', 'POST', 'PATCH', 'DELETE'],
-    },
+      origin: ['https://sesac-projects.site/waitmate/', 'http://ec2-13-124-56-103.ap-northeast-2.compute.amazonaws.com:3000'],
+      methods: ["GET","POST","PATCH","DELETE"],
+    }
+
   });
   console.log('소켓 시작');
   io.on('connection', async (socket) => {

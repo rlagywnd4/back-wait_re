@@ -4,6 +4,7 @@ const { WaitMate, ChatRoom, LikeWait, Proxy, ViewCount } = require('../models');
 
 // waitMateDetail 조회
 exports.getWaitMateDetail = async (req, res) => {
+  console.log('-----------------------');
   // wmAddress를 요청에 받고 응답 값에는 id(user)를 보내 글쓴 주인인지 확인(waitMate에 포함됨)
   try {
     let isLikeWait = false;
