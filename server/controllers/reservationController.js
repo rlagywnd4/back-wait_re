@@ -1,5 +1,4 @@
-const { WaitMate, Proxy } = require('../models');
-const Reservation = require('../models/Reservation');
+const { WaitMate, Proxy, Reservations } = require('../models');
 
 exports.getWaitMateReservation = async (req, res) => {
   try {
@@ -52,27 +51,31 @@ exports.getPickedWaitMate = async (req, res) => {
 };
 
 exports.getPickedProxy = async (req, res) => {
+  console.log('-------------');
   try {
     const { id } = req.query;
+    console.log(id);
     let proxyList = [];
-    const getWMId = await WaitMate.findAll({
+    const getWMId = await WaitMate.findOne({
       where: {
         id,
       },
     });
-    getWMId.forEach(async (element) => {
-      const getPickedProxy = await Reservation.findOne({
-        where: {
-          wmId: element.wmId,
-        },
-      });
-      const proxy = await Proxy.findOne({
-        where: {
-          proxyId: element.proxyId,
-        },
-      });
-      proxyList.push(proxy);
+    console.log(getWMId);
+    const getPickedProxy = await Reservations.findOne({
+      where: {
+        wmId: getWMId.wmId,
+      },
     });
+    const proxy = await Proxy.findOne({
+      where: {
+        proxyId: getWMId.proxyId,
+      },
+    });
+    // proxyList.push(proxy);
+    console.log(proxy);
+    // getWMId.forEach(async (element) => {
+    // });
     if (proxyList[0] !== '') {
       res.send(proxyList);
     } else {

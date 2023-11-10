@@ -19,7 +19,7 @@ const Review = require('./Review')(sequelize, Sequelize);
 const ChatRoom = require('./ChatRoom')(sequelize, Sequelize);
 const LikeWait = require('./LikeWait')(sequelize, Sequelize);
 const Payment = require('./Payment')(sequelize, Sequelize);
-const Reservation = require('./Reservation')(sequelize, Sequelize);
+const Reservations = require('./Reservations')(sequelize, Sequelize);
 
 User.hasMany(WaitMate, {
   foreignKey: 'id',
@@ -85,18 +85,18 @@ Payment.belongsTo(User, {
   as: 'payee',
 });
 
-WaitMate.hasOne(Reservation, {
+WaitMate.hasOne(Reservations, {
   foreignKey: 'wmId',
   sourceKey: 'wmId',
   onDelete: 'CASCADE',
 });
-Reservation.belongsTo(WaitMate, { foreignKey: 'wmId', targetKey: 'wmId' });
-Proxy.hasMany(Reservation, {
+Reservations.belongsTo(WaitMate, { foreignKey: 'wmId', targetKey: 'wmId' });
+Proxy.hasMany(Reservations, {
   foreignKey: 'proxyId',
   sourceKey: 'proxyId',
   onDelete: 'CASCADE',
 });
-Reservation.belongsTo(Proxy, { foreignKey: 'proxyId', targetKey: 'proxyId' });
+Reservations.belongsTo(Proxy, { foreignKey: 'proxyId', targetKey: 'proxyId' });
 
 db.User = User;
 db.Proxy = Proxy;
@@ -104,6 +104,7 @@ db.WaitMate = WaitMate;
 db.Review = Review;
 db.ChatRoom = ChatRoom;
 db.LikeWait = LikeWait;
+db.Reservations = Reservations;
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
