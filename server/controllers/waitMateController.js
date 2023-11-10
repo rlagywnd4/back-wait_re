@@ -98,6 +98,30 @@ exports.postWaitMate = async (req, res) => {
     } else {
       photo = `/public/proxyImg/` + req.file.filename;
     }
+    console.log(
+      'id',
+      id,
+      'title',
+      title,
+      'wmAddress',
+      wmAddress,
+      'wmDetailAddress',
+      wmDetailAddress,
+      'lng',
+      lng,
+      'lat',
+      lat,
+      'date',
+      date,
+      'description',
+      description,
+      'pay',
+      pay,
+      'startTime',
+      startTime,
+      'endTime',
+      endTime
+    );
     // DB에 waitMate 등록
     const insertWaitMate = await WaitMate.create({
       id: id,
@@ -122,7 +146,7 @@ exports.postWaitMate = async (req, res) => {
     }
   } catch (e) {
     console.error('Error WaitMate data:', e);
-    res.status(500).send('Internal Server Error');
+    res.status(500).send({ result: 'Internal Server Error', error: e });
   }
 };
 
