@@ -352,7 +352,28 @@ exports.getMyWaitMate = async (req, res) => {
       },
     });
     if (myWaitMates) {
-      res.send(myWaitMates);
+      res.send({ myWaitMates: myWaitMates });
+    } else {
+      res.send({ result: 'fail' });
+    }
+  } catch (e) {
+    console.error('Error WaitMate data:', e);
+    res.status(500).send('Internal Server Error');
+  }
+};
+
+// 웨메 입장에서 거래완료한 waitMate 목록
+exports.getMyWaitMateList = async (req, res) => {
+  try {
+    const { id } = req.query;
+    const completedMyWaitMateList = await WaitMate.findAll({
+      where: {
+        id: id,
+        state: 'completed',
+      },
+    });
+    if (completedMyWaitMateList) {
+      res.send({ completedMyWaitMateList: completedMyWaitMateList });
     } else {
       res.send({ result: 'fail' });
     }
