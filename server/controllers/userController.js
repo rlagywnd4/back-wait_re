@@ -318,9 +318,14 @@ exports.logOut = (req, res) => {
     res.status(500);
   }
 };
-exports.changeProfileImg = (req, res) => {
+exports.changeProfileImg = async (req, res) => {
   try {
-    res.status(201).send({message : '정상적으로 프로필 이미지가 변경되었습니다.'})
+    const userInfo = await Common.cookieUserinfo(req);
+    if (!userInfo) {
+      res.status(400).send();
+      return ;
+    }
+    res.status(201).json({message : '정상적으로 프로필 이미지가 변경되었습니다.', imageUrl : userInfo.dataValues.photo});
   } catch (error) {
     console.log(error);
     res.status(500).json({message : '알 수 없는 서버 에러'});

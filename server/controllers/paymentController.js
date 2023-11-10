@@ -9,16 +9,16 @@ exports.kakaoPay = async (req, res) => {
     const userInfo = await Common.cookieUserinfo(req);
     const { wmId, id } = req.body;
     const response = await  WaitMate.findOne({where : {wmId: wmId}});
-    const {title,  waitTime, pay } = response.dataValues;
+    const {title, pay } = response.dataValues;
     const paymentInfo = {
       cid: 'TC0ONETIME',
       partner_order_id: 'order',
       partner_user_id: 'user',
       item_name: `${title}`,
       quantity: 1,
-      total_amount: waitTime * pay,
+      total_amount: pay,
       tax_free_amount: 0,
-      approval_url: `${currSuver}/payment/kakao/success?plus=${id}&pay=${waitTime * pay}&minus=${userInfo.id}&title=${title}`,
+      approval_url: `${currSuver}/payment/kakao/success?plus=${id}&pay=${pay}&minus=${userInfo.id}&title=${title}`,
       cancel_url: `${currSuver}/payment/kakao/cancel`,
       fail_url: `${currSuver}/payment/kakao/fail`,
     };
