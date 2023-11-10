@@ -47,5 +47,10 @@ waitMateRouter.get('/mapList', waitMateController.getWaitMateMapList);
 
 // 내가 등록한 waitMate
 waitMateRouter.get('/myWaitMate', waitMateController.getMyWaitMate);
+// 웨메 입장에서 거래완료한 waitMate 목록
+waitMateRouter.get(
+  '/completedMyWaitMateList',
+  waitMateController.getMyWaitMateList
+);
 
 module.exports = waitMateRouter;

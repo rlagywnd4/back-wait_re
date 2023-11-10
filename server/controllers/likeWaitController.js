@@ -9,7 +9,7 @@ exports.getLikeWaitList = async (req, res) => {
       },
     });
     if (getLikeWaitList) {
-      res.send(getLikeWaitList);
+      res.send({ getLikeWaitList: getLikeWaitList });
     } else {
       res.send({ result: 'fail' });
     }
