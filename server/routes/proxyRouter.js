@@ -55,6 +55,8 @@ proxyRouter.get('/chat/:roomNumber', proxyController.output.getChatData);
 proxyRouter.get('/userList', proxyController.output.getWaitMateList);
 //채팅 데이터 하나만 가져오기(채팅리스트 이유)
 proxyRouter.get('/chatListOne/:roomNumber', proxyController.output.getChatDetailOne);
+//등록된 프록시들의 모든 정보값 불러오기
+proxyRouter.get('/getProxyAll', proxyController.output.getProxyList);
 
 //몽구스 테스트
 proxyRouter.post('/mongoose', proxyController.input.mongooseTest);

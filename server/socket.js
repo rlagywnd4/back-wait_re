@@ -16,7 +16,7 @@ function setupSocket(server) {
   const io = socketIO(server, {
     path : 'wapi/socket.io',
     cors: {
-      origin: ['https://sesac-projects.site/waitmate/', 'http://ec2-13-124-56-103.ap-northeast-2.compute.amazonaws.com:3000'],
+      origin: ['https://sesac-projects.site/waitmate/', 'http://ec2-13-124-56-103.ap-northeast-2.compute.amazonaws.com:3000', 'http://localhost:8080'],
       methods: ["GET","POST","PATCH","DELETE"],
     }
   });
@@ -57,7 +57,8 @@ function setupSocket(server) {
         }
         const sender = await User.findOne({ where: { id: room.sender } });
         const receiver = await User.findOne({ where: { id: room.receiver } });
-
+        console.log('센더값', sender);
+        console.log('리시버값', receiver);
         const proxyData = await Proxy.findOne({
           where: { proxyId: room.proxyId },
         });
