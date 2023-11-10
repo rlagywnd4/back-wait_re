@@ -254,9 +254,6 @@ exports.kakaoResult = async (req, res) => {
       Path : '/',
       httpOnly : true
     })
-    // res.redirect(`http://localhost:3000/main`);
-    // res.redirect(`http://localhost:3000/waitMate/list`);
-    // const userInfo = kakaoUser.dataValues
     res.send(`
     <html>
       <body>
