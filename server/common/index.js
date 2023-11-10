@@ -49,11 +49,12 @@ const storage = (folderName) => {
     filename: async (req, file, cb) => {
       try {
         const userInfo = await exports.cookieUserinfo(req);
+        if (!userInfo) {
+          return cb(new Error('쿠키값을 읽어올 수 없습니다.'))
+        };
+        console.log(userInfo);
         const extname = file.mimetype.split('/')[1];
-        const userId = userInfo.userId ? userInfo.userId : req.body.userId;
-        if (extname !== 'jpeg' && extname !== 'png' && extname !== 'jpg') {
-          throw Error('지원하지 않는 파일 형식입니다.');
-        }
+        const userId = userInfo?.userId;
         const profileImgDir = path.join(__dirname, '../public/profileImg/');
         const files = await fs.promises.readdir(profileImgDir);
         const deletePromises = files.map((file) => {
@@ -62,6 +63,8 @@ const storage = (folderName) => {
           }
         });
         await Promise.all(deletePromises);
+        const photo = 'https://sesac-projects.site/wapi/public/profileImg/' + `${userId}.${extname}`;
+        await User.update({photo}, {where :{userId}});
         cb(null, `${userId}.${extname}`);
       } catch (err) {
         console.log(err);
@@ -73,4 +76,4 @@ const storage = (folderName) => {
 
 exports.upload = (folderName) => {
   return multer({ storage: storage(folderName) });
-}
+};

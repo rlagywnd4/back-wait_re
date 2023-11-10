@@ -28,7 +28,7 @@ app.use(
   })
 );
 
-app.use('/public', express.static(path.join(__dirname, '/wapi/public')));
+app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // router 설정
 const home = require('./routes/index');

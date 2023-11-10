@@ -22,12 +22,16 @@ exports.getLikeWaitList = async (req, res) => {
 exports.postLikeWait = async (req, res) => {
   try {
     const { wmId, id } = req.body;
-    const insertLikeWait = await LikeWait.create({
-      id: id,
-      wmId: wmId,
-    });
-    if (insertLikeWait) {
-      res.send({ result: 'success' });
+    if (typeof wmId !== 'undefined' && typeof id !== 'undefined') {
+      const insertLikeWait = await LikeWait.create({
+        id: id,
+        wmId: wmId,
+      });
+      if (insertLikeWait) {
+        res.send({ result: 'success' });
+      } else {
+        res.send({ result: 'fail' });
+      }
     } else {
       res.send({ result: 'fail' });
     }

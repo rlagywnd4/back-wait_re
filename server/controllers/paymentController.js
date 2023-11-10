@@ -1,26 +1,24 @@
 const axios = require('axios');
 const KAKAO_ADMIN_KEY = process.env.KAKAO_ADMIN_KEY;
 const { WaitMate, User, Payment } = require('../models');
-const currSuver = 'http://ec2-13-124-56-103.ap-northeast-2.compute.amazonaws.com:8080';
+const currSuver = 'https://sesac-projects.site/wapi';
 const Common = require('../common');
 
 exports.kakaoPay = async (req, res) => {
   try {
     const userInfo = await Common.cookieUserinfo(req);
     const { wmId, id } = req.body;
-    console.log('wmId', wmId);
     const response = await  WaitMate.findOne({where : {wmId: wmId}});
-    console.log('response값', response);
-    const {title,  waitTime, pay } = response.dataValues;
+    const {title, pay } = response.dataValues;
     const paymentInfo = {
       cid: 'TC0ONETIME',
       partner_order_id: 'order',
       partner_user_id: 'user',
       item_name: `${title}`,
       quantity: 1,
-      total_amount: waitTime * pay,
+      total_amount: pay,
       tax_free_amount: 0,
-      approval_url: `${currSuver}/payment/kakao/success?plus=${id}&pay=${waitTime * pay}&minus=${userInfo.id}&title=${title}`,
+      approval_url: `${currSuver}/payment/kakao/success?plus=${id}&pay=${pay}&minus=${userInfo.id}&title=${title}`,
       cancel_url: `${currSuver}/payment/kakao/cancel`,
       fail_url: `${currSuver}/payment/kakao/fail`,
     };
