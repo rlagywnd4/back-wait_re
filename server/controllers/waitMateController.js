@@ -4,7 +4,6 @@ const { WaitMate, ChatRoom, LikeWait, Proxy, ViewCount } = require('../models');
 
 // waitMateDetail 조회
 exports.getWaitMateDetail = async (req, res) => {
-  console.log('-----------------------');
   // wmAddress를 요청에 받고 응답 값에는 id(user)를 보내 글쓴 주인인지 확인(waitMate에 포함됨)
   try {
     let isLikeWait = false;
@@ -94,9 +93,9 @@ exports.postWaitMate = async (req, res) => {
     } = req.body; //photo가 파일 자체가 날라옴
     let photo;
     if (!req.file) {
-      photo = `/public/proxyImg/waitMateDefaultImg.png`;
+      photo = `/public/waitMateImg/waitMateDefaultImg.png`;
     } else {
-      photo = `/public/proxyImg/` + req.file.filename;
+      photo = `/public/waitMateImg/` + req.file.filename;
     }
     console.log(
       'id',
@@ -202,7 +201,7 @@ exports.patchWaitMate = async (req, res) => {
           lat: lat,
           description: description,
           pay: pay,
-          photo: `/public/proxyImg/` + req.file.filename,
+          photo: `/public/waitMateImg/` + req.file.filename,
           state: state,
           startTime,
           endTime,
