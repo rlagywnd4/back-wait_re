@@ -23,6 +23,7 @@ app.use(
     origin: [
       'http://ec2-13-124-56-103.ap-northeast-2.compute.amazonaws.com:3000',
       'https://sesac-projects.site',
+      'http://localhost:3000'
     ],
     credentials: true,
   })

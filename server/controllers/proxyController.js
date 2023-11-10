@@ -18,7 +18,7 @@ const input = {
           gender: req.body.gender,
           age: req.body.age,
           proxyMsg: req.body.proxyMsg,
-          photo: `${process.env.AWS_HOST}:8080/public/proxyImg/default.png`,
+          photo: `${process.env.AWS_HOST}/public/proxyImg/default.png`,
         });
         return res.send(postProxy);
       } else if (req.body.photo !== null) {
@@ -444,6 +444,20 @@ const output = {
     } catch (err) {
       console.error(err);
       res.status(500).send({ error: '서버 오류 발생' });
+    }
+  },
+
+  //모든 프록시 리스트들 
+  getProxyList : async (req,res)=>{
+    try{
+      const result = await Proxy.findAll({
+        where : {
+          id : req.query.id,
+        }
+      });
+      res.send(result);
+    } catch(err){
+      console.error(err);
     }
   }
   };
