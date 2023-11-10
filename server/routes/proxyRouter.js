@@ -39,6 +39,9 @@ proxyRouter.post('/createRoom', chatController.createRoom);
 //등록된 채팅방 정보들을 불러옴
 proxyRouter.get('/listChatting', proxyController.output.getChattingList);
 
+// 모든 채팅 리스트 뽑기
+proxyRouter.get('/listChatting2', proxyController.output.getChattingListWithLatest);
+
 //등록된 프록시를 변경
 proxyRouter.patch('/update/:id', uploadProxy.single('photo'), proxyController.input.updateProxy);
 //등록된 프록시를 삭제
@@ -50,6 +53,8 @@ proxyRouter.post('/imgUpload', uploadProxy.single('photo'), proxyController.inpu
 proxyRouter.get('/chat/:roomNumber', proxyController.output.getChatData);
 // 웨이트메이트 값 가져오기
 proxyRouter.get('/userList', proxyController.output.getWaitMateList);
+//채팅 데이터 하나만 가져오기(채팅리스트 이유)
+proxyRouter.get('/chatListOne/:roomNumber', proxyController.output.getChatDetailOne);
 
 //몽구스 테스트
 proxyRouter.post('/mongoose', proxyController.input.mongooseTest);
