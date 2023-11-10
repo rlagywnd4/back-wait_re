@@ -21,9 +21,8 @@ app.use(cookieParser());
 app.use(
   cors({
     origin: [
-      'http://localhost:3000', 
       'http://ec2-13-124-56-103.ap-northeast-2.compute.amazonaws.com:3000',
-      'https://sesac-projects.site'
+      'https://sesac-projects.site',
     ],
     credentials: true,
   })
@@ -33,7 +32,7 @@ app.use('/public', express.static(path.join(__dirname, '/wapi/public')));
 
 // router 설정
 const home = require('./routes/index');
-app.use('/wapi', home);
+app.use('', home);
 
 //시퀄라이즈 설정
 const { sequelize } = require('./models');

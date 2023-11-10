@@ -10,15 +10,17 @@ const {
   LikeWait,
 } = require('./models');
 const Common = require('./common');
-const Reservation = require('./models/Reservation');
+const Reservation = require('./models/Reservations');
 let timer; //웨메가 끝나기 전에 소켓 연결이 끊겼을 때를 대비한 변수
 function setupSocket(server) {
   const io = socketIO(server, {
     cors: {
-
-      origin: ['http://localhost:3000', 'http://ec2-13-124-56-103.ap-northeast-2.compute.amazonaws.com:3000'],
-      methods: ["GET","POST","PATCH","DELETE"],
-    }
+      origin: [
+        'http://localhost:3000',
+        'http://ec2-13-124-56-103.ap-northeast-2.compute.amazonaws.com:3000',
+      ],
+      methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+    },
   });
   console.log('소켓 시작');
   io.on('connection', async (socket) => {
@@ -58,19 +60,18 @@ function setupSocket(server) {
         const sender = await User.findOne({ where: { id: room.sender } });
         const receiver = await User.findOne({ where: { id: room.receiver } });
 
-        const proxyData = await Proxy.findOne({ where: {proxyId: room.proxyId}});
-        const wmData = await WaitMate.findOne({where : {wmId : room.wmId}})
+        const proxyData = await Proxy.findOne({
+          where: { proxyId: room.proxyId },
+        });
+        const wmData = await WaitMate.findOne({ where: { wmId: room.wmId } });
         console.log('웨메 정보값!', wmData);
 
-    
         if (!sender || !receiver) {
           socket.emit('roomInfo', { error: '사용자 정보를 찾을 수 없습니다.' });
           return;
         }
 
-
-        socket.emit('roomInfo', { sender, receiver, proxyData, wmData});
-
+        socket.emit('roomInfo', { sender, receiver, proxyData, wmData });
       } catch (error) {
         console.error('getRoomInfo 에러:', error);
         socket.emit('roomInfo', { error: '서버에서 오류 발생' });
