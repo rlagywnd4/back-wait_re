@@ -88,33 +88,33 @@ const input = {
   },
 
   // 등록한 프록시 정보를 업데이트 하는 코드
-  updateProxy: async (req, res) => {
-    try {
-      const userInfo = Common.cookieUserinfo(req);
-      if (!userInfo) {
-        res.status(401).json({ message: '로그인을 먼저 해주세요' });
-      } else {
-        const updateProxy = await Proxy.update(
-          {
-            id: req.body.id,
-            proxyAddress: req.body.proxyAddress,
-            gender: req.body.gender,
-            age: req.body.age,
-            proxyMsg: req.body.proxyMsg,
-            title: req.body.title,
-            photo: 'http://localhost:8080/public/proxyImg/' + req.file.filename,
-          },
-          {
-            where: { id: userInfo.id },
-          }
-        );
-        return res.send(updateProxy);
-      }
-    } catch (err) {
-      console.error(e);
-      res.status(500).json({ message: '알 수 없는 서버 에러 입니다.' });
-    }
-  },
+  // updateProxy: async (req, res) => {
+  //   try {
+  //     const userInfo = Common.cookieUserinfo(req);
+  //     if (!userInfo) {
+  //       res.status(401).json({ message: '로그인을 먼저 해주세요' });
+  //     } else {
+  //       const updateProxy = await Proxy.update(
+  //         {
+  //           id: req.body.id,
+  //           proxyAddress: req.body.proxyAddress,
+  //           gender: req.body.gender,
+  //           age: req.body.age,
+  //           proxyMsg: req.body.proxyMsg,
+  //           title: req.body.title,
+  //           photo: 'http://localhost:8080/public/proxyImg/' + req.file.filename,
+  //         },
+  //         {
+  //           where: { id: userInfo.id },
+  //         }
+  //       );
+  //       return res.send(updateProxy);
+  //     }
+  //   } catch (err) {
+  //     console.error(e);
+  //     res.status(500).json({ message: '알 수 없는 서버 에러 입니다.' });
+  //   }
+  // },
 
   // 등록한 프록시 정보를 업데이트 하는 코드
   updateProxy: async (req, res) => {
