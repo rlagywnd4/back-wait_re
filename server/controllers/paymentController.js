@@ -3,13 +3,19 @@ const KAKAO_ADMIN_KEY = process.env.KAKAO_ADMIN_KEY;
 const { WaitMate, User, Payment } = require('../models');
 const currSuver = 'https://sesac-projects.site/wapi';
 const Common = require('../common');
+const db = require('../models');
+const sequelize = db.sequelize;
 
 exports.kakaoPay = async (req, res) => {
   try {
     const userInfo = await Common.cookieUserinfo(req);
     const { wmId, id } = req.body;
     const response = await  WaitMate.findOne({where : {wmId: wmId}});
-    const {title, pay } = response.dataValues;
+    const { title, pay } = response.dataValues;
+    if (pay > userInfo.wallet) {
+      res.status(400).json({message : '결제 가능 금액이 부족합니다.'});
+      return ;
+    }
     const paymentInfo = {
       cid: 'TC0ONETIME',
       partner_order_id: 'order',
@@ -28,15 +34,17 @@ exports.kakaoPay = async (req, res) => {
         'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
       },
     });
-    res.redirect(kakaoResponse.data.next_redirect_pc_url);
+    const {next_redirect_pc_url} = kakaoResponse.data;
+    res.json({redirectUrl : next_redirect_pc_url});
   } catch (error) {
     console.log(error);
     res.status(500).send();
   };
 };
 exports.success = async (req, res) => {
+  let transaction
   try {
-    const transaction = await sequelize.transaction();
+    transaction = await sequelize.transaction();
     let { plus, pay, minus, title } = req.query;
     plus = parseInt(plus, 10);
     pay = parseFloat(pay);
@@ -54,10 +62,6 @@ exports.success = async (req, res) => {
     }
     const plusWallet = plusUser.dataValues.wallet;
     const minusWallet = minusUser.dataValues.wallet;
-    if (minusWallet - pay < 0) {
-      await transaction.rollback();
-      throw new Error('결제 가능한 금액이 남아 있지 않습니다')
-    };
     await User.update({
       wallet : plusWallet + pay
     }, {
@@ -72,7 +76,26 @@ exports.success = async (req, res) => {
       amount : pay,
     }, { transaction });
     await transaction.commit();
-    res.json({message : "결제가 완료되었습니다."});
+    res.send(`
+    <html>
+      <body>
+        <h1 
+          style="
+            position:absolute; 
+            top:50%; 
+            left:50%; 
+            transform:translate(-50%,-50%)
+            ">
+          결제가 성공적으로 완료되었습니다.<br/>채팅 리스트로 이동합니다.</h1>
+        <script>
+          const reload = () => {
+            return setTimeout(() => {window.location.href='https://sesac-projects.site/waitmate/myPage/Chatlist'}, 1000)
+          }
+          reload();
+        </script>
+      </body>
+    </html>
+  `);
   } catch (error) {
     if (transaction) {
       await transaction.rollback();
@@ -88,8 +111,46 @@ exports.success = async (req, res) => {
   };
 };
 exports.cancel = (req, res) => {
-  res.json({message : '결제가 취소되었습니다.'});
+  res.send(`
+    <html>
+      <body>
+        <h1 
+          style="
+            position:absolute; 
+            top:50%; 
+            left:50%; 
+            transform:translate(-50%,-50%)
+            ">
+          결제를 취소하셨습니다.<br/>채팅 리스트로 이동합니다.</h1>
+        <script>
+          const reload = () => {
+            return setTimeout(() => {window.location.href='https://sesac-projects.site/waitmate/myPage/Chatlist'}, 1000)
+          }
+          reload();
+        </script>
+      </body>
+    </html>
+  `);
 };
 exports.fail = (req, res) => {
-  res.status(500).json({message : '알 수 없는 카카오 에러'});
+  res.send(`
+  <html>
+    <body>
+      <h1 
+        style="
+          position:absolute; 
+          top:50%; 
+          left:50%; 
+          transform:translate(-50%,-50%)
+          ">
+        알 수 없는 에러가 발생하였습니다.<br/>채팅 리스트로 이동합니다.</h1>
+      <script>
+        const reload = () => {
+          return setTimeout(() => {window.location.href='https://sesac-projects.site/waitmate/myPage/Chatlist'}, 1000)
+        }
+        reload();
+      </script>
+    </body>
+  </html>
+`);
 };

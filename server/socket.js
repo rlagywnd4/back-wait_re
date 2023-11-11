@@ -14,7 +14,6 @@ const Reservation = require('./models/Reservations');
 let timer; //웨메가 끝나기 전에 소켓 연결이 끊겼을 때를 대비한 변수
 function setupSocket(server) {
   const io = socketIO(server, {
-    path : 'wapi/socket.io',
     cors: {
       origin: ['https://sesac-projects.site/waitmate/', 'http://ec2-13-124-56-103.ap-northeast-2.compute.amazonaws.com:3000', 'http://localhost:8080'],
       methods: ["GET","POST","PATCH","DELETE"],

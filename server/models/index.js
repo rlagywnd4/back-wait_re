@@ -105,6 +105,7 @@ db.Review = Review;
 db.ChatRoom = ChatRoom;
 db.LikeWait = LikeWait;
 db.Reservations = Reservations;
+db.Payment = Payment;
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
