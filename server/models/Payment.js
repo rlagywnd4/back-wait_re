@@ -8,7 +8,7 @@ const Payment = (Sequelize, DataTypes) => {
         primaryKey: true,
       },
       title : {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING(255),
         allowNull : false,
       },
       payerId : {
