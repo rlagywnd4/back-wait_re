@@ -43,7 +43,6 @@ sequelize.sync({ force: false });
 
 // 소켓 연결 (http 서버를 생성하고 소켓 서버로 사용)
 const server = http.createServer(app);
-console.log(server)
 setupSocket(server);
 
 //몽구스 연결
