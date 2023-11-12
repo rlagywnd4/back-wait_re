@@ -33,7 +33,7 @@ const WaitMate = (Sequelize, DataTypes) => {
         comment: '위도',
       },
       waitTime: {
-        type: DataTypes.STRING(250),
+        type: DataTypes.DATE,
         allowNull: false,
         comment: '기다리는 날짜',
       },
