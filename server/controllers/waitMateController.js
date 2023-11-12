@@ -331,9 +331,9 @@ exports.getWaitMateMapList = async (req, res) => {
         state: {
           [Op.not]: `completed`, // state가 completed면 list에서 제외
         },
-        waitTime: {
-          [Op.gte]: Date.now(), // 현재 날짜이후만 가져오기
-        },
+        // waitTime: {
+        //   [Op.gte]: Date.now(), // 현재 날짜이후만 가져오기
+        // },
       },
     });
     res.send(getWaitMateMapList);
