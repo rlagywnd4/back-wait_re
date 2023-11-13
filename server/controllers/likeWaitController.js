@@ -1,15 +1,26 @@
-const { LikeWait } = require('../models');
+const { LikeWait, WaitMate } = require('../models');
 
 exports.getLikeWaitList = async (req, res) => {
   try {
     const { id } = req.query;
-    const getLikeWaitList = await LikeWait.findAll({
+    let waitMateList = [];
+    const gettingLikeWaitList = await LikeWait.findAll({
       where: {
         id,
       },
     });
-    if (getLikeWaitList) {
-      res.send({ getLikeWaitList: getLikeWaitList });
+    for (const element of gettingLikeWaitList) {
+      const getWaitMate = await WaitMate.findOne({
+        where: {
+          wmId: element.wmId,
+        },
+      });
+      if (getWaitMate) {
+        waitMateList.push(getWaitMate);
+      }
+    }
+    if (waitMateList) {
+      res.send({ getLikeWaitList: waitMateList });
     } else {
       res.send({ result: 'fail' });
     }

@@ -19,6 +19,7 @@ exports.getWaitMateReservation = async (req, res) => {
   }
 };
 
+// 내가 픽한 웨이트메이트
 exports.getPickedWaitMate = async (req, res) => {
   try {
     const { id } = req.query;
@@ -28,21 +29,27 @@ exports.getPickedWaitMate = async (req, res) => {
         id,
       },
     });
-    const getPickedWaitMate = await Reservation.findAll({
-      where: {
-        proxyId: getProxyId.proxyId,
-      },
-    });
-    getPickedWaitMate.forEach(async (element) => {
-      const waitMate = await WaitMate.findOne({
-        wmId: element.wmId,
+    if (getProxyId) {
+      const getPickedWaitMate = await Reservations.findAll({
+        where: {
+          proxyId: getProxyId.proxyId,
+        },
       });
-      waitMateList.push(waitMate);
-    });
-    if (getPickedWaitMate) {
-      res.send({ waitMateList: waitMateList });
+      for (const element of getPickedWaitMate) {
+        const waitMate = await WaitMate.findOne({
+          where: {
+            wmId: element.wmId,
+          },
+        });
+        waitMateList.push(waitMate);
+      }
+      if (getPickedWaitMate) {
+        res.send({ waitMateList: waitMateList });
+      } else {
+        res.send({ result: 'fail' });
+      }
     } else {
-      res.send({ result: 'fail' });
+      res.send({ result: 'no proxy' });
     }
   } catch (e) {
     console.error('Error WaitMate data:', e);
@@ -50,34 +57,41 @@ exports.getPickedWaitMate = async (req, res) => {
   }
 };
 
+// 내가 픽한 프록시
 exports.getPickedProxy = async (req, res) => {
   console.log('-------------');
   try {
     const { id } = req.query;
     console.log(id);
     let proxyList = [];
-    const getWMId = await WaitMate.findOne({
+    const getWMId = await WaitMate.findAll({
       where: {
         id,
       },
     });
-    console.log(getWMId);
-    const getPickedProxy = await Reservations.findOne({
-      where: {
-        wmId: getWMId.wmId,
-      },
-    });
-    const proxy = await Proxy.findOne({
-      where: {
-        proxyId: getWMId.proxyId,
-      },
-    });
-    // proxyList.push(proxy);
-    console.log(proxy);
-    // getWMId.forEach(async (element) => {
-    // });
-    if (proxyList[0] !== '') {
-      res.send(proxyList);
+    for (const element of getWMId) {
+      const getPickedProxy = await Reservations.findOne({
+        where: {
+          wmId: element.wmId,
+        },
+      });
+      if (getPickedProxy) {
+        const proxy = await Proxy.findOne({
+          where: {
+            proxyId: getPickedProxy.proxyId,
+          },
+        });
+        proxyList.push(proxy);
+      }
+    }
+    // 중복된 프록시 제거
+    const uniqueArray = proxyList.filter(
+      (element, index, self) =>
+        index === self.findIndex((e) => e.proxyId === element.proxyId)
+    );
+
+    if (uniqueArray[0] !== '') {
+      res.send(uniqueArray);
     } else {
       res.send({ result: 'fail' });
     }
