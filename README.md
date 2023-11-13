@@ -187,10 +187,10 @@ ex) header-#4
      </tr>
      <tr>
       <td>
-       <img width="480px" src="https://github.com/2nd-team-b/front-wait/assets/111476138/82f9f92e-e467-4c41-9495-9e2bd44d699c">
+       <img width="400px" src="https://github.com/2nd-team-b/front-wait/assets/111476138/82f9f92e-e467-4c41-9495-9e2bd44d699c">
      </td>
       <td>
-       <img width="480px" src="https://github.com/2nd-team-b/front-wait/assets/111476138/d0ce996b-5753-4ef1-8753-64dcabf466f2">
+       <img width="400px" src="https://github.com/2nd-team-b/front-wait/assets/111476138/d0ce996b-5753-4ef1-8753-64dcabf466f2">
       </td>
      </tr>
      <tr>
@@ -199,10 +199,10 @@ ex) header-#4
      </tr>
      <tr>
       <td>
-       <img width="480px" src="https://github.com/2nd-team-b/front-wait/assets/111476138/cd55f0bc-472c-491a-9422-4ea49a7ecbd0">
+       <img width="400px" src="https://github.com/2nd-team-b/front-wait/assets/111476138/cd55f0bc-472c-491a-9422-4ea49a7ecbd0">
       </td>
        <td>
-         <img width="100%" height="30%" src="https://github.com/2nd-team-b/front-wait/assets/111476138/7cdb7df5-7070-45af-8436-c58d2fd397b2">
+         <img width="400px" height="30%" src="https://github.com/2nd-team-b/front-wait/assets/111476138/7cdb7df5-7070-45af-8436-c58d2fd397b2">
       </td>
      </tr>
       <tr>
@@ -211,10 +211,10 @@ ex) header-#4
      </tr>
      <tr>
       <td>
-       <img width="480px" src="https://github.com/2nd-team-b/front-wait/assets/111476138/122a3203-5bd0-46cd-b407-6f66c330c594">
+       <img width="400px" src="https://github.com/2nd-team-b/front-wait/assets/111476138/122a3203-5bd0-46cd-b407-6f66c330c594">
       </td>
        <td>
-        <img width="480px" src="https://github.com/2nd-team-b/front-wait/assets/111476138/2a9858ff-15dd-4308-9fcb-f54f8d9c2921">
+        <img width="400px" src="https://github.com/2nd-team-b/front-wait/assets/111476138/2a9858ff-15dd-4308-9fcb-f54f8d9c2921">
       </td>
      </tr>
      <tr>
@@ -223,10 +223,10 @@ ex) header-#4
      </tr>
      <tr>
        <td>
-        <img width="480px" src="https://github.com/2nd-team-b/front-wait/assets/111476138/2686ec14-4c95-41eb-a156-113e4e9c0050">
+        <img width="400px" src="https://github.com/2nd-team-b/front-wait/assets/111476138/2686ec14-4c95-41eb-a156-113e4e9c0050">
       </td>
        <td>
-      <img width="100%" src="https://github.com/2nd-team-b/front-wait/assets/111476138/083af4c9-e09e-454f-839e-d53610879319">
+      <img width="400px" src="https://github.com/2nd-team-b/front-wait/assets/111476138/083af4c9-e09e-454f-839e-d53610879319">
       </td>
      </tr>
      <tr>
@@ -235,10 +235,10 @@ ex) header-#4
      </tr>
      <tr>
        <td>
-           <img width="480px" src="https://github.com/2nd-team-b/front-wait/assets/111476138/0d83b3e3-aec4-4fbd-a877-2eb7a57c7a9f">
+           <img width="400px" src="https://github.com/2nd-team-b/front-wait/assets/111476138/0d83b3e3-aec4-4fbd-a877-2eb7a57c7a9f">
        </td>
        <td>
-         <img width="480px" src="https://github.com/2nd-team-b/front-wait/assets/111476138/ac194bf7-30f4-4bba-80e5-00abeea4722a">
+         <img width="400px" src="https://github.com/2nd-team-b/front-wait/assets/111476138/ac194bf7-30f4-4bba-80e5-00abeea4722a">
       </td>
      </tr>
     </tbody>
@@ -277,9 +277,8 @@ ex) header-#4
     
  🟩 <strong>결제 기능 & 리뷰 기능</strong>
  
-    * 
-    * 
-    * 
+    * 카카오 페이 API를 이용한 결제 기능과 트랜잭션 통한 DB무결성 확보
+    * 대기자에 대한 리뷰와 평점을 남기고, 평점의 평균을 내서 리스트 출력
     
  🟩 <strong>마이페이지</strong>
 
