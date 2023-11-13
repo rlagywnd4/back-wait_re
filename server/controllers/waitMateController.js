@@ -28,16 +28,18 @@ exports.getWaitMateDetail = async (req, res) => {
       }
     );
 
-    // 찜을 했는지 체크
-    const likeWait = await LikeWait.findOne({
-      where: {
-        wmId: wmId,
-        id: id,
-      },
-    });
+    if (id) {
+      // 찜을 했는지 체크
+      const likeWait = await LikeWait.findOne({
+        where: {
+          wmId: wmId,
+          id: id,
+        },
+      });
 
-    if (likeWait) {
-      isLikeWait = true;
+      if (likeWait) {
+        isLikeWait = true;
+      }
     }
     //최근 채용 횟수(6개월전 ~ 현재)
     const sixMonthsAgo = new Date();
