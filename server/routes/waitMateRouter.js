@@ -10,7 +10,7 @@ const path = require('path'); //경로에 관한 내장 모듈
 const uploadWaitMate = multer({
   storage: multer.diskStorage({
     destination(req, res, done) {
-      done(null, 'public/waitMateImg');
+      done(null, 'public/waitMateImg/');
     },
     filename(req, file, done) {
       const ext = path.extname(file.originalname);

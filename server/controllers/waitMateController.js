@@ -99,6 +99,7 @@ exports.postWaitMate = async (req, res) => {
     } else {
       photo = `/public/waitMateImg/` + req.file.filename;
     }
+    console.log('photooo ', photo);
     // DB에 waitMate 등록
     const insertWaitMate = await WaitMate.create({
       id: id,
