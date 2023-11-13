@@ -8,16 +8,20 @@ const {
   User,
   Review,
   LikeWait,
+  Reservations,
 } = require('./models');
 const Common = require('./common');
-const Reservation = require('./models/Reservations');
 let timer; //웨메가 끝나기 전에 소켓 연결이 끊겼을 때를 대비한 변수
 function setupSocket(server) {
   const io = socketIO(server, {
     cors: {
-      origin: ['https://sesac-projects.site/waitmate/', 'http://ec2-13-124-56-103.ap-northeast-2.compute.amazonaws.com:3000', 'http://localhost:8080'],
-      methods: ["GET","POST","PATCH","DELETE"],
-    }
+      origin: [
+        'https://sesac-projects.site/waitmate/',
+        'http://ec2-13-124-56-103.ap-northeast-2.compute.amazonaws.com:3000',
+        'http://localhost:8080',
+      ],
+      methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+    },
   });
   console.log('소켓 시작');
   io.on('connection', async (socket) => {
@@ -118,6 +122,10 @@ function setupSocket(server) {
           }
         );
       }
+      const newReservation = await Reservations.create({
+        wmId: data.wmId,
+        proxyId: data.proxyId,
+      });
     });
     // 예약중에서 다시 취소했을때
     socket.on('deleteReservation', async (data) => {
@@ -139,6 +147,9 @@ function setupSocket(server) {
             },
           }
         );
+        const deleteReservation = await Reservations.destroy({
+          where: { wmId: data.wmId, proxyId: data.proxyId },
+        });
       }
     });
     // 거래 완료
@@ -154,6 +165,16 @@ function setupSocket(server) {
         const updateWM = await WaitMate.update(
           {
             state: 'completed',
+          },
+          {
+            where: {
+              wmId: data.wmId,
+            },
+          }
+        );
+        const updateReservation = await Reservations.update(
+          {
+            state: false,
           },
           {
             where: {
@@ -191,7 +212,7 @@ function setupSocket(server) {
         attributes: ['waitTime', 'endTime'],
       });
       wmEndTime.array.forEach(async (element) => {
-        const reservation = await Reservation.findOne({
+        const reservation = await Reservations.findOne({
           where: {
             wmId: wmEndTime.wmId,
             state: true,

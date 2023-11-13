@@ -86,3 +86,28 @@ exports.getPickedProxy = async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 };
+
+exports.postReservation = async (req, res) => {
+  try {
+    const { wmId, proxyId } = req.body;
+    console.log(req.body);
+    console.log('wmID = ', wmId, 'proxyId = ', proxyId);
+    if (typeof wmId !== 'undefined' && typeof proxyId !== 'undefined') {
+      const newReservation = await Reservations.create({
+        wmId: wmId,
+        proxyId: proxyId,
+      });
+      if (newReservation) {
+        res.send({ result: 'success' });
+      } else {
+        res.send({ result: 'fail' });
+      }
+    } else {
+      res.send({ wmId: wmId, proxyId: proxyId });
+      console.log('wmID = ', wmId, 'proxyId = ', proxyId);
+    }
+  } catch (e) {
+    console.error('Error WaitMate data:', e);
+    res.status(500).send('Internal Server Error');
+  }
+};

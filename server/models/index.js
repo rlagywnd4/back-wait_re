@@ -90,13 +90,21 @@ WaitMate.hasOne(Reservations, {
   sourceKey: 'wmId',
   onDelete: 'CASCADE',
 });
-Reservations.belongsTo(WaitMate, { foreignKey: 'wmId', targetKey: 'wmId' });
+Reservations.belongsTo(WaitMate, {
+  foreignKey: 'wmId',
+  targetKey: 'wmId',
+  allowNull: false,
+});
 Proxy.hasMany(Reservations, {
   foreignKey: 'proxyId',
   sourceKey: 'proxyId',
   onDelete: 'CASCADE',
 });
-Reservations.belongsTo(Proxy, { foreignKey: 'proxyId', targetKey: 'proxyId' });
+Reservations.belongsTo(Proxy, {
+  foreignKey: 'proxyId',
+  targetKey: 'proxyId',
+  allowNull: false,
+});
 
 db.User = User;
 db.Proxy = Proxy;
