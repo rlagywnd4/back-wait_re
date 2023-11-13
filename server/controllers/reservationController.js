@@ -91,7 +91,7 @@ exports.getPickedProxy = async (req, res) => {
     );
 
     if (uniqueArray[0] !== '') {
-      res.send(uniqueArray);
+      res.send({ proxyList: uniqueArray });
     } else {
       res.send({ result: 'fail' });
     }
