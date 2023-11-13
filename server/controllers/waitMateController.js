@@ -97,30 +97,6 @@ exports.postWaitMate = async (req, res) => {
     } else {
       photo = `/public/waitMateImg/` + req.file.filename;
     }
-    console.log(
-      'id',
-      id,
-      'title',
-      title,
-      'wmAddress',
-      wmAddress,
-      'wmDetailAddress',
-      wmDetailAddress,
-      'lng',
-      lng,
-      'lat',
-      lat,
-      'date',
-      date,
-      'description',
-      description,
-      'pay',
-      pay,
-      'startTime',
-      startTime,
-      'endTime',
-      endTime
-    );
     // DB에 waitMate 등록
     const insertWaitMate = await WaitMate.create({
       id: id,
@@ -304,16 +280,14 @@ exports.getWaitMateList = async (req, res) => {
         waitMates: waitMates,
       });
     } else {
-      const waitMates = await WaitMate.findAll(
-        {
-          where: {
-            waitTime: {
-              [Op.gte]: today, // 현재 날짜이후만 가져오기
-            },
+      const waitMates = await WaitMate.findAll({
+        where: {
+          waitTime: {
+            [Op.gte]: today, // 현재 날짜이후만 가져오기
           },
         },
-        { order: [[order, 'DESC']] }
-      );
+        order: [[order, 'DESC']],
+      });
       res.send({
         waitMates: waitMates,
       });
