@@ -55,7 +55,7 @@ const input = {
           res.status(402).json({ message: '이미 등록하신 글이 있습니다' });
         } else {
           // 등록 가능한 경우 프록시 생성
-          if (req.body.photo === null) {
+          if (!req.file) {
             const postProxy = await Proxy.create({
               id: req.body.id,
               proxyAddress: req.body.proxyAddress,
@@ -63,10 +63,10 @@ const input = {
               age: req.body.age,
               proxyMsg: req.body.proxyMsg,
               title: req.body.title,
-              photo: `${process.env.AWS_HOST}/public/proxyImg/default.png`,
+              photo: `https://sesac-projects.site/waitmate/images/proxy.png`,
             });
             return res.send(postProxy);
-          } else {
+          } else if (req.file){
             const postProxy = await Proxy.create({
               id: req.body.id,
               proxyAddress: req.body.proxyAddress,
