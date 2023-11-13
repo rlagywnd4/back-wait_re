@@ -263,6 +263,10 @@ exports.getWaitMateList = async (req, res) => {
     let today = new Date();
     today.setHours(9, 0, 0, 0);
     console.log(today);
+    // order가 정의되지 않은 경우 기본값으로 'updatedAt' 사용
+    if (!order) {
+      order = 'updatedAt';
+    }
     if (wmAddress) {
       const waitMates = await WaitMate.findAll({
         where: {
