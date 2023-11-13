@@ -80,6 +80,8 @@ proxyRouter.get(
 proxyRouter.get('/getProxyAll', proxyController.output.getProxyList);
 // 프록시 업데이트
 proxyRouter.patch('/update2/:proxyId', proxyController.input.realUpdateProxyId);
+// 프록시 업로드시 글 가져오기
+proxyRouter.get('/updateGet/:proxyId', proxyController.output.getProxyOne);
 
 //몽구스 테스트
 proxyRouter.post('/mongoose', proxyController.input.mongooseTest);
