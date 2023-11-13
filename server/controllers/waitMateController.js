@@ -2,6 +2,23 @@ const path = require('path'); //경로에 관한 내장 모듈
 const { Op, fn, col } = require('sequelize');
 const { WaitMate, ChatRoom, LikeWait, Proxy, ViewCount } = require('../models');
 
+const checkDate = (waitTime, startTime, endTime) => {
+  let checkDay = new Date();
+  checkDay.setHours(9, 0, 0, 0);
+  console.log(checkDay);
+  const newWaitTime = new Date(waitTime);
+  console.log(newWaitTime);
+  if (newWaitTime < checkDay) {
+    console.log('waitTime이 과거입니다.');
+    return false;
+  } else if (startTime >= endTime) {
+    console.log('startTime보다 endTime이 빠릅니다.');
+    return false;
+  } else {
+    return true;
+  }
+};
+
 // waitMateDetail 조회
 exports.getWaitMateDetail = async (req, res) => {
   // wmAddress를 요청에 받고 응답 값에는 id(user)를 보내 글쓴 주인인지 확인(waitMate에 포함됨)
@@ -99,28 +116,35 @@ exports.postWaitMate = async (req, res) => {
     } else {
       photo = `/public/waitMateImg/` + req.file.filename;
     }
-    console.log('photooo ', photo);
-    // DB에 waitMate 등록
-    const insertWaitMate = await WaitMate.create({
-      id: id,
-      title: title,
-      wmAddress: wmAddress,
-      wmDetailAddress: wmDetailAddress,
-      lng: lng,
-      lat: lat,
-      waitTime: date,
-      description: description,
-      pay: pay,
-      startTime,
-      endTime,
-      photo: photo,
-      state: 'active',
-    });
-    if (insertWaitMate) {
-      res.send({ result: 'success' });
+
+    // waitTime, startTime, endTime 값이 제대로 들어왔는지 체크
+    const check = checkDate(date, startTime, endTime);
+    if (!check) {
+      res.send({ result: 'validation failed' });
     } else {
-      console.log(insertWaitMate);
-      res.send({ result: 'fail' });
+      console.log('photooo ', photo);
+      // DB에 waitMate 등록
+      const insertWaitMate = await WaitMate.create({
+        id: id,
+        title: title,
+        wmAddress: wmAddress,
+        wmDetailAddress: wmDetailAddress,
+        lng: lng,
+        lat: lat,
+        waitTime: date,
+        description: description,
+        pay: pay,
+        startTime,
+        endTime,
+        photo: photo,
+        state: 'active',
+      });
+      if (insertWaitMate) {
+        res.send({ result: 'success' });
+      } else {
+        console.log(insertWaitMate);
+        res.send({ result: 'fail' });
+      }
     }
   } catch (e) {
     console.error('Error WaitMate data:', e);
@@ -168,62 +192,69 @@ exports.patchWaitMate = async (req, res) => {
     } = req.body;
 
     let isSuccess;
-    // 사진이 있으면
-    if (req.file) {
-      const patchWaitMate = await WaitMate.update(
-        {
-          title: title,
-          wmAddress: wmAddress,
-          waitTime: date,
-          wmDetailAddress: wmDetailAddress,
-          lng: lng,
-          lat: lat,
-          description: description,
-          pay: pay,
-          photo: `/public/waitMateImg/` + req.file.filename,
-          state: state,
-          startTime,
-          endTime,
-        },
-        {
-          where: {
-            wmId: wmId,
-          },
-        }
-      );
-      if (patchWaitMate) {
-        isSuccess = true;
-      }
+
+    // waitTime, startTime, endTime 값이 제대로 들어왔는지 체크
+    const check = checkDate(date, startTime, endTime);
+    if (!check) {
+      res.send({ result: 'validation failed' });
     } else {
-      // 사진이 없을때
-      const patchWaitMate = await WaitMate.update(
-        {
-          title: title,
-          wmAddress: wmAddress,
-          wmDetailAddress: wmDetailAddress,
-          lng: lng,
-          lat: lat,
-          waitTime: date,
-          description: description,
-          pay: pay,
-          state: state,
-          startTime,
-          endTime,
-        },
-        {
-          where: {
-            wmId: wmId,
+      // 사진이 있으면
+      if (req.file) {
+        const patchWaitMate = await WaitMate.update(
+          {
+            title: title,
+            wmAddress: wmAddress,
+            waitTime: date,
+            wmDetailAddress: wmDetailAddress,
+            lng: lng,
+            lat: lat,
+            description: description,
+            pay: pay,
+            photo: `/public/waitMateImg/` + req.file.filename,
+            state: state,
+            startTime,
+            endTime,
           },
+          {
+            where: {
+              wmId: wmId,
+            },
+          }
+        );
+        if (patchWaitMate) {
+          isSuccess = true;
         }
-      );
-      if (patchWaitMate) {
-        isSuccess = true;
+      } else {
+        // 사진이 없을때
+        const patchWaitMate = await WaitMate.update(
+          {
+            title: title,
+            wmAddress: wmAddress,
+            wmDetailAddress: wmDetailAddress,
+            lng: lng,
+            lat: lat,
+            waitTime: date,
+            description: description,
+            pay: pay,
+            state: state,
+            startTime,
+            endTime,
+          },
+          {
+            where: {
+              wmId: wmId,
+            },
+          }
+        );
+        if (patchWaitMate) {
+          isSuccess = true;
+        }
       }
-    }
-    if (isSuccess) {
-      res.send({ result: 'success' });
-    } else {
-      res.send({ result: 'fail' });
+      if (isSuccess) {
+        res.send({ result: 'success' });
+      } else {
+        res.send({ result: 'fail' });
+      }
     }
   } catch (e) {
     console.error('Error WaitMate data:', e);
