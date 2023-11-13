@@ -146,6 +146,47 @@ const input = {
     }
   },
 
+  //진짜로 업데이트 코드
+  realUpdateProxyId: async (req, res) => {
+    console.log('a', req.params.proxyId);
+    console.log('b', req.query.proxyId);
+    console.log(req.body);
+    try {
+      const userInfo = Common.cookieUserinfo(req);
+      if (!userInfo) {
+        res.status(401).json({ message: '로그인을 진행하십시오' });
+      } else {
+        const updateProxy = await Proxy.update(
+          {
+            proxyAddress: req.body.proxyAddress,
+            gender: req.body.gender,
+            age: req.body.age,
+            proxyMsg: req.body.proxyMsg,
+            title: req.body.title,
+          },
+          {
+            where: { proxyId: parseInt(req.params.proxyId) },
+          }
+        );
+
+        const updatedRows = updateProxy[0];
+
+        if (updatedRows > 0) {
+          return res.send({
+            message: '프록시가 성공적으로 업데이트되었습니다.',
+          });
+        } else {
+          return res.send({
+            message: '해당하는 프록시가 없거나 업데이트되지 않았습니다.',
+          });
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: '알 수 없는 서버 오류입니다!' });
+    }
+  },
+
   // 등록한 프록시를 삭제하는 코드
   deleteRegister: async (req, res) => {
     try {
@@ -356,7 +397,6 @@ const output = {
     }
   },
 
-
   // 모든 채팅 리스트 출력
   getChatData: async (req, res) => {
     try {
@@ -372,13 +412,13 @@ const output = {
 
   //모든 웨이트 메이트 리스트값 적용
 
-  getWaitMateList : async( req,res)=>{
-    try{
+  getWaitMateList: async (req, res) => {
+    try {
       console.log('여기의', req.query.id);
       const result = await WaitMate.findAll({
         where: { id: req.query.id },
       });
-      
+
       console.log('결과값', result);
       res.send(result);
     } catch (err) {
@@ -387,18 +427,20 @@ const output = {
   },
 
   // 채팅창에서 딱 하나의 정보값만 가져오는 것 적용
-  getChatDetailOne : async (req, res) => {
+  getChatDetailOne: async (req, res) => {
     try {
       const { roomNumber } = req.params; // 채팅 방번호는 라우트 파라미터로 받아온다고 가정
-  
+
       // 해당 방번호의 최신 정보글 가져오기
       const result = await ChatData.findOne({ roomNumber })
-        .sort({ createdAt: -1 }) 
+        .sort({ createdAt: -1 })
         .limit(1);
       if (!result) {
-        return res.status(404).json({ message: '해당 방번호의 채팅이 없습니다.' });
+        return res
+          .status(404)
+          .json({ message: '해당 방번호의 채팅이 없습니다.' });
       }
-  
+
       res.json(result);
     } catch (err) {
       console.error(err);
@@ -407,39 +449,41 @@ const output = {
   },
 
   // 모든 채팅 리스트들 뽑기
-   getChattingListWithLatest : async (req, res) => {
+  getChattingListWithLatest: async (req, res) => {
     try {
       const userInfo = await Common.cookieUserinfo(req);
-  
+
       if (!userInfo) {
         return res.send({ message: '사용자 정보를 찾을 수 없습니다.' });
       }
-  
+
       const roomList = await Room.find({
         $or: [{ sender: userInfo.id }, { receiver: userInfo.id }],
       });
-  
+
       if (!roomList || roomList.length === 0) {
         return res.send({ message: '채팅방 목록이 없습니다.' });
       }
-  
+
       const chatListWithLatest = [];
-  
+
       for (const room of roomList) {
-        const latestChat = await ChatData.findOne({ roomNumber: room.roomNumber })
+        const latestChat = await ChatData.findOne({
+          roomNumber: room.roomNumber,
+        })
           .sort({ createdAt: -1 })
           .limit(1);
-  
+
         const latestChatWithNumericSenderReceiver = {
           roomNumber: room.roomNumber,
           sender: parseInt(latestChat.sender, 10) || null,
           receiver: parseInt(latestChat.receiver, 10) || null,
           latestChat: latestChat || null,
         };
-  
+
         chatListWithLatest.push(latestChatWithNumericSenderReceiver);
       }
-  
+
       res.send({ list: chatListWithLatest });
     } catch (err) {
       console.error(err);
@@ -447,19 +491,19 @@ const output = {
     }
   },
 
-  //모든 프록시 리스트들 
-  getProxyList : async (req,res)=>{
-    try{
+  //모든 프록시 리스트들
+  getProxyList: async (req, res) => {
+    try {
       const result = await Proxy.findAll({
-        where : {
-          id : req.query.id,
-        }
+        where: {
+          id: req.query.id,
+        },
       });
       res.send(result);
-    } catch(err){
+    } catch (err) {
       console.error(err);
     }
-  }
-  };
+  },
+};
 
 module.exports = { input, output };
