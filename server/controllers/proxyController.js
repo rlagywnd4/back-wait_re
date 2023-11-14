@@ -474,17 +474,16 @@ const output = {
     }
   },
 
-  // 모든 채팅 리스트들 뽑기
+    // 모든 채팅 리스트들 뽑기
   getChattingListWithLatest: async (req, res) => {
     try {
-      const userInfo = await Common.cookieUserinfo(req);
-
-      if (!userInfo) {
-        return res.send({ message: '사용자 정보를 찾을 수 없습니다.' });
+      console.log('파라미터', req.query.id);
+      if (!req.query.id) {
+        res.send({ list: '채팅 리스트가 존재하지 않습니다' });
       }
 
       const roomList = await Room.find({
-        $or: [{ sender: userInfo.id }, { receiver: userInfo.id }],
+        $or: [{ sender: req.query.id }, { receiver: req.query.id }],
       });
 
       if (!roomList || roomList.length === 0) {
@@ -500,13 +499,15 @@ const output = {
           .sort({ createdAt: -1 })
           .limit(1);
 
+        console.log('센더2', latestChat?.sender);
         const latestChatWithNumericSenderReceiver = {
           roomNumber: room.roomNumber,
-          sender: parseInt(latestChat.sender, 10) || null,
-          receiver: parseInt(latestChat.receiver, 10) || null,
+          sender: latestChat ? latestChat.sender : null,
+          receiver: latestChat ? latestChat.receiver : null,
           latestChat: latestChat || null,
         };
 
+        console.log('센더3', latestChatWithNumericSenderReceiver);
         chatListWithLatest.push(latestChatWithNumericSenderReceiver);
       }
 
@@ -516,7 +517,7 @@ const output = {
       res.status(500).send({ error: '서버 오류 발생' });
     }
   },
-
+  
   //모든 프록시 리스트들
   getProxyList: async (req, res) => {
     try {
