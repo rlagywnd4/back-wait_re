@@ -97,6 +97,8 @@ exports.getWaitMateDetail = async (req, res) => {
 exports.postWaitMate = async (req, res) => {
   console.log('-----------------------');
   try {
+    let exchangePay;
+    let exchangeDesc;
     const {
       id,
       title,
@@ -123,6 +125,16 @@ exports.postWaitMate = async (req, res) => {
       res.send({ result: 'validation failed' });
     } else {
       console.log('photooo ', photo);
+      if (typeof pay === 'string') {
+        exchangePay = null;
+      } else {
+        exchangePay = pay;
+      }
+      if (description === 'undefined') {
+        exchangeDesc = null;
+      } else {
+        exchangeDesc = description;
+      }
       // DB에 waitMate 등록
       const insertWaitMate = await WaitMate.create({
         id: id,
@@ -132,8 +144,8 @@ exports.postWaitMate = async (req, res) => {
         lng: lng,
         lat: lat,
         waitTime: date,
-        description: description,
-        pay: pay,
+        description: exchangeDesc,
+        pay: exchangePay,
         startTime,
         endTime,
         photo: photo,
@@ -176,6 +188,8 @@ exports.deleteWaitMate = async (req, res) => {
 // waitMate 수정
 exports.patchWaitMate = async (req, res) => {
   try {
+    let exchangePay;
+    let exchangeDesc;
     const {
       wmId,
       title,
@@ -198,6 +212,16 @@ exports.patchWaitMate = async (req, res) => {
     if (!check) {
       res.send({ result: 'validation failed' });
     } else {
+      if (pay === 'undefined') {
+        exchangePay = null;
+      } else {
+        exchangePay = pay;
+      }
+      if (description === 'undefined') {
+        exchangeDesc = null;
+      } else {
+        exchangeDesc = description;
+      }
       // 사진이 있으면
       if (req.file) {
         const patchWaitMate = await WaitMate.update(
@@ -208,8 +232,8 @@ exports.patchWaitMate = async (req, res) => {
             wmDetailAddress: wmDetailAddress,
             lng: lng,
             lat: lat,
-            description: description,
-            pay: pay,
+            description: exchangeDesc,
+            pay: exchangePay,
             photo: `/public/waitMateImg/` + req.file.filename,
             state: state,
             startTime,
@@ -234,8 +258,8 @@ exports.patchWaitMate = async (req, res) => {
             lng: lng,
             lat: lat,
             waitTime: date,
-            description: description,
-            pay: pay,
+            description: exchangeDesc,
+            pay: exchangePay,
             state: state,
             startTime,
             endTime,
