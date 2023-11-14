@@ -212,7 +212,7 @@ exports.patchWaitMate = async (req, res) => {
     if (!check) {
       res.send({ result: 'validation failed' });
     } else {
-      if (pay === 'undefined') {
+      if (typeof pay === 'string') {
         exchangePay = null;
       } else {
         exchangePay = pay;
