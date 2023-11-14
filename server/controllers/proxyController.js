@@ -146,8 +146,8 @@ const input = {
     }
   },
 
-  //진짜로 업데이트 코드
-  realUpdateProxyId: async (req, res) => {
+   //진짜로 업데이트 코드
+   realUpdateProxyId: async (req, res) => {
     console.log('a', req.params.proxyId);
     console.log('b', req.query.proxyId);
     console.log(req.body);
@@ -156,29 +156,55 @@ const input = {
       if (!userInfo) {
         res.status(401).json({ message: '로그인을 진행하십시오' });
       } else {
-        const updateProxy = await Proxy.update(
-          {
-            proxyAddress: req.body.proxyAddress,
-            gender: req.body.gender,
-            age: req.body.age,
-            proxyMsg: req.body.proxyMsg,
-            title: req.body.title,
-          },
-          {
-            where: { proxyId: parseInt(req.params.proxyId) },
+        if(!req.file){
+          const updateProxy = await Proxy.update(
+            {
+              proxyAddress: req.body.proxyAddress,
+              gender: req.body.gender,
+              age: req.body.age,
+              proxyMsg: req.body.proxyMsg,
+              title: req.body.title,
+            },
+            {
+              where: { proxyId: parseInt(req.params.proxyId) },
+            }
+          );
+          const updatedRows = updateProxy[0];
+
+          if (updatedRows > 0) {
+            return res.send({
+              message: '프록시가 성공적으로 업데이트되었습니다.',
+            });
+          } else {
+            return res.send({
+              message: '해당하는 프록시가 없거나 업데이트되지 않았습니다.',
+            });
           }
-        );
+        } else if (req.file){
+          const updateProxy = await Proxy.update(
+            {
+              proxyAddress: req.body.proxyAddress,
+              gender: req.body.gender,
+              age: req.body.age,
+              proxyMsg: req.body.proxyMsg,
+              title: req.body.title,
+              photo : `https://sesac-projects.site/waitmate/public/proxyImg/` + req.file.filename,
+            },
+            {
+              where: { proxyId: parseInt(req.params.proxyId) },
+            }
+          );
+          const updatedRows = updateProxy[0];
 
-        const updatedRows = updateProxy[0];
-
-        if (updatedRows > 0) {
-          return res.send({
-            message: '프록시가 성공적으로 업데이트되었습니다.',
-          });
-        } else {
-          return res.send({
-            message: '해당하는 프록시가 없거나 업데이트되지 않았습니다.',
-          });
+          if (updatedRows > 0) {
+            return res.send({
+              message: '프록시가 성공적으로 업데이트되었습니다.',
+            });
+          } else {
+            return res.send({
+              message: '해당하는 프록시가 없거나 업데이트되지 않았습니다.',
+            });
+          }
         }
       }
     } catch (err) {

@@ -79,7 +79,7 @@ proxyRouter.get(
 //등록된 프록시들의 모든 정보값 불러오기
 proxyRouter.get('/getProxyAll', proxyController.output.getProxyList);
 // 프록시 업데이트
-proxyRouter.patch('/update2/:proxyId', proxyController.input.realUpdateProxyId);
+proxyRouter.patch('/update2/:proxyId', uploadProxy.single('photo'), proxyController.input.realUpdateProxyId);
 // 프록시 업로드시 글 가져오기
 proxyRouter.get('/updateGet/:proxyId', proxyController.output.getProxyOne);
 

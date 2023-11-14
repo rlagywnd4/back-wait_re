@@ -18,7 +18,7 @@ function setupSocket(server) {
       origin: [
         'https://sesac-projects.site/waitmate/',
         'http://ec2-13-124-56-103.ap-northeast-2.compute.amazonaws.com:3000',
-        'http://localhost:8080',
+        'http://localhost:3000',
       ],
       methods: ['GET', 'POST', 'PATCH', 'DELETE'],
     },
@@ -41,8 +41,10 @@ function setupSocket(server) {
             sender: data.sender,
             receiver: data.receiver,
             proxyId: data.proxyId,
+            wmId : data.wmId,
             roomNumber: roomNumber,
           });
+          console.log('방번호가 완성되었습니다', roomNumber)
           await newRoom.save();
           socket.emit('roomCreated', { roomNumber });
           socket.join(`room_${roomNumber}`);
