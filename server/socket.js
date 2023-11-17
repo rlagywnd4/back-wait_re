@@ -36,15 +36,15 @@ function setupSocket(server) {
           socket.emit('roomExists', { roomNumber: existingRoom.roomNumber });
         } else {
           const roomNumber = Date.now();
-          console.log(roomNumber + '룸넘버입니다');
+
           const newRoom = new Room({
             sender: data.sender,
             receiver: data.receiver,
             proxyId: data.proxyId,
-            wmId : data.wmId,
+            wmId: data.wmId,
             roomNumber: roomNumber,
           });
-          console.log('방번호가 완성되었습니다', roomNumber)
+
           await newRoom.save();
           socket.emit('roomCreated', { roomNumber });
           socket.join(`room_${roomNumber}`);
@@ -62,13 +62,11 @@ function setupSocket(server) {
         }
         const sender = await User.findOne({ where: { id: room.sender } });
         const receiver = await User.findOne({ where: { id: room.receiver } });
-        console.log('센더값', sender);
-        console.log('리시버값', receiver);
+
         const proxyData = await Proxy.findOne({
           where: { proxyId: room.proxyId },
         });
         const wmData = await WaitMate.findOne({ where: { wmId: room.wmId } });
-        console.log('웨메 정보값!', wmData);
 
         if (!sender || !receiver) {
           socket.emit('roomInfo', { error: '사용자 정보를 찾을 수 없습니다.' });
@@ -82,7 +80,6 @@ function setupSocket(server) {
       }
     });
     socket.on('message', (data) => {
-      console.log('아하' + data);
       socket.broadcast.emit('smessage', data);
       const chatMessage = new ChatData({
         roomNumber: data.roomNumber,
@@ -93,9 +90,7 @@ function setupSocket(server) {
       });
       chatMessage
         .save()
-        .then((savedMessage) => {
-          console.log('메시지가 성공적으로 저장되었습니다:', savedMessage);
-        })
+        .then((savedMessage) => {})
         .catch((error) => {
           console.error('메시지 저장 중 오류 발생:', error);
         });
@@ -203,7 +198,6 @@ function setupSocket(server) {
     // 다시 연결 되었을 때를 대비한 코드
     // 가지고 있는 데이터 id
     socket.on('login', async (data) => {
-      console.log('reviewLogin'); // 나중에 지울 것
       const wmEndTime = await WaitMate.findAll({
         where: {
           wmId: data.id,
