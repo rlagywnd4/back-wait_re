@@ -9,7 +9,6 @@ const input = {
   //프록시 테스트용
   postRegisterTest: async (req, res) => {
     try {
-      console.log('포토값' + req.file.filename);
       if (req.body.photo === null) {
         const postProxy = await Proxy.create({
           id: req.body.id,
@@ -66,7 +65,7 @@ const input = {
               photo: `https://sesac-projects.site/waitmate/images/proxy.png`,
             });
             return res.send(postProxy);
-          } else if (req.file){
+          } else if (req.file) {
             const postProxy = await Proxy.create({
               id: req.body.id,
               proxyAddress: req.body.proxyAddress,
@@ -146,17 +145,14 @@ const input = {
     }
   },
 
-   //진짜로 업데이트 코드
-   realUpdateProxyId: async (req, res) => {
-    console.log('a', req.params.proxyId);
-    console.log('b', req.query.proxyId);
-    console.log(req.body);
+  //진짜로 업데이트 코드
+  realUpdateProxyId: async (req, res) => {
     try {
       const userInfo = Common.cookieUserinfo(req);
       if (!userInfo) {
         res.status(401).json({ message: '로그인을 진행하십시오' });
       } else {
-        if(!req.file){
+        if (!req.file) {
           const updateProxy = await Proxy.update(
             {
               proxyAddress: req.body.proxyAddress,
@@ -180,7 +176,7 @@ const input = {
               message: '해당하는 프록시가 없거나 업데이트되지 않았습니다.',
             });
           }
-        } else if (req.file){
+        } else if (req.file) {
           const updateProxy = await Proxy.update(
             {
               proxyAddress: req.body.proxyAddress,
@@ -188,7 +184,9 @@ const input = {
               age: req.body.age,
               proxyMsg: req.body.proxyMsg,
               title: req.body.title,
-              photo : `https://sesac-projects.site/waitmate/public/proxyImg/` + req.file.filename,
+              photo:
+                `https://sesac-projects.site/waitmate/public/proxyImg/` +
+                req.file.filename,
             },
             {
               where: { proxyId: parseInt(req.params.proxyId) },
@@ -276,7 +274,7 @@ const input = {
       });
 
       const room = await newRoom.save(); // 비동기로 저장하고 결과를 받음
-      console.log('room 저장 성공', room);
+
       res.status(201).json(room); // 성공 응답 보내기
     } catch (error) {
       console.error(error);
@@ -393,7 +391,7 @@ const output = {
     const proxy = await Proxy.findOne({
       where: { proxyId: req.params.proxyId },
     });
-    console.log('여기는 프록시 입니다' + proxy);
+
     return res.send({ result: proxy });
   },
 
@@ -401,7 +399,7 @@ const output = {
   getChattingList: async (req, res) => {
     try {
       const userInfo = await Common.cookieUserinfo(req);
-      console.log(userInfo);
+
       if (userInfo) {
         const resultList = await Room.find({
           $or: [{ sender: userInfo.id }, { receiver: userInfo.id }],
@@ -429,7 +427,7 @@ const output = {
       const result = await ChatData.find({
         roomNumber: req.params.roomNumber,
       });
-      console.log(result);
+
       res.send({ list: result });
     } catch (err) {
       console.error(err);
@@ -440,12 +438,10 @@ const output = {
 
   getWaitMateList: async (req, res) => {
     try {
-      console.log('여기의', req.query.id);
       const result = await WaitMate.findAll({
         where: { id: req.query.id },
       });
 
-      console.log('결과값', result);
       res.send(result);
     } catch (err) {
       console.error(err);
@@ -474,10 +470,9 @@ const output = {
     }
   },
 
-    // 모든 채팅 리스트들 뽑기
+  // 모든 채팅 리스트들 뽑기
   getChattingListWithLatest: async (req, res) => {
     try {
-      console.log('파라미터', req.query.id);
       if (!req.query.id) {
         res.send({ list: '채팅 리스트가 존재하지 않습니다' });
       }
@@ -499,7 +494,6 @@ const output = {
           .sort({ createdAt: -1 })
           .limit(1);
 
-        console.log('센더2', latestChat?.sender);
         const latestChatWithNumericSenderReceiver = {
           roomNumber: room.roomNumber,
           sender: latestChat ? latestChat.sender : null,
@@ -507,7 +501,6 @@ const output = {
           latestChat: latestChat || null,
         };
 
-        console.log('센더3', latestChatWithNumericSenderReceiver);
         chatListWithLatest.push(latestChatWithNumericSenderReceiver);
       }
 
@@ -517,7 +510,7 @@ const output = {
       res.status(500).send({ error: '서버 오류 발생' });
     }
   },
-  
+
   //모든 프록시 리스트들
   getProxyList: async (req, res) => {
     try {
