@@ -59,10 +59,9 @@ exports.getPickedWaitMate = async (req, res) => {
 
 // 내가 픽한 프록시
 exports.getPickedProxy = async (req, res) => {
-  console.log('-------------');
   try {
     const { id } = req.query;
-    console.log(id);
+
     let proxyList = [];
     const getWMId = await WaitMate.findAll({
       where: {
@@ -104,8 +103,7 @@ exports.getPickedProxy = async (req, res) => {
 exports.postReservation = async (req, res) => {
   try {
     const { wmId, proxyId } = req.body;
-    console.log(req.body);
-    console.log('wmID = ', wmId, 'proxyId = ', proxyId);
+
     if (typeof wmId !== 'undefined' && typeof proxyId !== 'undefined') {
       const newReservation = await Reservations.create({
         wmId: wmId,
@@ -118,7 +116,6 @@ exports.postReservation = async (req, res) => {
       }
     } else {
       res.send({ wmId: wmId, proxyId: proxyId });
-      console.log('wmID = ', wmId, 'proxyId = ', proxyId);
     }
   } catch (e) {
     console.error('Error WaitMate data:', e);
