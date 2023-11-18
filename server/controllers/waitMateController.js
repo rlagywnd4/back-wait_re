@@ -5,14 +5,12 @@ const { WaitMate, ChatRoom, LikeWait, Proxy, ViewCount } = require('../models');
 const checkDate = (waitTime, startTime, endTime) => {
   let checkDay = new Date();
   checkDay.setHours(9, 0, 0, 0);
-  console.log(checkDay);
+
   const newWaitTime = new Date(waitTime);
-  console.log(newWaitTime);
+
   if (newWaitTime < checkDay) {
-    console.log('waitTime이 과거입니다.');
     return false;
   } else if (startTime >= endTime) {
-    console.log('startTime보다 endTime이 빠릅니다.');
     return false;
   } else {
     return true;
@@ -95,7 +93,6 @@ exports.getWaitMateDetail = async (req, res) => {
 
 // waitMate를 DB에 등록
 exports.postWaitMate = async (req, res) => {
-  console.log('-----------------------');
   try {
     let exchangePay;
     let exchangeDesc;
@@ -124,7 +121,6 @@ exports.postWaitMate = async (req, res) => {
     if (!check) {
       res.send({ result: 'validation failed' });
     } else {
-      console.log('photooo ', photo);
       if (typeof pay === 'string') {
         exchangePay = null;
       } else {
@@ -154,7 +150,6 @@ exports.postWaitMate = async (req, res) => {
       if (insertWaitMate) {
         res.send({ result: 'success' });
       } else {
-        console.log(insertWaitMate);
         res.send({ result: 'fail' });
       }
     }
@@ -315,10 +310,10 @@ exports.patchWaitMateState = async (req, res) => {
 exports.getWaitMateList = async (req, res) => {
   try {
     let { wmAddress, order } = req.query;
-    console.log(req.query);
+
     let today = new Date();
     today.setHours(9, 0, 0, 0);
-    console.log(today);
+
     // order가 정의되지 않은 경우 기본값으로 'updatedAt' 사용
     if (!order) {
       order = 'updatedAt';

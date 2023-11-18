@@ -50,7 +50,7 @@ exports.createReview = async (req, res) => {
       throw new Error();
     }
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(500).json({ message: '알 수 없는 서버 에러' });
   }
 };
@@ -66,7 +66,7 @@ exports.getReview = async (req, res) => {
     });
     res.status(200).json({ review });
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(500).json({ message: '알 수 없는 서버 에러' });
   }
 };
@@ -127,14 +127,14 @@ exports.updateReview = async (req, res) => {
           res.status(201).json({ message: '리뷰 수정이 완료되었습니다.' });
         })
         .catch((err) => {
-          console.log(err);
+          console.error(err);
           throw new Error();
         });
     } else {
       throw new Error();
     }
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(500).json({ message: '알 수 없는 서버 에러' });
   }
 };
@@ -184,7 +184,7 @@ exports.deleteReview = async (req, res) => {
         throw new Error();
       });
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(500).json({ message: '알 수 없는 서버 에러' });
   }
 };
@@ -209,7 +209,7 @@ exports.checkReview = async (req, res) => {
       res.send({ result: true, User: findNickname });
     }
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(500).json({ message: '알 수 없는 서버 에러' });
   }
 };
