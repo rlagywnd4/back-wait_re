@@ -5,22 +5,11 @@ const proxyController = require('../controllers/proxyController');
 const path = require('path');
 const chatController = require('../controllers/chatController');
 
-// Multer를 위한 저장 엔진을 생성합니다.
-const storage = multer.diskStorage({
-  destination(req, file, done) {
-    done(null, 'public/proxyImg/');
-  },
-  filename(req, file, done) {
-    const ext = path.extname(file.originalname);
-    done(null, path.basename(file.originalname, ext) + Date.now() + ext);
-  },
-});
+// 멀터 설정
+const { uploadImg } = require('../common/multer');
 
-// 저장 엔진을 사용하여 Multer를 초기화합니다.
-const uploadProxy = multer({
-  storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 },
-});
+//업로드 코드
+const uploadProxy = uploadImg('proxyImg');
 
 //프록시 글 등록
 proxyRouter.post(
@@ -79,7 +68,11 @@ proxyRouter.get(
 //등록된 프록시들의 모든 정보값 불러오기
 proxyRouter.get('/getProxyAll', proxyController.output.getProxyList);
 // 프록시 업데이트
-proxyRouter.patch('/update2/:proxyId', uploadProxy.single('photo'), proxyController.input.realUpdateProxyId);
+proxyRouter.patch(
+  '/update2/:proxyId',
+  uploadProxy.single('photo'),
+  proxyController.input.realUpdateProxyId
+);
 // 프록시 업로드시 글 가져오기
 proxyRouter.get('/updateGet/:proxyId', proxyController.output.getProxyOne);
 

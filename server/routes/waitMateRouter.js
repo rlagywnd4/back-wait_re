@@ -3,22 +3,11 @@ const waitMateRouter = express.Router();
 const waitMateController = require('../controllers/waitMateController');
 const Common = require('../common');
 // 멀터 설정
-const multer = require('multer');
+const { uploadImg } = require('../common/multer');
 const path = require('path'); //경로에 관한 내장 모듈
 
 //업로드 코드
-const uploadWaitMate = multer({
-  storage: multer.diskStorage({
-    destination(req, res, done) {
-      done(null, 'public/waitMateImg/');
-    },
-    filename(req, file, done) {
-      const ext = path.extname(file.originalname);
-      done(null, path.basename(file.originalname, ext) + Date.now() + ext);
-    },
-  }),
-  limits: { fileSize: 5 * 1024 * 1024 },
-});
+const uploadWaitMate = uploadImg('waitMateImg');
 
 // waitMate 조회
 waitMateRouter.get('/detail', waitMateController.getWaitMateDetail);
