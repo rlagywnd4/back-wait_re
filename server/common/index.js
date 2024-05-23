@@ -1,5 +1,12 @@
 const jwt = require('jsonwebtoken');
-const { User, Review, Proxy, WaitMate, LikeWait, ChatRoom } = require('../models');
+const {
+  User,
+  Review,
+  Proxy,
+  WaitMate,
+  LikeWait,
+  ChatRoom,
+} = require('../models');
 const fs = require('fs');
 const path = require('path');
 const multer = require('multer');
@@ -18,20 +25,28 @@ exports.cookieUserinfo = (req) => {
     const access = req?.cookies?.access;
     if (!access) {
       return resolve({});
-    };
+    }
     jwt.verify(access, process.env.SECRET_KEY, async (err, decoded) => {
       if (err) {
         console.log(err);
-        return resolve({})
+        return resolve({});
       }
       const id = decoded?.id;
       const userInfo = await User.findOne({
-        where : { id },
-        attributes : ['id', 'userId', 'email', 'nickname', 'photo', 'createdAt', 'updatedAt'],
-      })
-      resolve(userInfo.dataValues)
-    })
-  })
+        where: { id },
+        attributes: [
+          'id',
+          'userId',
+          'email',
+          'nickname',
+          'photo',
+          'createdAt',
+          'updatedAt',
+        ],
+      });
+      resolve(userInfo.dataValues);
+    });
+  });
 };
 
 const storage = (folderName) => {
@@ -39,7 +54,7 @@ const storage = (folderName) => {
     destination: async (req, file, cb) => {
       const filePath = path.join(__dirname, `../public/${folderName}`);
       try {
-        await fs.promises.mkdir(filePath, {recursive : true});
+        await fs.promises.mkdir(filePath, { recursive: true });
         cb(null, filePath);
       } catch (err) {
         console.log(err);
@@ -50,8 +65,8 @@ const storage = (folderName) => {
       try {
         const userInfo = await exports.cookieUserinfo(req);
         if (!userInfo) {
-          return cb(new Error('쿠키값을 읽어올 수 없습니다.'))
-        };
+          return cb(new Error('쿠키값을 읽어올 수 없습니다.'));
+        }
         console.log(userInfo);
         const extname = file.mimetype.split('/')[1];
         const userId = userInfo?.userId;
@@ -63,15 +78,17 @@ const storage = (folderName) => {
           }
         });
         await Promise.all(deletePromises);
-        const photo = 'https://sesac-projects.site/wapi/public/profileImg/' + `${userId}.${extname}`;
-        await User.update({photo}, {where :{userId}});
+        const photo =
+          `${process.env.DOMAIN}/wapi/public/profileImg/` +
+          `${userId}.${extname}`;
+        await User.update({ photo }, { where: { userId } });
         cb(null, `${userId}.${extname}`);
       } catch (err) {
         console.log(err);
         cb(err);
       }
-    }
-  })
+    },
+  });
 };
 
 exports.upload = (folderName) => {

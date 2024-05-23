@@ -1,7 +1,7 @@
 const axios = require('axios');
 const KAKAO_ADMIN_KEY = process.env.KAKAO_ADMIN_KEY;
 const { WaitMate, User, Payment } = require('../models');
-const currSuver = 'https://sesac-projects.site/wapi';
+const currSuver = `${process.env.DOMAIN}/wapi`;
 const Common = require('../common');
 const db = require('../models');
 const sequelize = db.sequelize;
@@ -105,7 +105,7 @@ exports.success = async (req, res) => {
           결제가 성공적으로 완료되었습니다.<br/>채팅 리스트로 이동합니다.</h1>
         <script>
           const reload = () => {
-            return setTimeout(() => {window.location.href='https://sesac-projects.site/waitmate/myPage/Chatlist'}, 1000)
+            return setTimeout(() => {window.location.href='${process.env.DOMAIN}/waitmate/myPage/Chatlist'}, 1000)
           }
           reload();
         </script>
@@ -142,7 +142,7 @@ exports.cancel = (req, res) => {
           결제를 취소하셨습니다.<br/>채팅 리스트로 이동합니다.</h1>
         <script>
           const reload = () => {
-            return setTimeout(() => {window.location.href='https://sesac-projects.site/waitmate/myPage/Chatlist'}, 1000)
+            return setTimeout(() => {window.location.href='${process.env.DOMAIN}/waitmate/myPage/Chatlist'}, 1000)
           }
           reload();
         </script>
@@ -164,7 +164,7 @@ exports.fail = (req, res) => {
         알 수 없는 에러가 발생하였습니다.<br/>채팅 리스트로 이동합니다.</h1>
       <script>
         const reload = () => {
-          return setTimeout(() => {window.location.href='https://sesac-projects.site/waitmate/myPage/Chatlist'}, 1000)
+          return setTimeout(() => {window.location.href='${process.env.DOMAIN}/waitmate/myPage/Chatlist'}, 1000)
         }
         reload();
       </script>
