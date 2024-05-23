@@ -168,7 +168,7 @@ exports.updateUserInfo = async (req, res) => {
     if (req.file?.filename) {
       userInfo[
         'photo'
-      ] = `https://sesac-projects.site/wapi/public/profileImg/${req.file?.filename}`;
+      ] = `${process.env.DOMAIN}/wapi/public/profileImg/${req.file?.filename}`;
     }
     const response = await User.update(userInfo, {
       where: { id: userInfo.id },
@@ -217,7 +217,7 @@ exports.kakaoResult = async (req, res) => {
       {
         grant_type: 'authorization_code',
         client_id: `${process.env.KAKAO_REST_API_KEY}`,
-        redirect_uri: 'https://sesac-projects.site/wapi/user/kakao',
+        redirect_uri: `${process.env.DOMAIN}/wapi/user/kakao`,
         code: `${code}`,
       },
       {
@@ -280,7 +280,7 @@ exports.kakaoResult = async (req, res) => {
           로그인 중...</h1>
         <script>
           const reload = () => {
-            return setTimeout(() => {window.location.href='https://sesac-projects.site/waitmate/map'}, 1000)
+            return setTimeout(() => {window.location.href='${process.env.DOMAIN}/waitmate/map'}, 1000)
           }
           reload();
         </script>

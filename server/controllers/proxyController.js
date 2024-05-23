@@ -62,7 +62,7 @@ const input = {
               age: req.body.age,
               proxyMsg: req.body.proxyMsg,
               title: req.body.title,
-              photo: `https://sesac-projects.site/waitmate/images/proxy.png`,
+              photo: `${process.env.DOMAIN}/waitmate/images/proxy.png`,
             });
             return res.send(postProxy);
           } else if (req.file) {
@@ -185,7 +185,7 @@ const input = {
               proxyMsg: req.body.proxyMsg,
               title: req.body.title,
               photo:
-                `https://sesac-projects.site/waitmate/public/proxyImg/` +
+                `${process.env.DOMAIN}/waitmate/public/proxyImg/` +
                 req.file.filename,
             },
             {

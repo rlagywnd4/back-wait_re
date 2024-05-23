@@ -16,7 +16,7 @@ function setupSocket(server) {
   const io = socketIO(server, {
     cors: {
       origin: [
-        'https://sesac-projects.site/waitmate/',
+        `${process.env.DOMAIN}/waitmate`,
         'http://ec2-13-124-56-103.ap-northeast-2.compute.amazonaws.com:3000',
         'http://localhost:3000',
       ],
