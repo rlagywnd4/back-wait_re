@@ -1,6 +1,6 @@
 const path = require('path'); //경로에 관한 내장 모듈
 const { Op, fn, col } = require('sequelize');
-const { WaitMate, ChatRoom, LikeWait, Proxy, ViewCount } = require('../models');
+const { WaitMate, ChatRoom, LikeWait } = require('../models');
 
 const checkDate = (waitTime, startTime, endTime) => {
   let checkDay = new Date();
@@ -12,9 +12,9 @@ const checkDate = (waitTime, startTime, endTime) => {
     return false;
   } else if (startTime >= endTime) {
     return false;
-  } else {
-    return true;
   }
+
+  return true;
 };
 
 // waitMateDetail 조회
@@ -32,7 +32,7 @@ exports.getWaitMateDetail = async (req, res) => {
 
     // 조회수 증가
     waitMate.count += 1;
-    const patchWaitMateCount = await WaitMate.update(
+    await WaitMate.update(
       {
         count: waitMate.count,
       },
@@ -404,7 +404,7 @@ exports.getMyWaitMateList = async (req, res) => {
       },
     });
     if (completedMyWaitMateList) {
-      res.send({ completedMyWaitMateList: completedMyWaitMateList });
+      res.send({ completedMyWaitMateList });
     } else {
       res.send({ result: 'fail' });
     }
